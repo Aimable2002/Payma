@@ -1,0 +1,41 @@
+.drp-ctnt{
+    position: absolute;
+    background-color: #070707;
+    margin-left: 150px;
+    /* height: 100vh; */
+    width: calc(100% - 40%);
+    padding: 0px 10px 0px 10px;
+}
+
+.btn2{
+    border-bottom: 2px solid yellowgreen;
+    /* border-bottom: 2px solid rgb(116, 189, 245); */
+    width: 30%;
+    color: rgb(230, 255, 181);
+    /* color: rgb(137, 204, 255); */
+    padding: 4px 10px 4px 10px;
+}
+.btn1{
+    width: 30%;
+    padding: 4px 10px 4px 10px;
+}
+.hide-scrollbar {
+    -ms-overflow-style: none;  /* Edge and Internet Explorer */
+    scrollbar-width: none;  /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari, and Opera */
+}
+
+.tran{
+    position: absolute;
+    transform: translateY(-110%);
+    color: rgb(72, 182, 255);
+    font-size: 14px;
+}
+.tran2{
+    position: absolute;
+    transform: translateY(-110%);
+    color: aqua;
+    font-size: 14px;
+}

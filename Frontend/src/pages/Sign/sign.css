@@ -1,0 +1,33 @@
+
+.trans{
+    position: absolute;
+    transform: translateY(-110%);
+    color: rgb(72, 182, 255);
+    font-size: 14px;
+}
+.trans2{
+    position: absolute;
+    transform: translateY(-110%);
+    color: aqua;
+    font-size: 14px;
+}
+
+.inputClick{
+    outline: none;
+    border-bottom: 1px solid #ccc;
+}
+
+input{
+    outline: none;
+    border-bottom: 1px solid #ccc;
+}
+
+.inputGroup{
+    margin-top: 20px;
+}
+
+button{
+    border-radius: 10px;
+    width: 100%;
+    border: 2px solid yellowgreen;
+}
