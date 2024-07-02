@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 
 import Sign from './pages/Sign/sign'
 import Home from './pages/home/home'
+import Dashboard from './pages/dashboard/dashboard'
 import { useAuthContext } from './context/authContext/authContext'
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
       <Routes>
         <Route path='/sign' element={AuthUser ? <Navigate to= '/' /> : <Sign /> } />
         <Route path='/' element={AuthUser ? <Home /> : <Navigate to ='sign' />} />
+        <Route path='/dashboard' element={AuthUser ? <Dashboard /> : <Navigate to ='sign' />} />
       </Routes>
     </div>
   )

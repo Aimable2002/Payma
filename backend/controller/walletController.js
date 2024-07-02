@@ -6,9 +6,12 @@ const connection = connectDatabase();
 
 export const deposite = async (req, res) => {
     try{
-        const {email, Currency, Amount, Phone_number, userName, USERID} = req.body;
-
-        if(!email || !Currency || !Amount || !Phone_number || !userName || !USERID){
+        const {Email, Amount, Phone_number, userName} = req.body;
+        console.log('body req :', req.body)
+        const USERID = req.user.userId
+        console.log('userId :', USERID)
+        const Currency = 'FRW'
+        if(!Email || !Amount || !Phone_number || !userName || !USERID){
             console.log('missing data ')
             return res.status(400).json('missing data')
         }
@@ -16,9 +19,9 @@ export const deposite = async (req, res) => {
         connection.query(insertDeposite, [Amount, Currency, Phone_number, userName, USERID], async(err, result) => {
             if(err){
                 console.log('error on deposite :', err)
-                return res.status(400).json({err: 'error on deposite'})
+                return res.status(400).json({err: 'error on deposite', status: false})
             }
-             res.status(200).json('deposited successfully')
+             res.status(200).json({message: 'deposited successfully', status: true})
         })
     }catch(error){
         console.log('internal deposite server error :', error);
@@ -29,9 +32,13 @@ export const deposite = async (req, res) => {
 
 export const Withdrowal = async (req, res) => {
     try{
-        const {email, Currency, Amount, Phone_number, userName, USERID} = req.body;
+        const {Email, Amount, Phone_number, userName} = req.body;
+        console.log('req body :', req.body)
 
-        if(!email || !Currency || !Amount || !Phone_number || !userName || !USERID){
+        const Currency = 'FRW';
+        const USERID = req.user.userId;
+        console.log('userid :', USERID)
+        if(!Email|| !Amount || !Phone_number || !userName || !USERID){
             console.log('missing data ')
             return res.status(400).json('missing data')
         }
@@ -39,9 +46,9 @@ export const Withdrowal = async (req, res) => {
         connection.query(insertWithdrowl, [Amount, Currency, Phone_number, userName, USERID], async(err, result) => {
             if(err){
                 console.log('error on withdrow server :', err)
-                return res.status(400).json({err: 'error on withdrowal server'})
+                return res.status(400).json({err: 'error on withdrowal server', status: false})
             }
-            res.status(200).json('withdrowal successfull')
+            res.status(200).json({message: 'withdrowal successfull', status: true})
         })
     }catch(error){
         console.log('internal withdrowal error :', error.message)

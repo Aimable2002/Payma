@@ -123,6 +123,7 @@ const Sign = () => {
         Last_name: '',
         userName: '',
         Email: '',
+        Title: '',
         Password: '',
         confirmPassword: '',
         Phone_number: ''
@@ -172,7 +173,7 @@ const Sign = () => {
     }
     const handleSignUpSubmit = async (e) => {
         e.preventDefault();
-        const {First_name, Last_name, Email, userName, Password, confirmPassword, Phone_number} = inputValues
+        const {First_name, Last_name, Email, Title, userName, Password, confirmPassword, Phone_number} = inputValues
         console.log('inputs :', inputValues)
         await signup(inputValues)
     }
@@ -184,7 +185,7 @@ const Sign = () => {
                 <div className='frm'>
                     {!isNext ? (
                         <form className='flex w-full flex-col align-middle justify-center' onSubmit={handleSignUpSubmit}>
-                            {['First_name', 'Last_name', 'userName', 'Email', 'Password', 'confirmPassword'].map((field) => (
+                            {['First_name', 'Last_name', 'userName', 'Title', 'Email', 'Password', 'confirmPassword'].map((field) => (
                                 <div key={field} className='flex w-full flex-col inputGroup'>
                                     <label htmlFor={field} className={`absolute ${inputValues[field] ? 'trans2' : (focusedInput === field ? 'trans' : '')}`}>
                                         {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1').trim()}
@@ -247,12 +248,13 @@ const Sign = () => {
                     </div>
                 ))}
                 <div className='mt-10'>
-                    <button type='submit'>Login</button>
+                <button type='submit'>Login</button>
                 </div>
                 <div className='relative mt-20'>
                     <p>Dont have account <span onClick={() => setIsLogin(!isLogin)} className='text-info'> Signup</span></p>
                 </div>
             </form>
+            
         )}
         </div>
     );

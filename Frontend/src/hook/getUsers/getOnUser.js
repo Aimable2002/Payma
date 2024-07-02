@@ -1,17 +1,17 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 
-const useGetUser = () => {
+const useGetUserOn = () => {
   const [loading, setLoading] = useState(false);
 
-  const [users, setUsers] = useState([]);
+  const [usersOn, setUsersOn] = useState([]);
 
   useEffect(() => {
-    const getUsers = async () => {
+    const getUsersOn = async () => {
         setLoading(true)
         try{
             const token = localStorage.getItem('on-user')
-            const res = await axios.get('/api/user/people', {
+            const res = await axios.get('/api/user/onPeople', {
                 headers: {
                     Authorization: `${JSON.parse(token).token}`
                 }
@@ -20,7 +20,7 @@ const useGetUser = () => {
             if(!data){
                 throw new Error(data.error)
             }
-            setUsers(data)
+            setUsersOn(data)
             //console.log('data :', data)
         }catch(error){
             console.log('error :', error.message)
@@ -28,9 +28,9 @@ const useGetUser = () => {
             setLoading(false)
         }
       }
-      getUsers()
+      getUsersOn()
   },[])
-  return {loading, users}
+  return {loading, usersOn}
 }
 
-export default useGetUser
+export default useGetUserOn

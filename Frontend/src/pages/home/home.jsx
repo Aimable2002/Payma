@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {Card, CardHeader, CardBody, CardFooter, Avatar, Button} from "@nextui-org/react";
 import MenuIcon from '@mui/icons-material/Menu';
 import LinearScaleIcon from '@mui/icons-material/LinearScale';
@@ -13,6 +13,12 @@ import ClearTwoToneIcon from '@mui/icons-material/ClearTwoTone';
 
 import './home.css'
 import useLogout from "../../hook/registration/logout";
+import { Link } from "react-router-dom";
+import useGetUser from "../../hook/getUsers/useGetUser";
+import { Box } from "@mui/material";
+import Rating from '@mui/material/Rating';
+import useGetUserTask from "../../hook/getUsers/usegetusersTaskl";
+import usepostTask from "../../hook/postTaskReport/postTask";
 
 const truncateString = (str, maxLength) => {
     if(str.length <= maxLength ){
@@ -38,10 +44,10 @@ const home = () => {
     setInputValues((prevValues) => ({ ...prevValues, [name]: value }));
   };
   const menuItems = [
-    { name: 'transaction', leftIcon: <LinearScaleIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon /> },
-    { name: 'wallet', leftIcon: <WalletIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon /> },
-    { name: 'task Dashboard', leftIcon: <AssessmentIcon className="text-info"/>, rightIcon: <DragHandleTwoToneIcon /> },
-    { name: 'Dashboard', leftIcon: <SummarizeIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/> },
+    { name: 'transaction', leftIcon: <LinearScaleIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard'},
+    { name: 'wallet', leftIcon: <WalletIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard' },
+    { name: 'task Dashboard', leftIcon: <AssessmentIcon className="text-info"/>, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard' },
+    { name: 'Dashboard', leftIcon: <SummarizeIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>, link: '/dashboard' },
     { name: 'settings', leftIcon: <SettingsIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon /> },
     { name: 'logout', leftIcon: !loading ? <LogoutTwoToneIcon className="text-error"/> : <span className="loading loading-ring"></span>, rightIcon: '', onClick: logout },
     { name: 'delete_account', leftIcon: <DeleteForeverTwoToneIcon className="text-error" />, rightIcon: '' }
@@ -87,11 +93,43 @@ const home = () => {
         break;
     }
   };
+  const { users } = useGetUser();
+  const [isAddTask, setIsAddTask] = useState(false)
+  const handleisAddTask = (e) => {
+    e.preventDefault();
+    setIsAddTask(!isAddTask)
+  }
+  const [isScrolled, setIsScrolled] = useState(false)
+  const handleScrol = () => {
+    if(window.scrollY > 0){
+      setIsScrolled(true)
+    }else{
+      setIsScrolled(false)
+    }
+  }
+  useEffect(() => {
+    window.addEventListener('scroll', handleScrol)
+    return () => {
+      window.removeEventListener('scroll', handleScrol)
+    }
+  },[])
+  const {usersTask} = useGetUserTask()
+//console.log('userYask :', usersTask)
+const {isTrue, tasked} = usepostTask();
+const handleReportSubmit = async(e) => {
+  e.preventDefault();
+  const {Agreement, Amount, Currency, Start_date, End_date} = inputValues
+  console.log('input :', inputValues)
+  await tasked(inputValues)
+}
+const handleApply = (user) => {
+  console.log('user :', user)
+}
   return (
     <div className="w-full flex flex-col overflow-auto">
         <div className=" w-full">
             <div className=" fixed flex flex-row justify-between px-2 align-middle" style={{width: 'calc(100% - 32px)', zIndex: '2'}}>
-                <div>web Application</div>
+                <div>{isScrolled ? '' : 'Web Apllication'}</div>
                 <div onClick={handleMenu} className="text-info"><MenuIcon /></div>
                 {isMenu && (
                     <div className="drp-ctnt flex flex-col justify-between h-screen">
@@ -99,47 +137,55 @@ const home = () => {
                             <div className="flex justify-end" onClick={handleMenu}>
                                 <ClearTwoToneIcon />
                             </div>
-                            {menuItems.map(({ name, leftIcon, rightIcon, onClick }) => (
+                            {menuItems.map(({ name, leftIcon, rightIcon, onClick, link }) => (
+                              <Link to={link || '#'} key={name}> 
                                 <div key={name} className="flex flex-row justify-between items-center mt-5" onClick={onClick}>
-                                    <div className="flex flex-row items-center">
-                                    <span className="mr-2">{leftIcon}</span> {/* Left icon */}
-                                    {name.charAt(0).toUpperCase() + name.slice(1).replace(/([A-Z])/g, ' $1').trim()}
-                                    </div>
-                                    <span>{rightIcon}</span> {/* Right icon */}
-                                </div>
+                                      <div className="flex flex-row items-center">
+                                      <span className="mr-2">{leftIcon}</span> 
+                                      {name.charAt(0).toUpperCase() + name.slice(1).replace(/([A-Z])/g, ' $1').trim()}
+                                      </div>
+                                      <span>{rightIcon}</span>
+                                  </div>
+                              </Link> 
                             ))}
                         </div>
                     </div>
                 )}
+
             </div>
         </div>
         <div className="mt-8 py-2 gap-4 overflow-x-auto w-full flex flex-row hide-scrollbar">
-            <div className={`${activeButton === 'Home' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Home')}>Home</div>
-            <div className={`${activeButton === 'Rank' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Rank')}>Rank</div>
-            <div className={`${activeButton === 'Tasks' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Tasks')}>Tasks</div>
-            <div className={`${activeButton === 'Report' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Report')}>Report</div>
-            <div className={`${activeButton === 'Alert' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Alert')}>Alert</div>
+          <div className={`${activeButton === 'Home' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Home')}>Home</div>
+          <div className={`${activeButton === 'Rank' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Rank')}>People</div>
+          <div className={`${activeButton === 'Tasks' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Tasks')}>Tasks</div>
+          {/* <div className={`${activeButton === 'Report' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Report')}>Report</div> */}
+          <div className={`${activeButton === 'Alert' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Alert')}>Alert</div>
         </div>
         {isHome && (
-            <Card style={{zIndex: '1'}}>
+          <>
+          {usersTask.map((task) => (
+            <Card style={{zIndex: '1', width: '100%'}} className="mb-1">
                 <CardHeader className="justify-between ">
                     <div className="flex  gap-5">
                     <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
                     <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                        <h4 className="text-small font-semibold leading-none text-default-600">Zoey Lang</h4>
-                        <h5 className="text-small tracking-tight text-default-400">@zoeylang</h5>
+                        <h4 className="text-small font-semibold leading-none text-default-600">{task.FULL_NAME}</h4>
+                        <h5 className="text-small tracking-tight text-default-400">@{task.userName}</h5>
                     </div>
                     </div>
-                    <Button
-                    className={isFollowed ? " bg-transparent text-foreground border-default-200" : "border-primary"}
-                    color="primary"
-                    radius="full"
-                    size="sm"
-                    variant={isFollowed ? "bordered" : "solid"}
-                    onPress={() => setIsFollowed(!isFollowed)}
-                    >
-                    {isFollowed ? "Unfollow" : "Follow"}
-                    </Button>
+                    <div className="flex w-2/6">
+                      <p>Title: Manager</p>
+                    </div>
+                    {/* <Button
+                      className={isFollowed ? " bg-transparent text-foreground border-default-200" : "border-primary"}
+                      color="primary"
+                      radius="full"
+                      size="sm"
+                      variant={isFollowed ? "bordered" : "solid"}
+                      onPress={() => setIsFollowed(!isFollowed)}
+                      >
+                      {isFollowed ? "Unfollow" : "Follow"}
+                    </Button> */}
                 </CardHeader>
                 <CardBody className="px-3 py-0 text-small text-default-400">
                     <p>
@@ -152,20 +198,22 @@ const home = () => {
                     </span>
                     </span>
                 </CardBody>
-                <CardFooter className="gap-3">
-                    <div className="flex gap-1">
-                      <p className="font-semibold text-default-400 text-small">4</p>
-                      <p className=" text-default-400 text-small">Following</p>
+                <CardFooter className="gap-3 w-full">
+                    <div className="flex gap-1 flex-col">
+                      <p className="font-semibold text-default-400 text-small">Price</p>
+                      <p className=" text-default-400 text-small">FRW {task.Amount}</p>
+                    </div>
+                    <div className="flex gap-1 flex-col">
+                      <p className="font-semibold text-default-400 text-small">Duration</p>
+                      <p className="text-default-400 text-small">{task.Duration}</p>
                     </div>
                     <div className="flex gap-1">
-                      <p className="font-semibold text-default-400 text-small">97.1K</p>
-                      <p className="text-default-400 text-small">Followers</p>
-                    </div>
-                    <div className="flex gap-1">
-                      <button className="btn">Check Task</button>
+                      <button className="btn" onClick={() => handleApply(task)}>Apply Task</button>
                     </div>
                 </CardFooter>
             </Card>
+            ))}
+            </>
           )}
         {/* {isTask && (
           <div>
@@ -205,14 +253,57 @@ const home = () => {
           </div>
         )} */}
         {isTask && (
-      <div>
+          <>
+          
+          <div className="w-full">
+            <div className="w-full flex justify-end self-end text-info"onClick={handleisAddTask}>
+              {/* {!isAddTask ? ( */}
+                <div onClick={()=>document.getElementById('my_modal_3').showModal()}>
+                  <span>+ </span> <span>add New Task</span>
+                </div>
+              {/* ) : (
+                <div>
+                  <span> </span> <span>cancel</span>
+                </div>
+              )} */}
+            </div>
+            </div>
+            {/* {!isAddTask ? ( */}
+              <Card className="w-full" style={{zIndex: '1'}}>
+              <CardHeader className="justify-between w-full">
+                      <div className="flex w-4/5  gap-5">
+                      {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
+                      <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                          <h4 className="text-small font-semibold leading-none text-default-600">Task Name</h4>
+                          <h5 className="text-small tracking-tight text-default-400">@zoeylang</h5>
+                      </div>
+                      </div>
+                      <Button
+                      className={isFollowed ? " bg-transparent text-foreground border-default-200" : "border-primary"}
+                      color="primary"
+                      radius="full"
+                      size="sm"
+                      variant={isFollowed ? "bordered" : "solid"}
+                      onPress={() => setIsFollowed(!isFollowed)}
+                      >
+                      {isFollowed ? "Report" : "Reported"}
+                      </Button>
+                  </CardHeader>
+              </Card>
+          
+        {/* ) : ( */}
+        <dialog id="my_modal_3" className="modal">
+          <div className="modal-box">
+          <form method="dialog">
+                        <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                        </form>
         <h1 className="w-full text-center mt-5">Form to assign Task</h1>
         <div className="mt-10">
-          <form className="flex flex-col gap-10 w-full">
+          <form className="flex flex-col gap-10 w-full" onSubmit={handleReportSubmit}>
             <div className="flex flex-col w-full">
               <label htmlFor="Agreement" onClick={() => handleFocus('Agreement')}
                 className={`absolute ${inputValues['Agreement'] ? 'tran2' : (focusedInput === 'Agreement' ? 'tran' : '')}`}>
-                  Agreement
+                  Agreement Title
               </label>
               <input
                 id="Agreement"
@@ -220,6 +311,19 @@ const home = () => {
                 type="text"
                 onChange={handleChange}
                 onFocus={() => handleFocus('Agreement')}
+              />
+            </div>
+            <div className="flex flex-col w-full">
+              <label htmlFor="Description" onClick={() => handleFocus('Description')}
+                className={`absolute ${inputValues['Description'] ? 'tran2' : (focusedInput === 'Description' ? 'tran' : '')}`}>
+                  Agreement Description
+              </label>
+              <input
+                id="Description"
+                name="Description"
+                type="text"
+                onChange={handleChange}
+                onFocus={() => handleFocus('Description')}
               />
             </div>
             <div className="flex gap-10 w-full flex-row">
@@ -278,16 +382,59 @@ const home = () => {
                 />
               </div>
             </div>
+            <div className='mt-10'>
+              <button type='submit'>Submit</button>
+            </div>
+            <div className='relative mt-20'>
+              <p>Submitting {loading ? <span className='loading loading-ring '></span> : isTrue ? <span className='text-fuchsia-500 '> Success</span> : <span className='text-info'> Start</span>}</p>
+            </div>
           </form>
         </div>
-      </div>
+        </div>
+      </dialog>
+      {/* )} */}
+      </>
     )}
-        {isReport && (
+
+    {isReport && (
           <>
+          <div className="w-full">
+            <div className="w-full flex justify-end self-end text-info"onClick={handleisAddTask}>
+                <div onClick={()=>document.getElementById('my_modal_4').showModal()}>
+                  <span>+ </span> <span>add</span>
+                </div>
+            </div>
+            </div>
+              <Card className="w-full" style={{zIndex: '1'}}>
+              <CardHeader className="justify-between w-full">
+                      <div className="flex w-4/5  gap-5">
+                      <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                      <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                          <h4 className="text-small font-semibold leading-none text-default-600">Task Name</h4>
+                          <h5 className="text-small tracking-tight text-default-400">@zoeylang</h5>
+                      </div>
+                      </div>
+                      <Button
+                      className={isFollowed ? " bg-transparent text-foreground border-default-200" : "border-primary"}
+                      color="primary"
+                      radius="full"
+                      size="sm"
+                      variant={isFollowed ? "bordered" : "solid"}
+                      onPress={() => setIsFollowed(!isFollowed)}
+                      >
+                      {isFollowed ? "Report" : "Reported"}
+                      </Button>
+                  </CardHeader>
+              </Card>
+  
+          <dialog id="my_modal_4" className="modal">
+          <div className="modal-box">
+          <form method="dialog">
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+          </form>
           <h1 className="w-full text-center mt-5">Form to make Report</h1>
           <div className="mt-10">
             <form className="flex flex-col gap-10 w-full">
-
               <div className="flex flex-col w-full">
                 <label htmlFor="Agreement" onClick={() => handleFocus('Agreement')}
                   className={`absolute ${inputValues['Agreement'] ? 'tran2' : (focusedInput === 'Agreement' ? 'tran' : '')}`}>
@@ -357,10 +504,19 @@ const home = () => {
                   />
                 </div>
               </div>
+              <div className='mt-10'>
+                <button type='submit'>Submit</button>
+              </div>
+              <div className='relative mt-20'>
+                <p>Submitting {loading ? <span className='loading loading-ring '></span> : isTrue ? <span className='text-fuchsia-500 '> Success</span> : <span className='text-info'> Start</span>}</p>
+              </div>
             </form>
           </div>
+          </div>
+          </dialog>
         </>
         )}
+        
         {isAlert && (
           <Card style={{zIndex: '1'}}>
                 <CardBody className="px-3 py-0 text-small text-default-400">
@@ -377,16 +533,20 @@ const home = () => {
                 
             </Card>)}
         {isRank && (
-              <Card style={{zIndex: '1'}}>
+          <>
+          {users.map((user) => (
+              <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
               <CardHeader className="justify-between ">
                   <div className="flex  gap-5">
                   <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
                   <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                      <h4 className="text-small font-semibold leading-none text-default-600">Zoey Lang</h4>
-                      <h5 className="text-small tracking-tight text-default-400">@zoeylang</h5>
+                      <h4 className="text-small font-semibold leading-none text-default-600">{user.Last_name}</h4>
+                      <h5 className="text-small tracking-tight text-default-400">@{user.userName}</h5>
                   </div>
                   </div>
-                  <div>Software Developer</div>
+                  <div className="flex w-2/6">
+                    <p>Title: Manager</p>
+                  </div>
               </CardHeader>
               <CardFooter className="gap-3">
                   <div className="flex gap-1">
@@ -402,6 +562,8 @@ const home = () => {
                   </div>
               </CardFooter>
           </Card>
+          ))}
+          </>
         )}
     </div>
   );
@@ -410,3 +572,11 @@ const home = () => {
 
 export default home;
 
+
+
+
+
+
+
+
+// 

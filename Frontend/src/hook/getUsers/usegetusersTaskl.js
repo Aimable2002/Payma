@@ -1,17 +1,18 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 
-const useGetUser = () => {
+const useGetUserTask = () => {
   const [loading, setLoading] = useState(false);
 
-  const [users, setUsers] = useState([]);
+  const [usersTask, setUsersTask] = useState([]);
 
   useEffect(() => {
-    const getUsers = async () => {
+    const getUsersTask = async () => {
         setLoading(true)
         try{
             const token = localStorage.getItem('on-user')
-            const res = await axios.get('/api/user/people', {
+            //console.log('token :', token)
+            const res = await axios.get('/api/user/users-task', {
                 headers: {
                     Authorization: `${JSON.parse(token).token}`
                 }
@@ -20,7 +21,7 @@ const useGetUser = () => {
             if(!data){
                 throw new Error(data.error)
             }
-            setUsers(data)
+            setUsersTask(data)
             //console.log('data :', data)
         }catch(error){
             console.log('error :', error.message)
@@ -28,9 +29,9 @@ const useGetUser = () => {
             setLoading(false)
         }
       }
-      getUsers()
+      getUsersTask()
   },[])
-  return {loading, users}
+  return {loading, usersTask}
 }
 
-export default useGetUser
+export default useGetUserTask

@@ -3,10 +3,10 @@ import mysql from 'mysql';
 const connectDatabase = () => {
     try {
         const connection = mysql.createConnection({
-            host: 'localhost', // or '127.0.0.1'
-            user: 'root', // default username for XAMPP
-            password: '', // default password for XAMPP
-            database: 'payma'
+            host:  'localhost',
+            user: 'root',
+            password: '',
+            database: 'payma',
         });
 
         connection.connect((err) => {

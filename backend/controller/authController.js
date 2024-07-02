@@ -1,13 +1,14 @@
 import connectDatabase from "../database/connectDatabase.js";
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken'
 
 const connection = connectDatabase();
 
 export const signup = async (req, res) => {
     try{
-        const {First_name, Last_name, userName, Balance, Email, Phone_number, Password, confirmPassword} = req.body;
+        const {First_name, Last_name, userName, Title, Balance, Email, Phone_number, Password, confirmPassword} = req.body;
 
-        if(!First_name || !Last_name || !userName || !Email || !Phone_number || !Password || !confirmPassword){
+        if(!First_name || !Last_name || !userName || !Title || !Email || !Phone_number || !Password || !confirmPassword){
             return res.status(409).json('fill all the field')
         }
         if(Password !== confirmPassword){
@@ -26,13 +27,16 @@ export const signup = async (req, res) => {
                 return res.status(404).json('userName taken')
             }
             
-            const insertUser = 'INSERT INTO users (First_name, Last_name, userName, Email, Phone_number, Balance, Password) VALUES (?, ?, ?, ?, ?, ?, ?)';
-            connection.query(insertUser, [First_name, Last_name, userName, Email, Phone_number, Balance || 0, Password], (err, result) => {
+            const insertUser = 'INSERT INTO users (First_name, Last_name, userName, Title, Email, Phone_number, Balance, Password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+            connection.query(insertUser, [First_name, Last_name, userName, Title, Email, Phone_number, Balance || 0, Password], (err, result) => {
                 if(err){
                     console.log('error on insert user data :', err)
                     return res.status(409).json('error inserting user data')
                 }
-                return res.status(200).json('user inserted')
+                const token = jwt.sign({userId: user.userId}, process.env.SECRET_KEY_AUTH, {expiresIn: '5d'})
+                return res.status(200).json({
+                    token
+                })
             })
         })
     }catch(error){
@@ -50,6 +54,7 @@ export const login = async (req, res) => {
         if(!userName || !Password){
             return res.status(409).json('fill all the field')
         }
+        
         const trackUser = 'SELECT * FROM USERS WHERE userName = ?';
         connection.query(trackUser, [userName], async (err, result) => {
             if(err){
@@ -72,8 +77,10 @@ export const login = async (req, res) => {
             // if(!isPasswordTrue){
             //     return res.status(400).json('incorrect password')
             // }
+            const token = jwt.sign({userId: user.userId}, process.env.SECRET_KEY_AUTH, {expiresIn: '5d'})
             res.status(200).json({
-                userId: user.userId
+                userId: user.userId,
+                token
             })
         })
         

@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 const useSignup = () => {
   const [loading, setLoading] = useState(false);
 
-  const signup = async ({First_name, Last_name, userName, Email, Phone_number, Password, confirmPassword}) => {
+  const signup = async ({First_name, Last_name, userName, Title, Email, Phone_number, Password, confirmPassword}) => {
     const Success = handleLoginError(First_name, Last_name, userName, Email, Phone_number, Password, confirmPassword);
     if(!Success)return
     try{
@@ -13,6 +13,7 @@ const useSignup = () => {
             First_name,
             Last_name,
             userName,
+            Title,
             Email,
             Password,
             confirmPassword,
@@ -25,7 +26,7 @@ const useSignup = () => {
             throw new Error (data.error)
         }
         localStorage.setItem('on-user', JSON.stringify(data))
-        console.log('data :', data)
+        //console.log('data :', data)
         window.location = '/'
     }catch(error){
         console.log('error in signup')
@@ -39,8 +40,8 @@ const useSignup = () => {
 export default useSignup
 
 
-function handleLoginError (First_name, Last_name, userName, Email, Phone_number, Password, confirmPassword) {
-    if(!First_name || !Last_name || !userName || !Email || !Phone_number || !Password || !confirmPassword ){
+function handleLoginError (First_name, Last_name, userName, Title, Email, Phone_number, Password, confirmPassword) {
+    if(!First_name || !Last_name || !userName || !Title || !Email || !Phone_number || !Password || !confirmPassword ){
         return false
     }
     return true

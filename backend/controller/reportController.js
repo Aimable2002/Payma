@@ -6,8 +6,8 @@ const connection = connectDatabase();
 
 export const Report = async (req, res) => {
     try{
-        const {Proof, End_date, taskId, task_taker_id} = req.body;
-
+        const {Proof, End_date, taskId} = req.body;
+        const task_taker_id = req.user.userId
         if(!Proof ||  !End_date || !taskId || !task_taker_id){
             console.log('missing data')
             return res.status(404).json('missing data')
