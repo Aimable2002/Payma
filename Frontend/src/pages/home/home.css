@@ -16,10 +16,12 @@
     color: rgb(72, 182, 255);
     /* color: rgb(137, 204, 255); */
     padding: 4px 10px 4px 10px;
+    text-align: center;
 }
 .btn1{
     width: 30%;
     padding: 4px 10px 4px 10px;
+    text-align: center;
 }
 .hide-scrollbar {
     -ms-overflow-style: none;  /* Edge and Internet Explorer */
@@ -45,4 +47,13 @@
 .h1-color{
     border: 1px solid greenyellow;
     padding: 4px;
+}
+
+
+
+/* larger scree */
+
+
+.s::-webkit-scrollbar{
+    display: hidden;
 }

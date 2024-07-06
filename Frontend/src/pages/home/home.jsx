@@ -124,7 +124,7 @@ const home = () => {
   },[])
   const {usersTask} = useGetUserTask()
 const {isTrue, tasked} = usepostTask();
-const handleReportSubmit = async(e) => {
+const handleTaskSubmit = async(e) => {
   e.preventDefault();
   const {Agreement, Amount, Currency, Start_date, End_date} = inputValues
   await tasked(inputValues)
@@ -387,7 +387,7 @@ const [theme, setTheme] = useState(getCurrentTheme());
         </div>
         {isInvite && (
           <div className="mt-10">
-          <form className="flex flex-col gap-10 w-full" onSubmit={handleReportSubmit}>
+          <form className="flex flex-col gap-10 w-full" onSubmit={handleTaskSubmit}>
             <div className="flex flex-col w-full">
               <label htmlFor="Agreement" onClick={() => handleFocus('Agreement')}
                 className={`absolute ${inputValues['Agreement'] ? 'tran2' : (focusedInput === 'Agreement' ? 'tran' : '')}`}>
@@ -481,7 +481,7 @@ const [theme, setTheme] = useState(getCurrentTheme());
         </div>
         )}
         <div className="mt-10">
-          <form className="flex flex-col gap-10 w-full" onSubmit={handleReportSubmit}>
+          <form className="flex flex-col gap-10 w-full" onSubmit={handleTaskSubmit}>
             <div className="flex flex-col w-full">
               <label htmlFor="Agreement" onClick={() => handleFocus('Agreement')}
                 className={`absolute ${inputValues['Agreement'] ? 'tran2' : (focusedInput === 'Agreement' ? 'tran' : '')}`}>

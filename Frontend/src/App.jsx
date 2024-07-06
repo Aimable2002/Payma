@@ -10,6 +10,7 @@ import Profile from './pages/profile/profile'
 
 import Lsign from './Lpages/Lregistration/Lsign'
 import Lhome from './Lpages/Lhome/Lhome'
+import Ldashboard from './Lpages/Ldashboard/Ldashboard'
 
 function App() {
 
@@ -37,6 +38,7 @@ function App() {
         <Routes>
           <Route path='/sign' element={AuthUser ? <Navigate to= '/' /> : <Lsign /> } />
           <Route path='/' element={AuthUser ? <Lhome /> : <Navigate to='sign' />} />
+          <Route path='/Ldashboard' element={AuthUser ? <Ldashboard /> : <Navigate to='sign' />} />
         </Routes>
       )}
     </div>
