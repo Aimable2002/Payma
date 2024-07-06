@@ -19,6 +19,14 @@ import { Box } from "@mui/material";
 import Rating from '@mui/material/Rating';
 import useGetUserTask from "../../hook/getUsers/usegetusersTaskl";
 import usepostTask from "../../hook/postTaskReport/postTask";
+import useTakeTask from "../../hook/getTask/useTakeTask";
+import useTakeTaskView from "../../hook/getTask/useTakeTaskView";
+import reportTask from "../../hook/reportHooks/reportTask";
+import approveTask from "../../hook/approveTask/approveTask";
+import postApproval from "../../hook/approveTask/postApproval";
+
+import ContrastIcon from '@mui/icons-material/Contrast';
+import { toggleTheme, getCurrentTheme } from "../../utilities/themeToggle";
 
 const truncateString = (str, maxLength) => {
     if(str.length <= maxLength ){
@@ -49,6 +57,7 @@ const home = () => {
     { name: 'task Dashboard', leftIcon: <AssessmentIcon className="text-info"/>, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard' },
     { name: 'Dashboard', leftIcon: <SummarizeIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>, link: '/dashboard' },
     { name: 'settings', leftIcon: <SettingsIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon /> },
+    { name: 'Theme', leftIcon: <ContrastIcon className="text-info" />, onClick: toggleTheme },
     { name: 'logout', leftIcon: !loading ? <LogoutTwoToneIcon className="text-error"/> : <span className="loading loading-ring"></span>, rightIcon: '', onClick: logout },
     { name: 'delete_account', leftIcon: <DeleteForeverTwoToneIcon className="text-error" />, rightIcon: '' }
   ];
@@ -114,17 +123,89 @@ const home = () => {
     }
   },[])
   const {usersTask} = useGetUserTask()
-//console.log('userYask :', usersTask)
 const {isTrue, tasked} = usepostTask();
 const handleReportSubmit = async(e) => {
   e.preventDefault();
   const {Agreement, Amount, Currency, Start_date, End_date} = inputValues
-  console.log('input :', inputValues)
   await tasked(inputValues)
 }
-const handleApply = (user) => {
-  console.log('user :', user)
+const [loadingTasks, setLoadingTasks] = useState({});
+const {trackEvent, takeTask} = useTakeTask();
+const [TaskStatus, setTaskStatus] = useState({});
+
+const handleApply = async(task) => {
+  const values = task.taskId;
+  await takeTask(values)
+  setTaskStatus((prevStatus) => ({
+    ...prevStatus,
+    [task.taskId]: !prevStatus[task.taskId], // Toggle report status for the clicked user
+  }));
+  
 }
+const {isData} = useTakeTaskView();
+const {trackReport, postReport} = reportTask();
+const [reportStatus, setReportStatus] = useState({});
+
+const handleReport = async(user) => {
+  const {Agreement, taskId} = user
+  const inputs = {Agreement, taskId}
+  console.log('task to report :', inputs)
+  await postReport(user)
+  setReportStatus((prevStatus) => ({
+    ...prevStatus,
+    [user.taskId]: !prevStatus[user.taskId], // Toggle report status for the clicked user
+  }));
+}
+
+const [isInvite, setIsInvite] = useState(false)
+const [isFormTo, setIsFormTo] = useState(true)
+const [isInviteDefaulted, setIsInviteDefaulted] = useState('isform')
+const handleIsDefault = (e) => {
+  setIsInvite(false)
+  setIsFormTo(false)
+  setIsInviteDefaulted(e)
+  switch (e) {
+    case 'invite' :
+      setIsInvite(true)
+    break;
+    case 'isform' :
+      setIsFormTo(true)
+    break;
+  }
+}
+const {isTaskToApprove} = approveTask()
+console.log('isTaskTo approve :', isTaskToApprove)
+const {trackApprove, makePostAppr} = postApproval();
+
+const [approveStatus, setApproveStatus] = useState({});
+
+const handleApprove = async (user) => {
+  console.log('task am approving :', user)
+  const {Status, taskId} = user
+  const value = {Status, taskId}
+  //await makePostAppr(value)
+  setApproveStatus((prevStatus) => ({
+    ...prevStatus,
+    [user.taskId] : !prevStatus[user.taskId]
+  }))
+}
+const [theme, setTheme] = useState(getCurrentTheme());
+
+  useEffect(() => {
+    const handleThemeChange = () => {
+      setTheme(getCurrentTheme());
+    };
+
+    // Listen for changes in the data-theme attribute
+    const observer = new MutationObserver(handleThemeChange);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  const bgColorClass = theme === 'light' ? 'bg-white' : 'bg-base-100';
   return (
     <div className="w-full flex flex-col overflow-auto">
         <div className=" w-full">
@@ -132,7 +213,7 @@ const handleApply = (user) => {
                 <div>{isScrolled ? '' : 'Web Apllication'}</div>
                 <div onClick={handleMenu} className="text-info"><MenuIcon /></div>
                 {isMenu && (
-                    <div className="drp-ctnt flex flex-col justify-between h-screen">
+                    <div className={`drp-ctnt flex flex-col justify-between h-screen ${bgColorClass}`}>
                         <div>
                             <div className="flex justify-end" onClick={handleMenu}>
                                 <ClearTwoToneIcon />
@@ -164,7 +245,7 @@ const handleApply = (user) => {
         {isHome && (
           <>
           {usersTask.map((task) => (
-            <Card style={{zIndex: '1', width: '100%'}} className="mb-1">
+            <Card key={task.taskId} style={{zIndex: '1', width: '100%'}} className="mb-1">
                 <CardHeader className="justify-between ">
                     <div className="flex  gap-5">
                     <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
@@ -174,7 +255,7 @@ const handleApply = (user) => {
                     </div>
                     </div>
                     <div className="flex w-2/6">
-                      <p>Title: Manager</p>
+                      <p>Job: {task.Agreement}</p>
                     </div>
                     {/* <Button
                       className={isFollowed ? " bg-transparent text-foreground border-default-200" : "border-primary"}
@@ -208,7 +289,9 @@ const handleApply = (user) => {
                       <p className="text-default-400 text-small">{task.Duration}</p>
                     </div>
                     <div className="flex gap-1">
-                      <button className="btn" onClick={() => handleApply(task)}>Apply Task</button>
+                      <button className="btn" onClick={() => handleApply(task)}>
+                        {loading ? <span className="loading loading-ring"></span> :  !loading && TaskStatus[task.taskId] ? 'Taken' : task.Task_status }
+                      </button>
                     </div>
                 </CardFooter>
             </Card>
@@ -269,35 +352,134 @@ const handleApply = (user) => {
             </div>
             </div>
             {/* {!isAddTask ? ( */}
-              <Card className="w-full" style={{zIndex: '1'}}>
+            {isData.map((user) => (
+              <Card key={user.taskId} className="w-full mb-1" style={{zIndex: '1'}}>
               <CardHeader className="justify-between w-full">
                       <div className="flex w-4/5  gap-5">
                       {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
                       <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                          <h4 className="text-small font-semibold leading-none text-default-600">Task Name</h4>
-                          <h5 className="text-small tracking-tight text-default-400">@zoeylang</h5>
+                          <h4 className="text-small font-semibold leading-none text-default-600">{user.Agreement}</h4>
+                          <h5 className="text-small tracking-tight text-default-400">@{user.userName}</h5>
                       </div>
                       </div>
                       <Button
-                      className={isFollowed ? " bg-transparent text-foreground border-default-200" : "border-primary"}
+                      onClick={() => handleReport(user)}
+                      className={!reportStatus[user.taskId] ? " bg-transparent text-foreground border-default-200" : "border-primary"}
                       color="primary"
                       radius="full"
                       size="sm"
-                      variant={isFollowed ? "bordered" : "solid"}
-                      onPress={() => setIsFollowed(!isFollowed)}
                       >
-                      {isFollowed ? "Report" : "Reported"}
+                      {reportStatus[user.taskId] ? 'Reported' : user.Status}
+                      {/* {reportStatus[user.taskId] ? <span>Reported</span> : <span>pending</span>} */}
                       </Button>
                   </CardHeader>
               </Card>
-          
+            ))}
         {/* ) : ( */}
         <dialog id="my_modal_3" className="modal">
           <div className="modal-box">
           <form method="dialog">
-                        <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-                        </form>
-        <h1 className="w-full text-center mt-5">Form to assign Task</h1>
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+          </form>
+        <div className="w-full gap-4 flex flex-col">
+          <div className={`${isInviteDefaulted === 'isform' ? "  mt-5 flex  h1-color" : ""}`} onClick={() => handleIsDefault('isform')}>Form to publish task</div>
+          <div className={`${isInviteDefaulted === 'invite' ? "  mt-5 h1-color" : ""}`} onClick={() => handleIsDefault('invite')}>Invite user directly on task</div>
+        </div>
+        {isInvite && (
+          <div className="mt-10">
+          <form className="flex flex-col gap-10 w-full" onSubmit={handleReportSubmit}>
+            <div className="flex flex-col w-full">
+              <label htmlFor="Agreement" onClick={() => handleFocus('Agreement')}
+                className={`absolute ${inputValues['Agreement'] ? 'tran2' : (focusedInput === 'Agreement' ? 'tran' : '')}`}>
+                  invited userName
+              </label>
+              <input
+                id="Agreement"
+                name="Agreement"
+                type="text"
+                onChange={handleChange}
+                onFocus={() => handleFocus('Agreement')}
+              />
+            </div>
+            <div className="flex flex-col w-full">
+              <label htmlFor="Description" onClick={() => handleFocus('Description')}
+                className={`absolute ${inputValues['Description'] ? 'tran2' : (focusedInput === 'Description' ? 'tran' : '')}`}>
+                  Agreement Description
+              </label>
+              <input
+                id="Description"
+                name="Description"
+                type="text"
+                onChange={handleChange}
+                onFocus={() => handleFocus('Description')}
+              />
+            </div>
+            <div className="flex gap-10 w-full flex-row">
+              <div className="flex flex-col w-2/5">
+                <label  htmlFor="Amount" onClick={() => handleFocus('Amount')}
+                  className={`absolute ${inputValues['Amount'] ? 'tran2' : (focusedInput === 'Amount' ? 'tran' : '')}`}>
+                    Amount
+                  </label>
+                <input
+                  id="Amount"
+                  name="Amount"
+                  type="number"
+                  onChange={handleChange}
+                  onFocus={() => handleFocus('Amount')}
+                />
+              </div>
+              <div className="flex flex-col w-2/5">
+                <label htmlFor="Currency" onClick={() => handleFocus('Currency')}
+                  className={`absolute ${inputValues['Currency'] ? 'tran2' : (focusedInput === 'Currency' ? 'tran' : '')}`}>
+                    Currency
+                </label>
+                <input
+                  id="Currency"
+                  name="Currency"
+                  type="text"
+                  onChange={handleChange}
+                  onFocus={() => handleFocus('Currency')}
+                />
+              </div>
+            </div>
+            <div className="flex gap-10 w-full flex-row">
+              <div className="flex flex-col w-2/5">
+                <label htmlFor="Start_date" onClick={() => handleFocus('Start_date')}
+                  className={`absolute tran ${inputValues['Start_date'] ? 'tran2' : (focusedInput === 'Start_date' ? 'tran' : '')}`}>
+                    Start Date
+                </label>
+                <input
+                  id="Start_date"
+                  name="Start_date"
+                  type="date"
+                  onChange={handleChange}
+                  onFocus={() => handleFocus('Start_date')}
+                />
+              </div>
+              <div className="flex flex-col w-2/5">
+                <label htmlFor="End_date" onClick={() => handleFocus('End_date')}
+                  className={`absolute tran ${inputValues['End_date'] ? 'tran2' : (focusedInput === 'End_date' ? 'tran' : '')}`}>
+                    End Date
+                </label>
+                <input
+                  id="End_date"
+                  name="End_date"
+                  type="date"
+                  onChange={handleChange}
+                  onFocus={() => handleFocus('End_date')}
+                />
+              </div>
+            </div>
+            <div className='mt-10'>
+              <button type='submit'>Invite</button>
+              {/* <button className="mt-1" type='type'>Submit 1</button> */}
+            </div>
+            <div className='relative mt-5'>
+              <p>Submitting {loading ? <span className='loading loading-ring '></span> : isTrue ? <span className='text-fuchsia-500 '> Success</span> : <span className='text-info'> Start</span>}</p>
+            </div>
+          </form>
+        </div>
+        )}
         <div className="mt-10">
           <form className="flex flex-col gap-10 w-full" onSubmit={handleReportSubmit}>
             <div className="flex flex-col w-full">
@@ -384,8 +566,9 @@ const handleApply = (user) => {
             </div>
             <div className='mt-10'>
               <button type='submit'>Submit</button>
+              {/* <button className="mt-1" type='type'>Submit 1</button> */}
             </div>
-            <div className='relative mt-20'>
+            <div className='relative mt-5'>
               <p>Submitting {loading ? <span className='loading loading-ring '></span> : isTrue ? <span className='text-fuchsia-500 '> Success</span> : <span className='text-info'> Start</span>}</p>
             </div>
           </form>
@@ -518,20 +701,60 @@ const handleApply = (user) => {
         )}
         
         {isAlert && (
-          <Card style={{zIndex: '1'}}>
-                <CardBody className="px-3 py-0 text-small text-default-400">
-                    <p>
-                    Frontend developer and UI/UX enthusiast. Join me on this coding adventure!
-                    </p>
-                    <span className="pt-2">
-                    #FrontendWithZoey 
-                    <span className="py-2" aria-label="computer" role="img">
-                        💻
-                    </span>
-                    </span>
-                </CardBody>
-                
-            </Card>)}
+          <>
+          {isTaskToApprove.map((user) => (
+          <Card key={user.taskId} className="w-full mb-1" style={{zIndex: '1'}}>
+          <CardHeader className="justify-between w-full">
+                  <div className="flex w-4/5  gap-5">
+                  {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
+                  <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                      <h4 className="text-small font-semibold leading-none text-default-600">{user.Agreement}</h4>
+                      <h5 className="text-small tracking-tight text-default-400">@{user.userName}</h5>
+                  </div>
+                  </div>
+                  <Button
+                  onClick={()=>document.getElementById(user.taskId).showModal()}
+                  className={!approveStatus[user.taskId] ? " bg-transparent text-foreground border-default-200" : "border-primary"}
+                  color="primary"
+                  radius="full"
+                  size="sm"
+                  // variant={isFollowed ? "bordered" : "solid"}
+                  // onPress={() => setIsFollowed(!isFollowed)}
+                  >
+                    {approveStatus[user.taskId] ? 'Approved' : user.Approval}
+                  </Button>
+                  <dialog id={user.taskId} className="modal">
+                    <div className="modal-box">
+                      <form method="dialog">
+                        <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                      </form>
+                      <div className="w-full flex flex-col">
+                        <h3 className="font-bold text-lg">Approve Task</h3>
+                        <p className="py-4">Details</p>
+                      </div>
+                      <div className="w-full flex gap-5 flex-col">
+                        <div>task_giver: <span>{user.userName}</span></div>
+                        <div>task_taker: <span> {user.task_taker_name}</span></div>
+                        <div>Amount: <span>{user.Amount}</span></div>
+                      </div>
+                      <div className="mt-10">
+                        <Button
+                        onClick={() => handleApprove(user)}
+                        className={!approveStatus[user.taskId] ? " bg-transparent text-foreground border-default-200" : "border-primary"}
+                        color="primary"
+                        radius="full"
+                        size="sm"
+                        >
+                          {approveStatus[user.taskId] ? 'Approved' : user.Approval}
+                        </Button>
+                      </div>
+                    </div>
+                  </dialog>
+              </CardHeader>
+          </Card>
+          ))}
+          </>
+          )}
         {isRank && (
           <>
           {users.map((user) => (
@@ -574,9 +797,3 @@ export default home;
 
 
 
-
-
-
-
-
-// 

@@ -10,7 +10,7 @@ router.post('/assign-task', protectRoute, assignTask);
 router.get('/assigner', protectRoute, assigneer)
 router.get('/task-view', protectRoute, taskView)
 router.get('/task-taker', protectRoute, taskerView)
-router.post('/take-task', protectRoute, taskTaker)
+router.post('/take-task/:id', protectRoute, taskTaker)
 
 
 export default router

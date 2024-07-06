@@ -5,8 +5,9 @@ const useSignup = () => {
   const [loading, setLoading] = useState(false);
 
   const signup = async ({First_name, Last_name, userName, Title, Email, Phone_number, Password, confirmPassword}) => {
-    const Success = handleLoginError(First_name, Last_name, userName, Email, Phone_number, Password, confirmPassword);
-    if(!Success)return
+    const Success = handleLoginError(First_name, Last_name, userName, Title, Email, Phone_number, Password, confirmPassword);
+    
+    if(!Success)return alert('something wrong')
     try{
         setLoading(true)
         const res = await axios.post('/api/authUser/signup', {
@@ -26,7 +27,7 @@ const useSignup = () => {
             throw new Error (data.error)
         }
         localStorage.setItem('on-user', JSON.stringify(data))
-        //console.log('data :', data)
+        console.log('data :', data)
         window.location = '/'
     }catch(error){
         console.log('error in signup')

@@ -40,7 +40,7 @@ export const getOnPeople = async(req, res) => {
 export const getUsersTask = async (req, res) => {
     try{
         const USERID = req.user.userId
-        const selectUsersTask = 'SELECT * FROM USERS_TASK_VIEW';
+        const selectUsersTask = 'SELECT * FROM USERS_TASK_VIEW ORDER BY taskId DESC';
         connection.query(selectUsersTask, (err, result) => {
             if(err){
                 throw err

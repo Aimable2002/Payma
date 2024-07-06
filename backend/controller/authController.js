@@ -33,7 +33,9 @@ export const signup = async (req, res) => {
                     console.log('error on insert user data :', err)
                     return res.status(409).json('error inserting user data')
                 }
-                const token = jwt.sign({userId: user.userId}, process.env.SECRET_KEY_AUTH, {expiresIn: '5d'})
+                const user = result
+                console.log('user :', user)
+                const token = jwt.sign({userId: user.insertId}, process.env.SECRET_KEY_AUTH, {expiresIn: '5d'})
                 return res.status(200).json({
                     token
                 })

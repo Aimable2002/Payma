@@ -6,25 +6,32 @@ const connection = connectDatabase();
 
 export const StatusApproval = async (req, res) => {
     try{
-        const {ReportId, Status, pending_id} = req.body;
+        //const {taskId} = req.body;
+        const task_giverId = req.user.userId
 
-        if(!ReportId || !Status || !pending_id){
-            console.log('missing data');
-            return res.Status(400).json('missing data')
-        }
-        const insertApproval = 'INSERT INTO APPROVAL (ReportId, Status, pending_id) VALUES (?, ?, ?)';
+        // if(!taskId){
+        //     console.log('missing data');
+        //     return res.Status(400).json('missing data')
+        // }
+        const CheckApproval = 'SELECT * FROM USERS_TASK_VIEW WHERE Status = ? AND task_giverId = ?';
 
-        connection.query(insertApproval, [ReportId, Status, pending_id], (err, result) => {
+        connection.query(CheckApproval, ['Reported', task_giverId], (err, result) => {
             if(err){
                 console.log('error inserting approval data :', err)
                 return res.Status(400).json({err: 'error inserting approval data'})
             }
 
-            return res.status(200).json('approval data inserted')
+            if (result.length > 0) {
+                console.log('reported task to u')
+                return res.status(200).json(result);
+            } else {
+                console.log(' no reported task to u')
+                return res.status(404).json('No reported tasks found');
+            }
         })
     }catch(error){
         console.log('internal server approval error :', error.message)
-        res.Status(500).json({error: 'internal server approval error'})
+        res.status(500).json({error: 'internal server approval error'})
     }
 }
 
@@ -33,26 +40,26 @@ export const StatusApproval = async (req, res) => {
 
 export const approval = async (req, res) => {
     try{
-        const {reportId, Status, Payment, taskId, task_takerId, USERID} = req.body;
-
-        if(!reportId || !USERID){
-            return res.status(400).json('missing data')
-        }
-        console.log('report id:', reportId)
-        
-        if(Status === 'Abort'){
-            return res.status(201).json('the report is not approved')
+        const {Status, taskId} = req.body;
+        const USERID = req.user.userId;
+        if(!Status || !taskId || !USERID){
+            return res.status(300).json('missing data')
         }
         
-        else if(Status === 'Procced'){
+        if(Status !== 'Reported'){
+            return res.status(403).json('task is not yet reported')
+        }
+        
+        else if(Status === 'Reported'){
             connection.beginTransaction(err => {
                 if(err){
                     console.error('Transaction error:', err);
                     return res.status(500).json({ error: 'Transaction error' });
                 }
 
-                const tracktaskId = 'SELECT * FROM TASK WHERE taskId = ?';
-                connection.query(tracktaskId, [taskId], async(err, result) => {
+                const tracktaskId = 'SELECT * FROM TASK WHERE taskId = ? AND Status = ? AND task_giverId = ?';
+                console.log('tracktaskId :', tracktaskId)
+                connection.query(tracktaskId, [taskId, 'Reported', USERID], async(err, result) => {
                     if(err){
 
                         return connection.rollback(() => {
@@ -62,24 +69,39 @@ export const approval = async (req, res) => {
                     }
                     if (result.length === 0) {
                         return connection.rollback(() => {
-                            res.status(404).json({ error: 'Task not found' });
+                            res.status(404).json({ error: 'Task not found for approval' });
                         });
                     }
-
-                    const taskId = result[0];
-                    console.log('taskId :', taskId)
-                    if(taskId.task_giverId === USERID){
-                        console.log('user data match')
-                        res.status(201).json('user data match')
-                    }else{
-                        res.status(400).json('user data not match')
+                    if(result[0].Approval === 'Approved'){
+                        return connection.rollback(() => {
+                            console.log('result :', result[0].Approval === 'Approved')
+                            return res.status(304).json('task approved already')
+                        })
                     }
+                    console.log('result22', result[0].Approval === 'Approve')
 
+                    const updateApproval = 'UPDATE TASK SET Approval = ? WHERE taskId = ? AND Status = ? AND task_giverId = ?';
+                    connection.query(updateApproval, ['Approved', taskId, 'Reported', USERID], (err, result) => {
+                        if(err){
+                            return connection.rollback(() => {
+                                return res.status(400).json('something went wrong')
+                            })
+                        }
+                        connection.commit(err => {
+                            if (err) {
+                                return connection.rollback(() => {
+                                    throw err;
+                                });
+                            }
+    
+                            res.status(200).json({message: 'tast Approved', status: true});
+                        });
 
+                    })
                 })
             })
         }else{
-            res.status(400).json({error: 'something went wrong'})
+            res.status(400).json({error: 'task is not yet reported'})
         }
     }catch(error){
         console.log('internal server approval error :', error.message)
