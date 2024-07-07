@@ -146,23 +146,23 @@ const {taskTaker} = usegetTaskTaker();
                 </BarChart>
             </ResponsiveContainer>
         </div> */}
-        <div className='w-full flexflex-col  justify-center'>
+        <div className='w-full flex flex-col  justify-center'>
             {usersOn.map((user) => (
                 <>
             <div className='w-full px-2 py-2'>
                 <div className='w-full flex justify-center align-middle text-center mb-2'>Wallet</div>
                 <div className='w-full justify-between gap-1  flex flex-row'>
                     <div className='flex w-2/6 flex-col bg-base-100 p-2 px-3' style={{borderRadius: '15px'}}>
-                        <div className='flex justify-center'>Bal</div>
-                        <div className='flex justify-center'>FRW {user.Balance}</div>
+                        <div className='flex justify-center text-small tracking-tight'>Bal</div>
+                        <div className='flex justify-center'><span className='text-small tracking-tight text-default-400'>FRW </span> {user.Balance}</div>
                     </div>
                     <div className='flex w-2/6 flex-col bg-base-100 p-2 px-5' style={{borderRadius: '15px'}}>
-                        <div className='flex justify-center'>Deposite</div>
-                        <div className='flex justify-center'>FRW {user.Deposite}</div>
+                        <div className='flex justify-center text-small tracking-tight '>Deposite</div>
+                        <div className='flex justify-center'><span className='text-small tracking-tight text-default-400'>FRW </span> {user.Deposite}</div>
                     </div>
                     <div className='flex w-2/6 flex-col bg-base-100 p-2 px-5' style={{borderRadius: '15px'}}>
-                        <div className='flex justify-center'>Withdrow</div>
-                        <div className='flex justify-center'>FRW {user.WITHDROWAL}</div>
+                        <div className='flex justify-center text-small tracking-tight'>Withdrow</div>
+                        <div className='flex justify-center'><span className='text-small tracking-tight text-default-400'>FRW </span> {user.WITHDROWAL}</div>
                     </div>
                 </div>
             </div>

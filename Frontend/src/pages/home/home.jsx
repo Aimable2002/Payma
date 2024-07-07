@@ -66,6 +66,7 @@ const home = () => {
     e.preventDefault()
     setIsMenu(!isMenu)
   }
+  
 
   const [isHome, setIsHome] = useState(true)
   const [isTask, setIsTask] = useState(false);
@@ -102,7 +103,9 @@ const home = () => {
         break;
     }
   };
-  const { users } = useGetUser();
+  const {usersTask} = useGetUserTask(activeButton)
+
+  const { users } = useGetUser(activeButton);
   const [isAddTask, setIsAddTask] = useState(false)
   const handleisAddTask = (e) => {
     e.preventDefault();
@@ -122,7 +125,7 @@ const home = () => {
       window.removeEventListener('scroll', handleScrol)
     }
   },[])
-  const {usersTask} = useGetUserTask()
+ 
 const {isTrue, tasked} = usepostTask();
 const handleTaskSubmit = async(e) => {
   e.preventDefault();
@@ -142,7 +145,7 @@ const handleApply = async(task) => {
   }));
   
 }
-const {isData} = useTakeTaskView();
+const {isData} = useTakeTaskView(activeButton);
 const {trackReport, postReport} = reportTask();
 const [reportStatus, setReportStatus] = useState({});
 
@@ -173,7 +176,7 @@ const handleIsDefault = (e) => {
     break;
   }
 }
-const {isTaskToApprove} = approveTask()
+const {isTaskToApprove} = approveTask(activeButton)
 console.log('isTaskTo approve :', isTaskToApprove)
 const {trackApprove, makePostAppr} = postApproval();
 

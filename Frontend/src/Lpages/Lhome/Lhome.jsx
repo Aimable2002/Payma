@@ -119,8 +119,8 @@ const Lhome = () => {
             break;
         }
     };
-    const { users } = useGetUser()
-    const {usersTask} = useGetUserTask();
+    const { users } = useGetUser(activeButton)
+    const {usersTask} = useGetUserTask(activeButton);
 
     const {trackEvent, takeTask} = useTakeTask();
     const [TaskStatus, setTaskStatus] = useState({});
@@ -134,7 +134,7 @@ const Lhome = () => {
       }));
       
     }
-    const {isData} = useTakeTaskView();
+    const {isData} = useTakeTaskView(activeButton);
     const [reportStatus, setReportStatus] = useState({});
     const {trackReport, postReport} = reportTask()
     const handleReport = async(user) => {
@@ -163,7 +163,7 @@ const Lhome = () => {
         break;
     }
     }
-    const {isTaskToApprove} = approveTask()
+    const {isTaskToApprove} = approveTask(activeButton)
     const {trackApprove, makePostAppr} = postApproval()
     const [approveStatus, setApproveStatus] = useState({});
     const handleApprove = async (user) => {
