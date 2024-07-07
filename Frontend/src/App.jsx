@@ -32,13 +32,13 @@ function App() {
         <Route path='/sign' element={AuthUser ? <Navigate to= '/' /> : <Sign /> } />
         <Route path='/' element={AuthUser ? <Home /> : <Navigate to ='sign' />} />
         <Route path='/dashboard' element={AuthUser ? <Dashboard /> : <Navigate to ='sign' />} />
-        <Route path='/profile' element={AuthUser ? <Profile /> : <Navigate to ='sign' />} />
+        <Route path='/account' element={AuthUser ? <Profile /> : <Navigate to ='sign' />} />
       </Routes>
       ) : (
         <Routes>
           <Route path='/sign' element={AuthUser ? <Navigate to= '/' /> : <Lsign /> } />
           <Route path='/' element={AuthUser ? <Lhome /> : <Navigate to='sign' />} />
-          <Route path='/Ldashboard' element={AuthUser ? <Ldashboard /> : <Navigate to='sign' />} />
+          <Route path='/dashboard' element={AuthUser ? <Ldashboard /> : <Navigate to='sign' />} />
         </Routes>
       )}
     </div>

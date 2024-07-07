@@ -37,6 +37,8 @@ import LBtn from './Lbtn';
 import usegetTaskTaker from '../../hook/getTask/getTaskTaker';
 import useGetUserOn from '../../hook/getUsers/getOnUser';
 
+import LAccount from './LAccount';
+
 const Ldashboard = () => {
 
 
@@ -75,7 +77,7 @@ const Ldashboard = () => {
         { name: 'task Dashboard', leftIcon: <AssessmentIcon className="text-info"/>, rightIcon: <DragHandleTwoToneIcon />, onClick: () => handleButtonClick('Rank')},
         { name: 'History', leftIcon: <LinearScaleIcon className="text-info"/>, rightIcon: <DragHandleTwoToneIcon />, onClick: () => handleButtonClick('Tasks')},
         { name: 'Dashboard', leftIcon: <SummarizeIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>, onClick: () => handleButtonClick('Alert') },
-        { name: 'settings', leftIcon: <SettingsIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon /> },
+        { name: 'Account', leftIcon: <SettingsIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, onClick: () => handleButtonClick('Account')},
         { name: 'Theme', leftIcon: <ContrastIcon className="text-info" />, onClick: toggleTheme },
         { name: 'logout', leftIcon: !loading ? <LogoutTwoToneIcon className="text-error"/> : <span className="loading loading-ring"></span>, rightIcon: '', onClick: logout },
         { name: 'delete_account', leftIcon: <DeleteForeverTwoToneIcon className="text-error" />, rightIcon: '' }
@@ -101,7 +103,7 @@ const Ldashboard = () => {
     },[])
     const [isHome, setIsHome] = useState(true)
     const [isTask, setIsTask] = useState(false);
-    const [isReport, setIsReport] = useState(false)
+    const [isAccount, setIsAccount] = useState(false)
     const [isRank, setIsRank] = useState(false);
     const [isAlert, setIsAlert] = useState(false)
     const [activeButton, setActiveButton] = useState('Home');
@@ -110,7 +112,7 @@ const Ldashboard = () => {
 
         setIsHome(false)
         setIsTask(false)
-        setIsReport(false)
+        setIsAccount(false)
         setIsRank(false);
         setIsAlert(false)
 
@@ -130,6 +132,9 @@ const Ldashboard = () => {
             break;
         case 'Alert':
             setIsAlert(true);
+            break;
+        case 'Account':
+            setIsAccount(true);
             break;
         }
     };
@@ -283,273 +288,286 @@ const Ldashboard = () => {
                 ))}
             </div>
         </div>
-        <div className='flex flex-col h-screen overflow-y-auto' style={{width: '95%'}}>
-            <div className='w-full relative' style={{zIndex: '2'}}>
-                <div className={`fixed w-5/6 bg-base-300 top-0 flex flex-row justify-between px-2 align-middle`}>
-                    {/* <div>{isScrolled ? '' : 'Web Apllication'}</div> */}
-                    
-                
-                <div className="py-2 gap-4 overflow-x-auto w-full flex flex-row hide-scrollbar">
-                    <div className={`${activeButton === 'Home' ? 'btn2 cursor-pointer' : 'btn1 cursor-pointer'}`} >Wallet</div>
-                    <div className={`${activeButton === 'Rank' ? 'btn2 cursor-pointer' : 'btn1 cursor-pointer'}`} >Task Dashboard</div>
-                    <div className={`${activeButton === 'Tasks' ? 'btn2 cursor-pointer' : 'btn1 cursor-pointer'}`} >History</div>
-                    {/* <div className={`${activeButton === 'Report' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Report')}>Report</div> */}
-                    <div className={`${activeButton === 'Alert' ? 'btn2 cursor-pointer' : 'btn1 cursor-pointer'}`} >Dashboard</div>
-                </div>
-                </div>
-            </div>
-            <div className='relative mt-14'>
-                {isTask && (
-                  <Lhistory />
-                )}
-            <div className='grid grid-cols-3 gap-4 px-2 '>
-                {isHome && (
-                    <>
-                      {usersOn.map((user) => (
-                        <>
-                       <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
-                            <CardHeader className="justify-between ">
-                              <div className="flex w-full  gap-5">
-                                <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                                  <h5 className="text-small tracking-tight text-default-400">Balance</h5>
-                                  <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{user.Balance} FRW</h4>
-                                </div>
-                              </div>
-                              <div className="flex w-2/6">
-                                <p>Manager</p>
-                              </div>
-                            </CardHeader>
-                            <CardFooter className="gap-3">
-                              <Progress aria-label="Loading..." value={60} className="max-w-md"/>
-                          </CardFooter>
-                        </Card> 
-                        <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
-                            <CardHeader className="justify-between ">
-                              <div className="flex w-full  gap-5">
-                                <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                                  <h5 className="text-small tracking-tight text-default-400">Deposite</h5>
-                                  <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{user.Deposite} FRW</h4>
-                                </div>
-                              </div>
-                              <div className="flex w-2/6">
-                                <p>Manager</p>
-                              </div>
-                            </CardHeader>
-                            <CardFooter className="gap-3">
-                              <Progress aria-label="Loading..." value={60} className="max-w-md"/>
-                          </CardFooter>
-                        </Card>
-                        <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
-                            <CardHeader className="justify-between ">
-                              <div className="flex w-full  gap-5">
-                                <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                                  <h5 className="text-small tracking-tight text-default-400">Withdrow</h5>
-                                  <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{user.WITHDROWAL} FRW</h4>
-                                </div>
-                              </div>
-                              <div className="flex w-2/6">
-                                <p>Manager</p>
-                              </div>
-                            </CardHeader>
-                            <CardFooter className="gap-3">
-                              <Progress aria-label="Loading..." value={60} className="max-w-md"/>
-                          </CardFooter>
-                        </Card>
-                      </>
-                      ))}  
-                    </>
-                )}
-                
-                {isAlert && (
-                    <>
+        {/* {!isAccount ? ( */}
+          <div className='flex flex-col h-screen overflow-y-auto' style={{width: '95%'}}>
+          <div className='w-full relative' style={{zIndex: '2'}}>
+              <div className={`fixed w-5/6 bg-base-300 top-0 flex flex-row justify-between px-2 align-middle`}>
+                  {/* <div>{isScrolled ? '' : 'Web Apllication'}</div> */}
+                  
+              
+              <div className="py-2 gap-4 overflow-x-auto w-full flex flex-row hide-scrollbar">
+                  <div className={`${activeButton === 'Home' ? 'btn2 cursor-pointer' : 'btn1 cursor-pointer'}`} >Wallet</div>
+                  <div className={`${activeButton === 'Rank' ? 'btn2 cursor-pointer' : 'btn1 cursor-pointer'}`} >Task Dashboard</div>
+                  <div className={`${activeButton === 'Tasks' ? 'btn2 cursor-pointer' : 'btn1 cursor-pointer'}`} >History</div>
+                  {/* <div className={`${activeButton === 'Report' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Report')}>Report</div> */}
+                  <div className={`${activeButton === 'Alert' ? 'btn2 cursor-pointer' : 'btn1 cursor-pointer'}`} >Dashboard</div>
+              </div>
+              </div>
+          </div>
+          <div className='relative mt-14'>
+              {isTask && (
+                <Lhistory />
+              )}
+          <div className='grid grid-cols-3 gap-4 px-2 '>
+              {isHome && (
+                  <>
                     {usersOn.map((user) => (
                       <>
-                        <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
-                            <CardHeader className="justify-between ">
-                              <div className="flex w-full  gap-5">
-                                <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                                  <h5 className="text-small tracking-tight text-default-400">Balance</h5>
-                                  <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{user.Balance} FRW</h4>
-                                </div>
+                     <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
+                          <CardHeader className="justify-between ">
+                            <div className="flex w-full  gap-5">
+                              <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                                <h5 className="text-small tracking-tight text-default-400">Balance</h5>
+                                <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{user.Balance} FRW</h4>
                               </div>
-                              <div className="flex w-2/6">
-                                <p>Manager</p>
+                            </div>
+                            <div className="flex w-2/6">
+                              <p>Manager</p>
+                            </div>
+                          </CardHeader>
+                          <CardFooter className="gap-3">
+                            <Progress aria-label="Loading..." value={60} className="max-w-md"/>
+                        </CardFooter>
+                      </Card> 
+                      <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
+                          <CardHeader className="justify-between ">
+                            <div className="flex w-full  gap-5">
+                              <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                                <h5 className="text-small tracking-tight text-default-400">Deposite</h5>
+                                <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{user.Deposite} FRW</h4>
                               </div>
-                            </CardHeader>
-                            <CardFooter className="gap-3">
-                              <Progress aria-label="Loading..." value={60} className="max-w-md"/>
-                          </CardFooter>
-                        </Card> 
-                        <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
-                            <CardHeader className="justify-between ">
-                              <div className="flex w-full  gap-5">
-                                <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                                  <h5 className="text-small tracking-tight text-default-400">Deposite</h5>
-                                  <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{user.Deposite} FRW</h4>
-                                </div>
+                            </div>
+                            <div className="flex w-2/6">
+                              <p>Manager</p>
+                            </div>
+                          </CardHeader>
+                          <CardFooter className="gap-3">
+                            <Progress aria-label="Loading..." value={60} className="max-w-md"/>
+                        </CardFooter>
+                      </Card>
+                      <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
+                          <CardHeader className="justify-between ">
+                            <div className="flex w-full  gap-5">
+                              <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                                <h5 className="text-small tracking-tight text-default-400">Withdrow</h5>
+                                <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{user.WITHDROWAL} FRW</h4>
                               </div>
-                              <div className="flex w-2/6">
-                                <p>Manager</p>
-                              </div>
-                            </CardHeader>
-                            <CardFooter className="gap-3">
-                              <Progress aria-label="Loading..." value={60} className="max-w-md"/>
-                          </CardFooter>
-                        </Card>
-                        <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
-                            <CardHeader className="justify-between ">
-                              <div className="flex w-full  gap-5">
-                                <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                                  <h5 className="text-small tracking-tight text-default-400">Withdrow</h5>
-                                  <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{user.WITHDROWAL} FRW</h4>
-                                </div>
-                              </div>
-                              <div className="flex w-2/6">
-                                <p>Manager</p>
-                              </div>
-                            </CardHeader>
-                            <CardFooter className="gap-3">
-                              <Progress aria-label="Loading..." value={60} className="max-w-md"/>
-                          </CardFooter>
-                        </Card>
-                        </>
-                        ))}
-                        <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
-                            <CardHeader className="justify-between ">
-                              <div className="flex w-full  gap-5">
-                                <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                                  <h5 className="text-small tracking-tight text-default-400">Total Pending Earnings</h5>
-                                  <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{totalEarnPending} FRW</h4>
-                                </div>
-                              </div>
-                              <div className="flex w-2/6">
-                                <p>{countTaskITook} Tasks</p>
-                              </div>
-                            </CardHeader>
-                            <CardFooter className="gap-3">
-                              <Progress aria-label="Loading..." value={60} className="max-w-md"/>
-                          </CardFooter>
-                        </Card> 
-
-                        <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
-                            <CardHeader className="justify-between ">
-                              <div className="flex w-full  gap-5">
-                                <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                                  <h5 className="text-small tracking-tight text-default-400">Task Earning Amount</h5>
-                                  <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{totalEarn} FRW</h4>
-                                </div>
-                              </div>
-                              <div className="flex w-2/6">
-                                <p>{countTaskTook3} Tasks</p>
-                              </div>
-                            </CardHeader>
-                            <CardFooter className="gap-3">
-                              <Progress aria-label="Loading..." value={60} className="max-w-md"/>
-                          </CardFooter>
-                        </Card>
-
-                         
-
-                        <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
-                            <CardHeader className="justify-between ">
-                              <div className="flex w-full  gap-5">
-                                <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                                  <h5 className="text-small tracking-tight text-default-400">Balance I assigned on Task</h5>
-                                  <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{totalAmount} FRW</h4>
-                                </div>
-                              </div>
-                              <div className="flex w-2/6">
-                                <p>{countTaskPublished2} Tasks</p>
-                              </div>
-                            </CardHeader>
-                            <CardFooter className="gap-3">
-                              <Progress aria-label="Loading..." value={60} className="max-w-md"/>
-                          </CardFooter>
-                        </Card>
-                        
-                        <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
-                            <CardHeader className="justify-between ">
-                              <div className="flex w-full  gap-5">
-                                <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                                  <h5 className="text-small tracking-tight text-default-400">Money I paid Task</h5>
-                                  <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{TotalTaskPaid} FRW</h4>
-                                </div>
-                              </div>
-                              <div className="flex w-2/6">
-                                <p>{countTaskPublished3} Tasks</p>
-                              </div>
-                            </CardHeader>
-                            <CardFooter className="gap-3">
-                              <Progress aria-label="Loading..." value={60} className="max-w-md"/>
-                          </CardFooter>
-                        </Card>
+                            </div>
+                            <div className="flex w-2/6">
+                              <p>Manager</p>
+                            </div>
+                          </CardHeader>
+                          <CardFooter className="gap-3">
+                            <Progress aria-label="Loading..." value={60} className="max-w-md"/>
+                        </CardFooter>
+                      </Card>
                     </>
-                )}
-                <div className='-mb-16'></div>
-            </div>
-            {isHome && (<LBtn />)}
-            <div>
-            <div className='grid grid-cols-3 gap-4 px-2 '>
-            {isRank && (
+                    ))}  
+                  </>
+              )}
+
+              {isAccount && (
+                <LAccount />
+              )}
+              
+              {isAlert && (
+                  <>
+                  {usersOn.map((user) => (
                     <>
-                         <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
-                            <CardHeader className="justify-between ">
-                              <div className="flex w-full  gap-5">
-                                <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                                  <h5 className="text-small tracking-tight text-default-400">Total Pending</h5>
-                                  <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{TotalPend} FRW</h4>
-                                </div>
+                      <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
+                          <CardHeader className="justify-between ">
+                            <div className="flex w-full  gap-5">
+                              <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                                <h5 className="text-small tracking-tight text-default-400">Balance</h5>
+                                <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{user.Balance} FRW</h4>
                               </div>
-                              <div className="flex w-2/6">
-                                <p>Manager</p>
+                            </div>
+                            <div className="flex w-2/6">
+                              <p>Manager</p>
+                            </div>
+                          </CardHeader>
+                          <CardFooter className="gap-3">
+                            <Progress aria-label="Loading..." value={60} className="max-w-md"/>
+                        </CardFooter>
+                      </Card> 
+                      <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
+                          <CardHeader className="justify-between ">
+                            <div className="flex w-full  gap-5">
+                              <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                                <h5 className="text-small tracking-tight text-default-400">Deposite</h5>
+                                <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{user.Deposite} FRW</h4>
                               </div>
-                            </CardHeader>
-                            <CardFooter className="gap-3">
-                              <Progress aria-label="Loading..." value={60} className="max-w-md"/>
-                          </CardFooter>
-                        </Card> 
-                        <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
-                            <CardHeader className="justify-between ">
-                              <div className="flex w-full  gap-5">
-                                <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                                  <h5 className="text-small tracking-tight text-default-400">Pendin Earning</h5>
-                                  <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{totalEarnPending} FRW</h4>
-                                </div>
+                            </div>
+                            <div className="flex w-2/6">
+                              <p>Manager</p>
+                            </div>
+                          </CardHeader>
+                          <CardFooter className="gap-3">
+                            <Progress aria-label="Loading..." value={60} className="max-w-md"/>
+                        </CardFooter>
+                      </Card>
+                      <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
+                          <CardHeader className="justify-between ">
+                            <div className="flex w-full  gap-5">
+                              <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                                <h5 className="text-small tracking-tight text-default-400">Withdrow</h5>
+                                <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{user.WITHDROWAL} FRW</h4>
                               </div>
-                              <div className="flex w-2/6">
-                                <p>Manager</p>
+                            </div>
+                            <div className="flex w-2/6">
+                              <p>Manager</p>
+                            </div>
+                          </CardHeader>
+                          <CardFooter className="gap-3">
+                            <Progress aria-label="Loading..." value={60} className="max-w-md"/>
+                        </CardFooter>
+                      </Card>
+                      </>
+                      ))}
+                      <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
+                          <CardHeader className="justify-between ">
+                            <div className="flex w-full  gap-5">
+                              <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                                <h5 className="text-small tracking-tight text-default-400">Total Pending Earnings</h5>
+                                <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{totalEarnPending} FRW</h4>
                               </div>
-                            </CardHeader>
-                            <CardFooter className="gap-3">
-                              <Progress aria-label="Loading..." value={60} className="max-w-md"/>
-                          </CardFooter>
-                        </Card>
-                        <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
-                            <CardHeader className="justify-between ">
-                              <div className="flex w-full  gap-5">
-                                <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                                  <h5 className="text-small tracking-tight text-default-400">Pending Spendings</h5>
-                                  <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{totalAmount} FRW</h4>
-                                </div>
+                            </div>
+                            <div className="flex w-2/6">
+                              <p>{countTaskITook} Tasks</p>
+                            </div>
+                          </CardHeader>
+                          <CardFooter className="gap-3">
+                            <Progress aria-label="Loading..." value={60} className="max-w-md"/>
+                        </CardFooter>
+                      </Card> 
+
+                      <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
+                          <CardHeader className="justify-between ">
+                            <div className="flex w-full  gap-5">
+                              <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                                <h5 className="text-small tracking-tight text-default-400">Task Earning Amount</h5>
+                                <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{totalEarn} FRW</h4>
                               </div>
-                              <div className="flex w-2/6">
-                                <p>Manager</p>
+                            </div>
+                            <div className="flex w-2/6">
+                              <p>{countTaskTook3} Tasks</p>
+                            </div>
+                          </CardHeader>
+                          <CardFooter className="gap-3">
+                            <Progress aria-label="Loading..." value={60} className="max-w-md"/>
+                        </CardFooter>
+                      </Card>
+
+                       
+
+                      <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
+                          <CardHeader className="justify-between ">
+                            <div className="flex w-full  gap-5">
+                              <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                                <h5 className="text-small tracking-tight text-default-400">Balance I assigned on Task</h5>
+                                <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{totalAmount} FRW</h4>
                               </div>
-                            </CardHeader>
-                            <CardFooter className="gap-3">
-                              <Progress aria-label="Loading..." value={60} className="max-w-md"/>
-                          </CardFooter>
-                        </Card>
-              </>
-            )}
-            </div>
-            {isRank && (<LTables />)}
-            {/* {isAlert && (<LGraph />)} */}
-            </div>
-            </div>
-        </div>
+                            </div>
+                            <div className="flex w-2/6">
+                              <p>{countTaskPublished2} Tasks</p>
+                            </div>
+                          </CardHeader>
+                          <CardFooter className="gap-3">
+                            <Progress aria-label="Loading..." value={60} className="max-w-md"/>
+                        </CardFooter>
+                      </Card>
+                      
+                      <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
+                          <CardHeader className="justify-between ">
+                            <div className="flex w-full  gap-5">
+                              <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                                <h5 className="text-small tracking-tight text-default-400">Money I paid Task</h5>
+                                <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{TotalTaskPaid} FRW</h4>
+                              </div>
+                            </div>
+                            <div className="flex w-2/6">
+                              <p>{countTaskPublished3} Tasks</p>
+                            </div>
+                          </CardHeader>
+                          <CardFooter className="gap-3">
+                            <Progress aria-label="Loading..." value={60} className="max-w-md"/>
+                        </CardFooter>
+                      </Card>
+                  </>
+              )}
+              <div className='-mb-16'></div>
+          </div>
+          {isHome && (<LBtn />)}
+          <div>
+          <div className='grid grid-cols-3 gap-4 px-2 '>
+          {isRank && (
+                  <>
+                       <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
+                          <CardHeader className="justify-between ">
+                            <div className="flex w-full  gap-5">
+                              <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                                <h5 className="text-small tracking-tight text-default-400">Total Pending</h5>
+                                <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{TotalPend} FRW</h4>
+                              </div>
+                            </div>
+                            <div className="flex w-2/6">
+                              <p>Manager</p>
+                            </div>
+                          </CardHeader>
+                          <CardFooter className="gap-3">
+                            <Progress aria-label="Loading..." value={60} className="max-w-md"/>
+                        </CardFooter>
+                      </Card> 
+                      <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
+                          <CardHeader className="justify-between ">
+                            <div className="flex w-full  gap-5">
+                              <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                                <h5 className="text-small tracking-tight text-default-400">Pendin Earning</h5>
+                                <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{totalEarnPending} FRW</h4>
+                              </div>
+                            </div>
+                            <div className="flex w-2/6">
+                              <p>Manager</p>
+                            </div>
+                          </CardHeader>
+                          <CardFooter className="gap-3">
+                            <Progress aria-label="Loading..." value={60} className="max-w-md"/>
+                        </CardFooter>
+                      </Card>
+                      <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
+                          <CardHeader className="justify-between ">
+                            <div className="flex w-full  gap-5">
+                              <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                                <h5 className="text-small tracking-tight text-default-400">Pending Spendings</h5>
+                                <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{totalAmount} FRW</h4>
+                              </div>
+                            </div>
+                            <div className="flex w-2/6">
+                              <p>Manager</p>
+                            </div>
+                          </CardHeader>
+                          <CardFooter className="gap-3">
+                            <Progress aria-label="Loading..." value={60} className="max-w-md"/>
+                        </CardFooter>
+                      </Card>
+            </>
+          )}
+          </div>
+          {isRank && (<LTables />)}
+          {/* {isAlert && (<LGraph />)} */}
+          </div>
+          </div>
+      </div>
+        {/* ) : ( */}
+        {/* {isAccount && (
+          <div className='flex flex-col h-screen overflow-y-auto' style={{width: '95%'}}>
+            
+          </div>
+        )} */}
     </div>
   );
 };
 
 export default Ldashboard
+
+
