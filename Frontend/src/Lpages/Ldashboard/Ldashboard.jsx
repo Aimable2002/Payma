@@ -41,8 +41,6 @@ import LAccount from './LAccount';
 
 const Ldashboard = () => {
 
-
-
     const {loading, logout} = useLogout()
     const [theme, setTheme] = useState(getCurrentTheme());
 
@@ -77,7 +75,7 @@ const Ldashboard = () => {
         { name: 'task Dashboard', leftIcon: <AssessmentIcon className="text-info"/>, rightIcon: <DragHandleTwoToneIcon />, onClick: () => handleButtonClick('Rank')},
         { name: 'History', leftIcon: <LinearScaleIcon className="text-info"/>, rightIcon: <DragHandleTwoToneIcon />, onClick: () => handleButtonClick('Tasks')},
         { name: 'Dashboard', leftIcon: <SummarizeIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>, onClick: () => handleButtonClick('Alert') },
-        { name: 'Account', leftIcon: <SettingsIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, onClick: () => handleButtonClick('Account')},
+        // { name: 'Account', leftIcon: <SettingsIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, onClick: () => handleButtonClick('Account')},
         { name: 'Theme', leftIcon: <ContrastIcon className="text-info" />, onClick: toggleTheme },
         { name: 'logout', leftIcon: !loading ? <LogoutTwoToneIcon className="text-error"/> : <span className="loading loading-ring"></span>, rightIcon: '', onClick: logout },
         { name: 'delete_account', leftIcon: <DeleteForeverTwoToneIcon className="text-error" />, rightIcon: '' }

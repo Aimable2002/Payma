@@ -10,6 +10,8 @@ import useDeposite from '../../hook/wallet/useDeposite.js'
 import useWithdrowal from '../../hook/wallet/useWithdrowal.js';
 import usegetTaskView from '../../hook/getTask/useTaskView.js';
 import usegetTaskTaker from '../../hook/getTask/getTaskTaker.js';
+import useGetInvite from '../../hook/Invitation/useGetInvite.js';
+import inviteData from '../../hook/Invitation/inviteData.js';
 const dashboard = () => {
     const [isHome, setIsHome] = useState(true)
   const [isTask, setIsTask] = useState(false);
@@ -120,6 +122,15 @@ const {task} = usegetTaskView();
 //console.log('task :', task)
 const {taskTaker} = usegetTaskTaker();
 //console.log('taskToker :', taskTaker)
+
+const getRowStyle = (item) => {
+    if (item.Approval === 'Approved') {
+      return { backgroundColor: '#2563eb', color: 'white' };
+    }
+    return {};
+  };
+  const {inviteTaskDash} = inviteData()
+  console.log('invitee task :', inviteTaskDash)
   return (
     <div className="w-full flex flex-col overflow-auto">
         <div className=" w-full">
@@ -166,6 +177,16 @@ const {taskTaker} = usegetTaskTaker();
                     </div>
                 </div>
             </div>
+
+            <div className='w-full px-2 py-2'>
+                <div className='w-full justify-center gap-1  flex flex-row'>
+                    <div className='flex flex-col bg-base-100 p-2 px-5' style={{borderRadius: '15px'}}>
+                        <div className='flex justify-center text-small tracking-tight '>Earned Amount</div>
+                        <div className='flex justify-center'><span className='text-small tracking-tight text-default-400'>FRW </span> {user.Earnings}</div>
+                    </div>
+                </div>
+            </div>
+
             <div className='w-full flex flex-row mt-4 justify-center gap-4 py-2'>
                 <Button className='w-2/5 border-none outline-none bg-base-100' onClick={()=>document.getElementById('my_modal_3').showModal()}>deposite</Button>
                 <dialog id="my_modal_3" className="modal">
@@ -253,8 +274,8 @@ const {taskTaker} = usegetTaskTaker();
                         </tr>
                     </thead>
                     {task.map((user) => (
-                            <tbody>
-                                <tr>
+                            <tbody key={user.taskId}>
+                                <tr className={user.Approval === 'Approved' ? 'bg-indigo-500' : ''}>
                                     <th scope="row">{user.Agreement}</th>
                                     <td>{user.userName}</td>
                                     {/* <td>--</td> */}
@@ -277,15 +298,28 @@ const {taskTaker} = usegetTaskTaker();
                         </tr>
                     </thead>
                     {taskTaker.map((user) => (
-                            <tbody>
-                                <tr>
+                        <tbody key={user.taskId}>
+                            <tr className={user.Approval === 'Approved' ? 'bg-info' : ''}>
+                                <th scope="row">{user.Agreement}</th>
+                                <td>{user.userName}</td>
+                                {/* <td>--</td> */}
+                                <td>{user.Amount}</td>
+                            </tr>
+                        </tbody>
+                    ))}
+                    {!loading && inviteTaskDash.length !== 0 ? (
+                        inviteTaskDash.map((user) => (
+                            <tbody key={user.inviteeId}>
+                                <tr className={user.Approval === 'Approved' ? 'bg-info' : ''}>
                                     <th scope="row">{user.Agreement}</th>
-                                    <td>{user.userName}</td>
+                                    <td>{user.inviter}</td>
                                     {/* <td>--</td> */}
                                     <td>{user.Amount}</td>
                                 </tr>
                             </tbody>
-                    ))}
+                        ))):(
+                            ''
+                        )}
                 </table>
         </div>
     </div>

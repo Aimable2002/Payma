@@ -1,5 +1,5 @@
 import express from 'express';
-import { assignTask, assigneer, taskTaker, taskView, taskerView } from '../controller/taskController.js';
+import { assignTask, assigneer, postInvitation, taskInviteeView, taskTaker, taskView, taskerView } from '../controller/taskController.js';
 import { protectRoute } from '../middleware/protectRoute.js';
 
 
@@ -11,6 +11,10 @@ router.get('/assigner', protectRoute, assigneer)
 router.get('/task-view', protectRoute, taskView)
 router.get('/task-taker', protectRoute, taskerView)
 router.post('/take-task/:id', protectRoute, taskTaker)
+
+
+router.post('/invitation', protectRoute, postInvitation)
+router.get('/get-Invite-task', protectRoute, taskInviteeView)
 
 
 export default router

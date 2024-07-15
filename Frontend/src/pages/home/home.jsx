@@ -27,6 +27,10 @@ import postApproval from "../../hook/approveTask/postApproval";
 
 import ContrastIcon from '@mui/icons-material/Contrast';
 import { toggleTheme, getCurrentTheme } from "../../utilities/themeToggle";
+import { updatePassward } from "../../../../backend/controller/updateControlla";
+import { PUpdate } from "../../hook/updateHook/PUpdate";
+import useInvite from "../../hook/Invitation/useInvite";
+import useGetInvite from "../../hook/Invitation/useGetInvite";
 
 const truncateString = (str, maxLength) => {
     if(str.length <= maxLength ){
@@ -56,7 +60,7 @@ const home = () => {
     { name: 'wallet', leftIcon: <WalletIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard' },
     { name: 'task Dashboard', leftIcon: <AssessmentIcon className="text-info"/>, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard' },
     { name: 'Dashboard', leftIcon: <SummarizeIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>, link: '/dashboard' },
-    { name: 'Account', leftIcon: <SettingsIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, link: '/account' },
+    { name: 'Account', leftIcon: <SettingsIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, onClick: () =>document.getElementById('my_modal_30').showModal() },
     { name: 'Theme', leftIcon: <ContrastIcon className="text-info" />, onClick: toggleTheme },
     { name: 'logout', leftIcon: !loading ? <LogoutTwoToneIcon className="text-error"/> : <span className="loading loading-ring"></span>, rightIcon: '', onClick: logout },
     { name: 'delete_account', leftIcon: <DeleteForeverTwoToneIcon className="text-error" />, rightIcon: '' }
@@ -177,7 +181,7 @@ const handleIsDefault = (e) => {
   }
 }
 const {isTaskToApprove} = approveTask(activeButton)
-console.log('isTaskTo approve :', isTaskToApprove)
+//console.log('isTaskTo approve :', isTaskToApprove)
 const {trackApprove, makePostAppr} = postApproval();
 
 const [approveStatus, setApproveStatus] = useState({});
@@ -186,7 +190,7 @@ const handleApprove = async (user) => {
   console.log('task am approving :', user)
   const {Status, taskId} = user
   const value = {Status, taskId}
-  //await makePostAppr(value)
+  await makePostAppr(value)
   setApproveStatus((prevStatus) => ({
     ...prevStatus,
     [user.taskId] : !prevStatus[user.taskId]
@@ -209,6 +213,99 @@ const [theme, setTheme] = useState(getCurrentTheme());
   }, []);
 
   const bgColorClass = theme === 'light' ? 'bg-white' : 'bg-base-100';
+  const {tractP, trackPStatus, updatePassword} = PUpdate()
+  const [submitting, setSubmitting] = useState(false);
+  const [focusedInput22, setFocusedInput22] = useState('');
+      const [inputValues2, setInputValues2] = useState({
+        OldPassword: '',
+        NewPassword: ''
+    })
+    const handleFocus22 = (label) => {
+        setFocusedInput22(label);
+        setSubmitting(true)
+    };
+    const handleChange22 = (e) => {
+        const { name, value } = e.target;
+        setInputValues2({
+            ...inputValues2,
+            [name]: value
+        });
+
+    };
+    const submitPassUpdate = async(e) => {
+      e.preventDefault()
+      const {OldPassword, NewPassword} = inputValues2
+      console.log('new value :', inputValues2)
+      await updatePassword(inputValues2)
+      setSubmitting(false)
+    }
+    const getButtonText = () => {
+      switch (tractP) {
+        case 'success':
+          return 'Password Saved';
+        case 'fail':
+          return 'Fail';
+        case 'mismatch':
+          return 'Old Password not matching';
+        case 'same data':
+          return 'Same Password';
+        case 'not found':
+          return 'incorrect old Password';
+        default:
+          return 'Save Password';  
+      }
+    };
+    const [isTitle, setIsTitle] = useState(false)
+    const handleTitleEdit = () => {
+      setIsTitle(true)
+    }
+    const [ InviteValue, setInviteValue ] = useState({
+      Task: '',
+      Agreement: "",
+      Amount: '',
+      Start_date: '',
+      End_date: ''
+    })
+    const handleChange00 = (e) => {
+      const { name, value } = e.target;
+      setInviteValue({
+          ...InviteValue,
+          [name]: value
+      });
+
+  };
+  const { isInvited, postInvitation} = useInvite()
+    const handleInvite = async (user) => {
+      const  {"Task Title": Agreement, "Task Description": Description, "Amount in FRW": Amount, Start_date, End_date} = InviteValue
+      const inviteData = {
+        Agreement,
+        Description,
+        Amount,
+        Start_date,
+        End_date
+      };
+      const {userId, userName} = user
+      const input = {userId, userName}
+      const allData = {inviteData, input}
+      console.log('all data :', allData)
+      await postInvitation(allData)
+    }
+    const {inviteTask} = useGetInvite(activeButton)
+    const [search, setSearch] = useState('')
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (!search) return;
+    
+        const result = users.find((any) => any.userName.toLowerCase().includes(search.toLowerCase()));
+    
+        if (result) {
+          setUser(result);
+          setSearch('');
+        } else {
+          console.log('no user found');
+        }
+    };
   return (
     <div className="w-full flex flex-col overflow-auto">
         <div className=" w-full">
@@ -237,6 +334,90 @@ const [theme, setTheme] = useState(getCurrentTheme());
                 )}
 
             </div>
+            <dialog id="my_modal_30" className="modal">
+                <div className="modal-box">
+                    <form method="dialog">
+                    {/* if there is a button in form, it will close the modal */}
+                    <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                    </form>
+                    <h3 className="font-bold text-lg">Pearsonal Details</h3>
+                    <div className='flex flex-col align-middle justify-center'>
+                        <h2>Your detail info</h2>
+                        <div className='flex flex-row gap-4'>
+                            <div className='flex flex-col text-sm'>
+                                <h2>First_Name</h2>
+                                <div>Aimable 1 <span className='ml-2 text-info'> Edit</span></div>
+                            </div>
+                            <div className='flex flex-col text-sm'>
+                                <h2>Last_Name</h2>
+                                <div>Aimable 2  <span className='ml-2 text-info'> Edit</span></div>
+                            </div>
+                            <div className='flex flex-col text-sm'>
+                                <h2>User_Name</h2>
+                                <div>@Aimable  <span className='ml-2 text-info'> Apply</span></div>
+                            </div>
+                        </div>
+                        <div className='flex flex-col mt-4'>
+                            <h2>Title</h2>
+                            <div className='flex flex-row gap-4'>
+                                <div>Dev <span className='ml-2 cursor-pointer text-info' onClick={handleTitleEdit}> Edit</span></div>
+                                {isTitle && (
+                                  <>
+                                    <div className="flex flex-row gap-5">
+                                      <input 
+                                      type="text" 
+                                      onFocus={() => handleFocus22('OldPassword')}/>
+                                      {focusedInput22 ? (<i>vi</i>) : (<div>v0</div>)}
+                                    </div>
+                                  </>
+                                )}
+                            </div>
+                        </div>
+                        <div className='flex flex-col gap-2 mt-4'>
+                            <h2>Change Password</h2>
+                            <div className='flex flex-col mt-5'>
+                                <div className='flex-col flex'>
+                                    <form onSubmit={submitPassUpdate}>
+                                        <div className='flex'>
+                                            <label htmlFor="old" className={` absolute ${inputValues2['OldPassword'] ? 'trans2' : (focusedInput22 === 'OldPassword' ? 'trans' : '')}`}>Old Password</label>
+                                            <input type="password" 
+                                            id='old'
+                                            name='OldPassword'
+                                            onChange={handleChange22}
+                                            onFocus={() => handleFocus22('OldPassword')}/>
+                                        </div>
+                                        <div className='flex mt-5 mb-5 '>
+                                            <label htmlFor="new" className={` absolute ${inputValues2['NewPassword'] ? 'trans2' : (focusedInput22 === 'NewPassword' ? 'trans' : '')}`}>New Password</label>
+                                            <input type="password"
+                                            id='new'
+                                            name='NewPassword'
+                                            onChange={handleChange22}
+                                            onFocus={() => handleFocus22('NewPassword')} />
+                                        </div>
+                                        <div className=''>
+                                            <button type="submit">{trackPStatus ? 'Successfull' : 'Save password'}</button>
+                                        </div>
+                                    </form>
+                                    <div className='flex flex-col mt-2'>
+                                        <h2>Address</h2>
+                                        <div className='flex flex-col'>
+                                            <div>Email</div>
+                                            <div>aimable@gmail <span className='text-info'> Edit</span></div>
+                                        </div>
+                                        <div className='flex flex-col'>
+                                            <div>Phone_number</div>
+                                            <div>(+255) 555 5555 <span className='text-info'> Edit</span></div>
+                                        </div>
+                                        <div className='mt-4'>
+                                            <button>Save all</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </dialog>
         </div>
         <div className="mt-8 py-2 gap-4 overflow-x-auto w-full flex flex-row hide-scrollbar">
           <div className={`${activeButton === 'Home' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Home')}>Home</div>
@@ -292,10 +473,29 @@ const [theme, setTheme] = useState(getCurrentTheme());
                       <p className="text-default-400 text-small">{task.Duration}</p>
                     </div>
                     <div className="flex gap-1">
-                      <button className="btn" onClick={() => handleApply(task)}>
+                      <button className="btn" onClick={()=>document.getElementById(task.taskId).showModal()}>
                         {loading ? <span className="loading loading-ring"></span> :  !loading && TaskStatus[task.taskId] ? 'Taken' : task.Task_status }
                       </button>
                     </div>
+                    <dialog id={task.taskId} className="modal">
+                      <div className="modal-box">
+                        <form method="dialog">
+                          {/* if there is a button in form, it will close the modal */}
+                          <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                        </form>
+                        <h3 className="font-bold text-lg">Hello!</h3>
+                        <p className="py-4">Press ESC key or click on ✕ button to close</p>
+                        {task.Task_status === 'Taken' ? (
+                          <Button className="btn">
+                            Task Taken
+                          </Button>
+                        ) : (
+                          <button className="btn" onClick={() => handleApply(task)}>
+                            Apply/contact
+                          </button>
+                        )}
+                      </div>
+                  </dialog>
                 </CardFooter>
             </Card>
             ))}
@@ -352,7 +552,10 @@ const [theme, setTheme] = useState(getCurrentTheme());
                   <span> </span> <span>cancel</span>
                 </div>
               )} */}
-            </div>
+              </div>
+              <div className="px-2 mb-1">
+                <h1>This is task U take</h1>
+              </div>
             </div>
             {/* {!isAddTask ? ( */}
             {isData.map((user) => (
@@ -378,6 +581,30 @@ const [theme, setTheme] = useState(getCurrentTheme());
                   </CardHeader>
               </Card>
             ))}
+            {!loading && inviteTask.length !== 0 ? (
+              inviteTask.map((user) => (
+              <Card key={user.taskId} className="w-full mb-1" style={{zIndex: '1'}}>
+              <CardHeader className="justify-between w-full">
+                      <div className="flex w-4/5  gap-5">
+                      {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
+                      <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                          <h4 className="text-small font-semibold leading-none text-default-600">{user.Agreement}</h4>
+                          <h5 className="text-small tracking-tight text-default-400">@{user.inviter}</h5>
+                      </div>
+                      </div>
+                      <Button
+                      onClick={() => handleReport(user)}
+                      className={!reportStatus[user.inviteeId] ? " bg-transparent text-foreground border-default-200" : "border-primary"}
+                      color="primary"
+                      radius="full"
+                      size="sm"
+                      >
+                      {reportStatus[user.inviteeId] ? 'Reported' : user.Report}
+                      {/* {reportStatus[user.taskId] ? <span>Reported</span> : <span>pending</span>} */}
+                      </Button>
+                  </CardHeader>
+              </Card>
+            ))) : ('')}
         {/* ) : ( */}
         <dialog id="my_modal_3" className="modal">
           <div className="modal-box">
@@ -705,6 +932,9 @@ const [theme, setTheme] = useState(getCurrentTheme());
         
         {isAlert && (
           <>
+          <div className="px-2 mb-1">
+            <h1>This is task U need to Approve</h1>
+          </div>
           {isTaskToApprove.map((user) => (
           <Card key={user.taskId} className="w-full mb-1" style={{zIndex: '1'}}>
           <CardHeader className="justify-between w-full">
@@ -760,7 +990,21 @@ const [theme, setTheme] = useState(getCurrentTheme());
           )}
         {isRank && (
           <>
-          {users.map((user) => (
+          <div className='w-full flex-row flex gap-2 py-1'>
+            <div className='w-full'>
+              <form onSubmit={handleSearch}>
+                <input 
+                  type="search" 
+                  placeholder='search...'
+                  className='border-none w-full px-4'
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)} />
+              </form>
+            </div>
+          </div>
+          {users
+          .filter((user) => user.userName.toLowerCase().includes(search.toLowerCase()))
+          .map((user) => (
               <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
               <CardHeader className="justify-between ">
                   <div className="flex  gap-5">
@@ -784,8 +1028,35 @@ const [theme, setTheme] = useState(getCurrentTheme());
                     <p className="text-default-400 text-small">Task Done</p>
                   </div>
                   <div className="flex gap-1">
-                    <button className="btn">Approach</button>
+                    <button className="btn" onClick={()=>document.getElementById(user.userId).showModal()}>Invite</button>
                   </div>
+                  <dialog id={user.userId} className="modal">
+                    <div className="modal-box">
+                      <form method="dialog">
+                        {/* if there is a button in form, it will close the modal */}
+                        <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                      </form>
+                      <h3 className="font-bold text-lg">Invite {user.userName}</h3>
+
+                      {['Task Title', 'Task Description', 'Amount in FRW', 'Start_date', 'End_date'].map((field) => (
+                          <div key={field} className='flex w-full flex-col inputGroup'>
+                            <label htmlFor={field} className={`absolute ${InviteValue[field] ? 'trans2' : (focusedInput === field ? 'trans' : '')} ${field.toLowerCase().includes('date') ? 'tran' : ''}`}>
+                              {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1').trim()}
+                            </label>
+                            <input
+                              id={field}
+                              name={field}
+                              onChange={handleChange00}
+                              type={field.includes('date') ? 'date' : field.toLowerCase() === 'amount' ? 'number' : 'text'}
+                              onFocus={() => handleFocus(field)}
+                            />
+                          </div>
+                      ))}
+                      <div className='mt-10'>
+                        <button type='button' onClick={() => handleInvite(user)}>{!isInvited ? 'Invite' : 'Well Done'}</button>
+                      </div>
+                    </div>
+                </dialog>
               </CardFooter>
           </Card>
           ))}

@@ -58,7 +58,7 @@ export const approval = async (req, res) => {
                 }
 
                 const tracktaskId = 'SELECT * FROM TASK WHERE taskId = ? AND Status = ? AND task_giverId = ?';
-                console.log('tracktaskId :', tracktaskId)
+                
                 connection.query(tracktaskId, [taskId, 'Reported', USERID], async(err, result) => {
                     if(err){
 
@@ -79,25 +79,73 @@ export const approval = async (req, res) => {
                         })
                     }
                     console.log('result22', result[0].Approval === 'Approve')
+                    const taskAmount = result[0].Amount;
+                    
+                    const taskTakerId = result[0].task_takerId;
+                    console.log('taker :', taskTakerId)
+
+                    if (isNaN(taskAmount)) {
+                        return connection.rollback(() => {
+                            console.log('Invalid task amount:', taskAmount);
+                            return res.status(407).json('Invalid task amount');
+                        });
+                    }
+                    const selectUser = 'SELECT Balance, Earnings FROM USERS WHERE userId = ?';
+                    connection.query(selectUser, [taskTakerId], (err, result) => {
+                        if(err){
+                            return connection.rollback(() => {
+                                return res.status(408).json('something went wrong')
+                            })
+                        }
+
+                        const OLDBALANCE = result[0].Balance;
+                        console.log('old balance :', OLDBALANCE)
+                        const OLDEARNINGS = result[0].Earnings;
+                        console.log('old earnings :', OLDEARNINGS)
+                        const totalE = taskAmount + OLDEARNINGS
+                        console.log('total E :', totalE)
+                        const totalB = taskAmount + OLDBALANCE
+                        console.log('total B :', totalB)
 
                     const updateApproval = 'UPDATE TASK SET Approval = ? WHERE taskId = ? AND Status = ? AND task_giverId = ?';
                     connection.query(updateApproval, ['Approved', taskId, 'Reported', USERID], (err, result) => {
                         if(err){
                             return connection.rollback(() => {
-                                return res.status(400).json('something went wrong')
+                                return res.status(402).json('something went wrong')
                             })
                         }
-                        connection.commit(err => {
-                            if (err) {
-                                return connection.rollback(() => {
-                                    throw err;
-                                });
-                            }
+                    const updateUserBalance = 'UPDATE USERS SET Balance = ? , Earnings = ? WHERE userId = ?';
+                    connection.query(updateUserBalance, [totalB, totalE, taskTakerId], (err, result) => {
+                        if (err) {
+                            return connection.rollback(() => {
+                                return res.status(406).json('something went wrong updating user balance');
+                            });
+                            
+                        }
+                        console.log('amount :', taskAmount)
+                        console.log('taker :', taskTakerId)
+                        // const resetTaskAmount = 'UPDATE TASK SET amount = 0 WHERE taskId = ?';
+                        // connection.query(resetTaskAmount, [taskId], (err, result) => {
+                        //     if (err) {
+                        //         return connection.rollback(() => {
+                        //             return res.status(400).json('something went wrong resetting task amount');
+                        //         });
+                        //     }
+                        
+                            connection.commit(err => {
+                                if (err) {
+                                    return connection.rollback(() => {
+                                        throw err;
+                                    });
+                                }
     
-                            res.status(200).json({message: 'tast Approved', status: true});
+                                res.status(200).json({message: 'tast Approved', status: true});
+                            // })
+                            })
                         });
 
                     })
+                })
                 })
             })
         }else{

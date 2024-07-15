@@ -80,7 +80,7 @@ const Lsign = () => {
             <div className='w-full'>
               <h1 className='text-center text-info mb-5'>Web Focus</h1>
               <p className='text-center'>Welcome to [Your Website Name], <br /> where efficiency meets opportunity! We are <br /> a streamlined platform designed <br /> for seamless transactions and task management:</p>
-              <ul className='mt-5'>
+              <ul className='mt-5 text-center'>
                 <li>Publish Tasks: Easily list tasks needing completion and specify requirements.</li>
                 <li>Deposit Funds: Securely transfer funds to ensure task completion and payment.</li>
                 <li>Earn Rewards: Task completers receive swift payments upon task approval.</li>

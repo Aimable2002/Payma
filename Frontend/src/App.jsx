@@ -11,6 +11,7 @@ import Profile from './pages/profile/profile'
 import Lsign from './Lpages/Lregistration/Lsign'
 import Lhome from './Lpages/Lhome/Lhome'
 import Ldashboard from './Lpages/Ldashboard/Ldashboard'
+import AfriPayForm from './context/afripay'
 
 function App() {
 
@@ -39,6 +40,7 @@ function App() {
           <Route path='/sign' element={AuthUser ? <Navigate to= '/' /> : <Lsign /> } />
           <Route path='/' element={AuthUser ? <Lhome /> : <Navigate to='sign' />} />
           <Route path='/dashboard' element={AuthUser ? <Ldashboard /> : <Navigate to='sign' />} />
+          <Route path='/afripay' element={AuthUser ? <AfriPayForm /> : <Navigate to='sign' />} />
         </Routes>
       )}
     </div>

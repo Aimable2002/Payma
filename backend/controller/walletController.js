@@ -1,11 +1,13 @@
+import { response } from "express";
 import connectDatabase from "../database/connectDatabase.js";
-
 
 const connection = connectDatabase();
 
 
 export const deposite = async (req, res) => {
     try{
+        // const cashToDeposite = req.cashInTrack
+        console.log('payload :', req.body)
         const {Email, Amount, Phone_number, userName} = req.body;
         console.log('body req :', req.body)
         const USERID = req.user.userId
@@ -32,6 +34,7 @@ export const deposite = async (req, res) => {
 
 export const Withdrowal = async (req, res) => {
     try{
+        // const cashtoWithdrowa = req.cashOutTrack
         const {Email, Amount, Phone_number, userName} = req.body;
         console.log('req body :', req.body)
 

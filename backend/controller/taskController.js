@@ -153,9 +153,9 @@ export const taskTaker = async (req, res) => {
             if(err){
                 console.log(401).json({error: 'error'})
             }
-            if (result.length === 0) { // Check if result is empty
+            if (result.length === 0) {
                 console.log('No task found');
-                return res.status(404).json('No task found'); // Added return to stop further execution
+                return res.status(404).json('No task found');
             }
             if(result[0].task_takerId !== null){
                 return res.status(501).json('task taken already')
@@ -238,4 +238,74 @@ export const taskTakerView = async(req, res) => {
         console.log('internal server error :', error.message)
         return res.status(500).json({error: 'internal serer error'})
     }
+}
+
+
+
+
+export const postInvitation = async (req, res) => {
+    const GiverId = req.user.userId
+
+    const {TakerId, Taker_Name, Agreement, Description, Amount, Start_date, End_date} = req.body
+
+    if(!TakerId || !Taker_Name || !Agreement || !Description || !Amount || !Start_date || !End_date){
+        console.log('missing data')
+        return res.status(400).json({message: 'missing data', status: false})
+    }
+
+    connection.beginTransaction(err => {
+        if(err){
+            throw new Error (err)
+        }
+
+        const getInvittingUser = 'SELECT * FROM USERS WHERE userId = ?'
+        connection.query(getInvittingUser, [GiverId], (err, result) => {
+            if(err){
+                return connection.rollback(() => {
+                    console.log('error :', err.message)
+                    return res.status(404).json({message: 'user data missing', status: false})
+                })
+            }
+            const inviter = result[0].userName
+            console.log('userData :', inviter)
+
+            const insertInviteData = 'INSERT INTO invitee (invitee, inviter, Agreement, Description, Start_date, End_date, Amount, inviterId, TakerId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            connection.query(insertInviteData, [Taker_Name, inviter, Agreement, Description, Start_date, End_date, Amount, GiverId, TakerId], (err, result) => {
+                if(err){
+                    return connection.rollback(() => {
+                        console.log('error :', err.message)
+                        return res.status(409).json({err: 'error'})
+                    })
+                }
+                connection.commit(err => {
+                    if(err){
+                        return connection.rollback(() => {
+                            console.log('fail to commit :', err.message)
+                            return res.status(409).json({message: 'fail to commit :', status: false})
+                        })
+                    }
+                    return res.status(200).json({message: 'successfully invited', status: true})
+                })
+            })
+        })
+    })
+}
+
+
+export const taskInviteeView = async (req, res) => {
+    const USERID = req.user.userId
+    console.log('userId :', USERID)
+    const selectTask = 'SELECT * FROM INVITEE WHERE TakerId = ?';
+    connection.query(selectTask, [USERID], (err, result) => {
+        if(err){
+            console.log('error :', err.message)
+            return res.status(409).json({message: 'error', status: false})
+        }
+        if(result.lenght === 0){
+            return res.status(404).json({message: 'No task found', status: false})
+        }
+        const data = result
+        console.log('data :', data)
+        return res.status(200).json(data)
+    })
 }
