@@ -102,3 +102,15 @@ export const logout = (req, res) => {
         res.status(500).json({error: "internal server logout error"})
     }
 }
+
+
+export const googleCallback = async (req, res) => {
+    try {
+      const user = req.user;
+      return res.status(200).json({ token: user.token });
+    } catch (error) {
+      console.log('Error in Google callback:', error.message);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+  

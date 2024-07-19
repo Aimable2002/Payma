@@ -60,6 +60,7 @@ export const Withdrowal = async (req, res) => {
 }
 
 
+
 export const wallet = async(req, res) => {
     try{
         const {userId} = req.body;
@@ -86,3 +87,5 @@ export const wallet = async(req, res) => {
         res.status(500).json({error: 'internal server wallet error'})
     }
 }
+
+
