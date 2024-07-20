@@ -16,7 +16,7 @@ import { toggleTheme, getCurrentTheme } from "../../utilities/themeToggle";
 import useLogout from '../../hook/registration/logout';
 
 import PersonIcon from '@mui/icons-material/Person';
-import {Card, CardHeader, CardBody, CardFooter, Avatar, Button} from "@nextui-org/react";
+import {Card, CardHeader, CardBody, CardFooter, Avatar, Button, input} from "@nextui-org/react";
 import useGetUserTask from '../../hook/getUsers/usegetusersTaskl';
 import useTakeTask from '../../hook/getTask/useTakeTask';
 import approveTask from '../../hook/approveTask/approveTask';
@@ -31,6 +31,8 @@ import useGetInvite from '../../hook/Invitation/useGetInvite';
 
 import {Snippet} from "@nextui-org/react";
 import usegetApplyView from '../../hook/applying/applyView';
+import invitationSent from '../../hook/applying/invitationSent';
+import useConfirm from '../../hook/applying/comfirm';
 
 const Lhome = () => {
     const {loading, logout} = useLogout()
@@ -139,16 +141,18 @@ const Lhome = () => {
     const { users } = useGetUser(activeButton)
     const {usersTask} = useGetUserTask(activeButton);
 
+
     const {trackEvent, takeTask} = useTakeTask();
     const [TaskStatus, setTaskStatus] = useState({});
     
     const handleApply = async(task) => {
-      const values = task.taskId;
-      await takeTask(values)
-      setTaskStatus((prevStatus) => ({
-        ...prevStatus,
-        [task.taskId]: !prevStatus[task.taskId], // Toggle report status for the clicked user
-      }));
+        console.log('task apply :', task)
+    //   const values = task.taskId;
+    //   await takeTask(values)
+    //   setTaskStatus((prevStatus) => ({
+    //     ...prevStatus,
+    //     [task.taskId]: !prevStatus[task.taskId],
+    //   }));
       
     }
     const {isData} = useTakeTaskView(activeButton);
@@ -294,7 +298,30 @@ const Lhome = () => {
 
     }
     const {applyView} = usegetApplyView(activeButton);
-    console.log('applyView :', applyView)
+    //console.log('applyView :', applyView)
+
+    const {inviteTaskPending} = invitationSent(activeButton)
+
+    const {trackConfirm, confirmTask } = useConfirm()
+    const [trackConfirmId, setTrackConfirmId] = useState({})
+
+    const handleConfirmButton = async(apply) => {
+        
+        const {taskId, APPLYING_USERNAME} = apply
+        const input = {taskId, APPLYING_USERNAME}
+        console.log('confrim id :', input)
+        console.log('confrim id :', apply)
+        await confirmTask (input)
+        setTrackConfirmId((prevStatus) => ({
+        ...prevStatus,
+        [apply.taskId] : !prevStatus[apply.taskId]
+        }))
+    }
+    const handleDEclineButton = (apply) => {
+        const {taskId, APPLYING_USERNAME} = apply
+        const input = {taskId}
+        console.log('decline id :', input)
+    }
   return (
     <div className='w-full flex flex-row fixed'>
         <div className={`w-2/12 overflow-y-auto ${bgColorClass}`} style={{zIndex: '2'}}>
@@ -453,7 +480,9 @@ const Lhome = () => {
             <div className='grid grid-cols-3 gap-4 px-2 w-full'>
                 {isHome && (
                     <>
-                {usersTask.map((task) => (
+                {usersTask.map((task) => {
+                    console.log('task status :', task.Task_Status)
+                    return (
                     <Card  style={{zIndex: '1'}}>
                         <CardHeader className="justify-between">
                             <div className="flex gap-5">
@@ -489,7 +518,8 @@ const Lhome = () => {
                             </div>
                             <div className="flex gap-1">
                                 <button className="btn" onClick={()=>document.getElementById(task.taskId).showModal()}>
-                                    {loading ? <span className="loading loading-ring"></span> :  !loading && TaskStatus[task.taskId] ? 'Taken' : task.Task_status }
+                                    {loading ? <span className="loading loading-ring"></span> :  !loading  && TaskStatus[task.taskId] ? 'Apply' : task.Task_Status }
+                                    {/* {task.Task_Status} */}
                                 </button>
                             </div>
                             <dialog id={task.taskId} className="modal">
@@ -538,9 +568,17 @@ const Lhome = () => {
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div className="w-full flex flex-col mt-4">
+                                                <h1 className="text-info">Our Contact</h1>
+                                                <div className="w-full flex flex-col">
+                                                    <div>Contact info</div>
+                                                    <div><Snippet>{task.Phone_number}</Snippet></div>
+                                                    <div><Snippet>{task.EMAIL}</Snippet></div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    {task.Task_status === 'Taken' ? (
+                                    {task.Task_Status === 'Taken' ? (
                                         <Button className="btn">
                                             Task Taken
                                         </Button>
@@ -553,7 +591,8 @@ const Lhome = () => {
                             </dialog>
                         </CardFooter>
                     </Card>
-                ))}
+                    )
+                })}
                 </>
                 )}
                 {isRank && (
@@ -939,7 +978,7 @@ const Lhome = () => {
                                         <div className="flex w-4/5  gap-5">
                                             <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
                                             <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                                                <h4 className="text-small font-semibold leading-none text-default-600">{apply.APPLYING_FULL_NAME}</h4>
+                                                <h4 className="text-small font-semibold leading-none text-default-600">{apply.Agreement}</h4>
                                                 <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}</h5>
                                             </div>
                                         </div>
@@ -949,11 +988,11 @@ const Lhome = () => {
                                                 color="primary"
                                                 radius="full"
                                                 size="sm"
-                                                onClick={() => document.getElementById('my_modal_31').showModal()}
+                                                onClick={() => document.getElementById(apply.taskId).showModal()}
                                             >
                                             Accept /Decline
                                             </Button>
-                                            <dialog id="my_modal_31" className="modal">
+                                            <dialog id={apply.taskId} className="modal">
                                                 <div className="modal-box">
                                                     <form method="dialog">
                                                         {/* if there is a button in form, it will close the modal */}
@@ -966,8 +1005,8 @@ const Lhome = () => {
                                                                 <div className="flex gap-5">
                                                                     <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
                                                                     <div className="flex flex-col gap-1 items-start justify-center">
-                                                                        <h4 className="text-small font-semibold leading-none text-default-600">{apply.APPLYING_FULL_NAME}</h4>
-                                                                        <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}</h5>
+                                                                        <h4 className="text-small font-semibold leading-none text-default-600">{apply.Agreement}</h4>
+                                                                        <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}, {apply.taskId}</h5>
                                                                     </div>
                                                                 </div>
                                                                 {/* <div className="flex w-2/6">
@@ -1014,8 +1053,8 @@ const Lhome = () => {
                                                                 </div>
                                                             </div>
                                                             <div className="w-full flex flex-row justify-between gap-5 mt-10">
-                                                                <Button>Confirm offer</Button>
-                                                                <Button>Decline offer</Button>
+                                                                    <Button onClick={() => handleConfirmButton(apply)}>{!loading && trackConfirmId[apply.taskId] ? 'well done' : loading ? 'loading..' : 'Confirm offer'}</Button>
+                                                                    <Button onClick={() => handleDEclineButton(apply)}>Decline offer</Button>
                                                             </div>
                                                         </div>
                                                         {/* </div> */}
@@ -1026,7 +1065,7 @@ const Lhome = () => {
                                         </div>
                                     </CardHeader>
                                     <CardBody className="px-3 py-0 text-small text-default-400">
-                                        <span className="pt-2 text-white">
+                                        <span className="pt-2 text-default-700">
                                             {apply.APPLYING_USERNAME} requesting  
                                             <span className="py-2 ml-2" aria-label="computer" role="img">
                                                 Job: {apply.Agreement}, you published.
@@ -1042,14 +1081,16 @@ const Lhome = () => {
                             loading && applyView.length !== 0 ? 'lodding....' : ''
                         )}
                         
+                        {!loading && inviteTaskPending.length !== 0 ? (
+                            inviteTaskPending.map((invite) => (
 
                         <Card className="w-full mt-2" style={{zIndex: '1'}}>
                             <CardHeader className="justify-between w-full">
                                 <div className="flex w-4/5  gap-5">
                                 <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
                                 <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                                    <h4 className="text-small font-semibold leading-none text-default-600">Task Invitaion Name</h4>
-                                    <h5 className="text-small tracking-tight text-default-400">@zoeylang</h5>
+                                    <h4 className="text-small font-semibold leading-none text-default-600">{invite.Agreement}</h4>
+                                    <h5 className="text-small tracking-tight text-default-400">@{invite.inviter}</h5>
                                 </div>
                                 </div>
                                 <div className="w-2/6">
@@ -1058,11 +1099,11 @@ const Lhome = () => {
                                     color="primary"
                                     radius="full"
                                     size="sm"
-                                    onClick={() => document.getElementById('my_modal_32').showModal()}
+                                    onClick={() => document.getElementById(invite.inviteeId).showModal()}
                                     >
                                         Accept/Decline
                                     </Button>
-                                    <dialog id="my_modal_32" className="modal">
+                                    <dialog id={invite.inviteeId} className="modal">
                                         <div className="modal-box">
                                             <form method="dialog">
                                                 {/* if there is a button in form, it will close the modal */}
@@ -1075,8 +1116,8 @@ const Lhome = () => {
                                                         <div className="flex gap-5">
                                                             <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
                                                             <div className="flex flex-col gap-1 items-start justify-center">
-                                                                <h4 className="text-small font-semibold leading-none text-default-600">task.FULL_NAME</h4>
-                                                                <h5 className="text-small tracking-tight text-default-400">@task.userName</h5>
+                                                                <h4 className="text-small font-semibold leading-none text-default-600">{invite.INVITER_FULL_NAME }</h4>
+                                                                <h5 className="text-small tracking-tight text-default-400">@{invite.inviter}</h5>
                                                             </div>
                                                         </div>
                                                         {/* <div className="flex w-2/6">
@@ -1087,9 +1128,9 @@ const Lhome = () => {
 
                                                 <div className='w-full px-2 flex flex-col'>
                                                     <h1 className="text-default-500 tracking-tight">Job description</h1>
-                                                    <h2 className="text-small tracking-tight text-default-500">Job titile : task.Agreement</h2>
+                                                    <h2 className="text-small tracking-tight text-default-500">Job titile : {invite.Agreement}</h2>
                                                     <div className='w-full inline-block mt-3'>
-                                                        task.Description
+                                                        {invite.Description}
                                                     </div>
                                                     {/* <div className='w-full inline-block mt-3'>
                                                     this is specification
@@ -1097,20 +1138,20 @@ const Lhome = () => {
                                                     <div className='w-full flex flex-col'>
                                                         <div className='w-2/4 flex flex-col mt-2'>
                                                             <div>Amount</div>
-                                                            <div>task.Amount FRW</div>
+                                                            <div>{invite.Amount} FRW</div>
                                                         </div>
                                                         <div className='w-2/4 flex flex-col mt-2'>
                                                             <div>Duration</div>
-                                                            <div>task.Duration</div>
+                                                            <div>{invite.Duration}</div>
                                                         </div>
                                                         <div className='w-full flex justify-between gap-5 flex-row mt-2'>
                                                             <div className='w-full flex flex-col'>
                                                                 <div>Start date</div>
-                                                                <div>formatDate task.Start_date</div>
+                                                                <div>{formatDate (invite.Start_date)}</div>
                                                             </div>
                                                             <div className='w-full flex flex-col'>
                                                                 <div>End date</div>
-                                                                <div>formatDate task.End_date</div>
+                                                                <div>{formatDate (invite.End_date)}</div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1118,8 +1159,8 @@ const Lhome = () => {
                                                         <h1 className="text-info">Our Contact</h1>
                                                         <div className="w-full flex flex-col">
                                                             <div>Contact info</div>
-                                                            <div><Snippet>0788888888</Snippet></div>
-                                                            <div><Snippet>example@gmail.com</Snippet></div>
+                                                            <div><Snippet>{invite.INVITER_TEL }0788888888</Snippet></div>
+                                                            <div><Snippet>{invite.INVITER_EMAIL}</Snippet></div>
                                                         </div>
                                                     </div>
                                                     <div className="w-full flex flex-row justify-between gap-5 mt-10">
@@ -1136,16 +1177,20 @@ const Lhome = () => {
                             </CardHeader>
                             <CardBody className="px-3 py-0 text-small text-default-400">
                                 <div>
-                                    Frontend developer and UI/UX enthusiast. Join me on this coding adventure!
+                                    {invite.Description}
                                 </div>
-                                <span className="pt-2">
+                                <span className="pt-2 text-default-700">
                                     Amount: 
                                     <span className="py-2 ml-2" aria-label="computer" role="img">
-                                        3000 FRW
+                                        {invite.Amount} FRW
                                     </span>
                                 </span>
                             </CardBody>
                         </Card>
+                        ))
+                        ) : (
+                            loading && inviteTaskPending.length !== 0 ? 'loading..' : ''
+                        )}
                         {/* </div> */}
                         <dialog id="my_modal_4" className="modal">
                             <div className="modal-box">

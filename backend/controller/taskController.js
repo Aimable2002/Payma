@@ -136,13 +136,14 @@ export const taskGiverView = async (req, res) => {
 
 export const taskTaker = async (req, res) => {
     try {
-        const taskId = req.params.id;
-        console.log('taskId :', taskId)
-        const takerId = req.user.userId
-        console.log('takerId :', takerId)
-        if (!taskId || !takerId) {
-            return res.status(404).json('Missing data');
-        }
+        console.log('called')
+        const {taskId, APPLYING_USERNAME} = req.body;
+        console.log('req body :', req.body)
+        const ConfirmId = req.user.userId
+        console.log('confirm id :', ConfirmId )
+         if (!taskId || !ConfirmId ) {
+             return res.status(404).json('Missing data');
+         }
 
         connection.beginTransaction(err => {
             if (err) {
@@ -160,21 +161,25 @@ export const taskTaker = async (req, res) => {
             if(result[0].task_takerId !== null){
                 return res.status(501).json('task taken already')
             }
-            if(takerId === result[0].task_giverId){
-                return res.status(401).json('u cant take yr own task')
+            if(ConfirmId !== result[0].task_giverId){
+                return res.status(401).json('u cant confirm')
             }
-            const getName = 'SELECT userName FROM USERS WHERE userId = ?';
-            connection.query(getName, [takerId], (err, result) => {
+            const getName = 'SELECT userId FROM USERS WHERE userName = ?';
+            connection.query(getName, [APPLYING_USERNAME], (err, results) => {
                 if(err){
                     return connection.rollback(() => {
                         return res.status(400).json('some issue occur')
                     })
                 }
-                const taker_name = result[0].userName
-                console.log('taker_name :', taker_name)
+                const taker_Id = results[0].userId
+                console.log('taker_name :', taker_Id)
+                if(taker_Id === result[0].task_giverId){
+                    console.log('equalize :', taker_Id === result[0].task_giverId)
+                    return res.status(502).json('u cant take your own task')
+                }
             
             const insertTaskTaker = 'INSERT INTO TASK_TAKER (taskId, takerId) VALUES (?, ?)';
-            connection.query(insertTaskTaker, [taskId, takerId], (err, insertResult) => {
+            connection.query(insertTaskTaker, [taskId, taker_Id], (err, insertResult) => {
                 if (err) {
                     return connection.rollback(() => {
                         console.log('Error inserting task taker:', err);
@@ -183,14 +188,22 @@ export const taskTaker = async (req, res) => {
                 }
 
                 const updateTask = 'UPDATE TASK SET task_takerId = ?, Task_status= ?, task_taker_name= ? WHERE taskId = ?';
-                connection.query(updateTask, [takerId, 'Taken', taker_name, taskId], (err, updateResult) => {
+                connection.query(updateTask, [taker_Id, 'Taken', APPLYING_USERNAME, taskId], (err, updateResult) => {
                     if (err) {
                         return connection.rollback(() => {
                             console.log('Error updating task:', err);
                             return res.status(400).json({ err: 'Error updating task' , status: false});
                         });
                     }
-
+                
+                const updateApplyTask = 'UPDATE APPLY_TASK SET Apply_Status = ? WHERE taskId = ? AND task_giverId = ? AND applying_user = ?';
+                connection.query(updateApplyTask, ['Taken', taskId, ConfirmId, taker_Id], (err, result) => {
+                    if(err){
+                        return connection.rollback(() => {
+                            console.log('fail to update apply task')
+                            return res.status(400).json('fail to update apply task')
+                        })
+                    }
                     connection.commit(err => {
                         if (err) {
                             return connection.rollback(() => {
@@ -200,6 +213,7 @@ export const taskTaker = async (req, res) => {
 
                         return res.status(200).json({message: 'tast taken', status: true});
                     });
+                })
                 });
             });
         })
@@ -266,8 +280,16 @@ export const postInvitation = async (req, res) => {
                     return res.status(404).json({message: 'user data missing', status: false})
                 })
             }
+            console.log('result :', result)
             const inviter = result[0].userName
             console.log('userData :', inviter)
+            console.log( 'bal :', result[0].Balance)
+            console.log('check bal :', result[0].Balance < Amount)
+            if(result[0].Balance < Amount){
+                return connection.rollback(() => {
+                    return res.status(400).json({message: 'insufficient Amount', status: false})
+                })
+            }
 
             const insertInviteData = 'INSERT INTO invitee (invitee, inviter, Agreement, Description, Start_date, End_date, Amount, inviterId, TakerId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
             connection.query(insertInviteData, [Taker_Name, inviter, Agreement, Description, Start_date, End_date, Amount, GiverId, TakerId], (err, result) => {
@@ -277,6 +299,14 @@ export const postInvitation = async (req, res) => {
                         return res.status(409).json({err: 'error'})
                     })
                 }
+            const substractAmount = 'UPDATE USERS SET Balance = Balance - ? WHERE userId = ?';
+            connection.query(substractAmount, [Amount, GiverId], (err, subResult) => {
+                if(err){
+                    return connection.rollback(() => {
+                        return res.status(303).json(err.message)
+                    })
+                }
+            
                 connection.commit(err => {
                     if(err){
                         return connection.rollback(() => {
@@ -286,6 +316,7 @@ export const postInvitation = async (req, res) => {
                     }
                     return res.status(200).json({message: 'successfully invited', status: true})
                 })
+            })
             })
         })
     })
@@ -327,4 +358,31 @@ export const taskInviteePending = async (req, res) => {
         console.log('data :', data)
         return res.status(200).json(data)
     })
+}
+
+
+
+
+export const acceptInvitation = async (req, res) => {
+    try{
+        const {inviteeId, inviter} = req.body
+        console.log('req body :', req.body)
+        const invitee = req.user.userId
+        console.log('invitee :', invitee)
+
+        if(!inviteeId || !inviter){
+            return res.status(404).json('missing data')
+        }
+
+        connection.beginTransaction(err => {
+            if(err){
+                throw err
+            }
+
+        })
+
+    }catch(error){
+        console.log('internal server error :', error.message)
+        return res.status(500).json({error: 'internal serer error'})
+    }
 }

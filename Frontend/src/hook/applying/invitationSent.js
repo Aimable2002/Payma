@@ -19,7 +19,7 @@ const invitationSent= (activeButton) => {
                     }
                 })
                 const data = res.data
-                console.log('reserver data :', data)
+                //console.log('reserver data :', data)
                 if(!data){
                     throw new Error ('missing data')
                 }

@@ -36,6 +36,7 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import {Snippet} from "@nextui-org/react";
 import usegetApplyView from "../../hook/applying/applyView";
 import invitationSent from "../../hook/applying/invitationSent";
+import useConfirm from "../../hook/applying/comfirm";
 
 const truncateString = (str, maxLength) => {
     if(str.length <= maxLength ){
@@ -344,8 +345,33 @@ const [theme, setTheme] = useState(getCurrentTheme());
 
   }
   const {applyView} = usegetApplyView(activeButton);
-  console.log('applyView :', applyView)
   const {inviteTaskPending} = invitationSent(activeButton)
+
+  console.log('invite pending :', inviteTaskPending)
+
+  const {trackConfirm, confirmTask } = useConfirm()
+
+  const [isconfirm, setIsConfirm] = useState(false)
+  const [trackConfirmId, setTrackConfirmId] = useState({})
+
+  const handleConfirmButton = async(apply) => {
+        
+    const {taskId, APPLYING_USERNAME} = apply
+    const input = {taskId, APPLYING_USERNAME}
+    console.log('confrim id :', input)
+    console.log('confrim id :', apply)
+    //await confirmTask (input)
+    setIsConfirm(true)
+    setTrackConfirmId((prevStatus) => ({
+      ...prevStatus,
+      [apply.taskId] : !prevStatus[apply.taskId]
+    }))
+  }
+  const handleDEclineButton = (apply) => {
+    const {taskId, APPLYING_USERNAME} = apply
+    const input = {taskId}
+    console.log('decline id :', input)
+  }
   return (
     <div className="w-full flex flex-col overflow-auto">
         <div className=" w-full">
@@ -517,7 +543,7 @@ const [theme, setTheme] = useState(getCurrentTheme());
                     </div>
                     <div className="flex gap-1">
                       <button className="btn" onClick={()=>document.getElementById(task.taskId).showModal()}>
-                        {loading ? <span className="loading loading-ring"></span> :  !loading && TaskStatus[task.taskId] ? 'APPLY' : task.Task_status }
+                        {loading ? <span className="loading loading-ring"></span> :  !loading  && TaskStatus[task.taskId] ? 'Apply' : task.Task_Status }
                       </button>
                     </div>
                     <dialog id={task.taskId} className="modal">
@@ -575,7 +601,7 @@ const [theme, setTheme] = useState(getCurrentTheme());
                     {/* </div> */}
 
                         </div>
-                        {task.Task_status === 'Taken' ? (
+                        {task.Task_Status === 'Taken' ? (
                           <Button className="btn">
                             Task Taken
                           </Button>
@@ -906,7 +932,7 @@ const [theme, setTheme] = useState(getCurrentTheme());
                 <div className={`${ActiveType === 'Request' ? 'text-info' : ''}`} onClick={() => handleNotificationsType('Request')}>Request</div>
                 <div className={`${ActiveType === 'Invitation' ? 'text-info' : ''}`} onClick={() => handleNotificationsType('Invitation')}>Invitations</div>
               </div>
-            <div className="w-full gap-2 relative">
+            <div className="w-full  relative">
               {!loading && applyView.length !== 0 ? ( 
                 applyView.map((apply) => (
               <Card className="w-full relative mt-2" style={{zIndex: '1'}}>
@@ -924,11 +950,11 @@ const [theme, setTheme] = useState(getCurrentTheme());
                       color="primary"
                       radius="full"
                       size="sm"
-                      onClick={() => document.getElementById('my_modal_31').showModal()}
+                      onClick={()=>document.getElementById(apply.taskId).showModal()}
                       >
                       Accept /Decline
                       </Button>
-                      <dialog id="my_modal_31" className="modal">
+                      <dialog id={apply.taskId} className="modal">
                         <div className="modal-box">
                           <form method="dialog">
                             {/* if there is a button in form, it will close the modal */}
@@ -942,7 +968,7 @@ const [theme, setTheme] = useState(getCurrentTheme());
                                 <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
                                 <div className="flex flex-col gap-1 items-start justify-center">
                                   <h4 className="text-small font-semibold leading-none text-default-600">{apply.APPLYING_FULL_NAME}</h4>
-                                  <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}</h5>
+                                  <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}, {apply.taskId}</h5>
                                 </div>
                               </div>
                               {/* <div className="flex w-2/6">
@@ -989,8 +1015,8 @@ const [theme, setTheme] = useState(getCurrentTheme());
                               </div>
                             </div>
                             <div className="w-full flex flex-row justify-between gap-5 mt-10">
-                              <Button>Confirm offer</Button>
-                              <Button>Decline offer</Button>
+                              <Button onClick={() => handleConfirmButton(apply)}>{!loading && trackConfirmId[apply.taskId] ? 'well done' : loading ? 'loading..' : 'Confirm offer'}</Button>
+                              <Button onClick={() => handleDEclineButton(apply)}>Decline offer</Button>
                             </div>
                         </div>
                     {/* </div> */}
@@ -1001,7 +1027,7 @@ const [theme, setTheme] = useState(getCurrentTheme());
                       </div>
                   </CardHeader>
                   <CardBody className="px-3 py-0 text-small text-default-400">
-                    <span className="pt-2">
+                    <span className="pt-2 text-default-700">
                         {apply.APPLYING_USERNAME} requesting  
                       <span className="py-2 ml-2" aria-label="computer" role="img">
                         Job: {apply.Agreement}, you publishes.
@@ -1017,7 +1043,8 @@ const [theme, setTheme] = useState(getCurrentTheme());
                 loading && applyView.length !== 0 ? 'Loading..' : ''
               )}
               {!loading && inviteTaskPending.length !== 0 ? (
-                inviteTaskPending.map((invite) => (
+                inviteTaskPending.map((invite) => {
+                  return (
 
               <Card className="w-full mt-2" style={{zIndex: '1'}}>
               <CardHeader className="justify-between w-full">
@@ -1034,11 +1061,11 @@ const [theme, setTheme] = useState(getCurrentTheme());
                       color="primary"
                       radius="full"
                       size="sm"
-                      onClick={() => document.getElementById('my_modal_32').showModal()}
+                      onClick={() => document.getElementById(invite.inviteeId).showModal()}
                       >
                       Accept/Decline
                       </Button>
-                      <dialog id="my_modal_32" className="modal">
+                      <dialog id={invite.inviteeId} className="modal">
                         <div className="modal-box">
                           <form method="dialog">
                             {/* if there is a button in form, it will close the modal */}
@@ -1114,7 +1141,7 @@ const [theme, setTheme] = useState(getCurrentTheme());
                     <div>
                       {invite.Description}
                     </div>
-                    <span className="pt-2">
+                    <span className="pt-2 text-default-700">
                       Amount: 
                       <span className="py-2 ml-2" aria-label="computer" role="img">
                           {invite.Amount} FRW
@@ -1122,7 +1149,8 @@ const [theme, setTheme] = useState(getCurrentTheme());
                     </span>
                 </CardBody>
               </Card>
-              ))
+                  )
+                })
             ) : (
               loading && inviteTaskPending.length !== 0 ? 'loading..' : ''
             )}

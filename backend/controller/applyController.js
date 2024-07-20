@@ -27,6 +27,26 @@ export const applyTask = async (req, res) => {
                 }
                 const taskGiver = result[0].task_giverId
                 console.log('data :', taskGiver)
+                if(taskGiver === applyingId){
+                    return connection.rollback(() => {
+                        return res.status(401).json('u cant apply your own task')
+                    })
+                }
+
+                const selectApplyTask = 'SELECT * FROM APPLY_TASK WHERE taskId = ?';
+                connection.query(selectApplyTask, [taskId], (err, results) => {
+                    if(err){
+                        return connection.rollback(() => {
+                            return res.status(403).json('fail to select in apply task')
+                        })
+                    }
+                    console.log('results :', results)
+                    console.log('apply :', results.Apply_Status)
+                    if(results.Apply_Status !== 'PENDING'){
+                        return connection.rollback(() => {
+                            return res.status(409).json('task not available')
+                        })
+                    }
 
                 const insertApply = 'INSERT INTO APPLY_TASK (taskId, applying_user, task_giverId) VALUES(?,?, ?)';
                 connection.query(insertApply, [taskId, applyingId, taskGiver], (err, result) => {
@@ -34,8 +54,17 @@ export const applyTask = async (req, res) => {
                         console.log(err.message)
                         return res.status(400).json({err: 'error'})
                     }
-                    return res.status(202).json({message: 'succeffully inserted apply'})
+                    connection.commit(err => {
+                        if (err) {
+                            return connection.rollback(() => {
+                                throw err;
+                            });
+                        }
+
+                        return res.status(202).json({message: 'succeffully inserted apply', status: true})
+                    });
                 })
+            })
             })
             
         })

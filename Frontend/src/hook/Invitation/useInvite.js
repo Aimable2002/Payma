@@ -17,13 +17,19 @@ const useInvite = () => {
 
     const startDate = new Date(Start_date);
     const endDate = new Date(End_date);
+    const currentDate = new Date();
 
     if (isNaN(startDate) || isNaN(endDate)) {
       console.error('Invalid dates');
       alert('Invalid dates');
       return;
     }
-
+    currentDate.setHours(0, 0, 0, 0);
+    if (startDate < currentDate) {
+        console.error('Start date cannot be in the past');
+        alert('Start date cannot be in the past');
+        return;
+    }
     const durationInMs = endDate - startDate;
     const Duration = Math.round(durationInMs / (1000 * 60 * 60 * 24));
 
