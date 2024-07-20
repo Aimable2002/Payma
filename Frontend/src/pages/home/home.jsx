@@ -34,6 +34,8 @@ import useGetInvite from "../../hook/Invitation/useGetInvite";
 
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import {Snippet} from "@nextui-org/react";
+import usegetApplyView from "../../hook/applying/applyView";
+import invitationSent from "../../hook/applying/invitationSent";
 
 const truncateString = (str, maxLength) => {
     if(str.length <= maxLength ){
@@ -341,6 +343,9 @@ const [theme, setTheme] = useState(getCurrentTheme());
     }
 
   }
+  const {applyView} = usegetApplyView(activeButton);
+  console.log('applyView :', applyView)
+  const {inviteTaskPending} = invitationSent(activeButton)
   return (
     <div className="w-full flex flex-col overflow-auto">
         <div className=" w-full">
@@ -512,7 +517,7 @@ const [theme, setTheme] = useState(getCurrentTheme());
                     </div>
                     <div className="flex gap-1">
                       <button className="btn" onClick={()=>document.getElementById(task.taskId).showModal()}>
-                        {loading ? <span className="loading loading-ring"></span> :  !loading && TaskStatus[task.taskId] ? 'Taken' : task.Task_status }
+                        {loading ? <span className="loading loading-ring"></span> :  !loading && TaskStatus[task.taskId] ? 'APPLY' : task.Task_status }
                       </button>
                     </div>
                     <dialog id={task.taskId} className="modal">
@@ -902,13 +907,15 @@ const [theme, setTheme] = useState(getCurrentTheme());
                 <div className={`${ActiveType === 'Invitation' ? 'text-info' : ''}`} onClick={() => handleNotificationsType('Invitation')}>Invitations</div>
               </div>
             <div className="w-full gap-2 relative">
+              {!loading && applyView.length !== 0 ? ( 
+                applyView.map((apply) => (
               <Card className="w-full relative mt-2" style={{zIndex: '1'}}>
               <CardHeader className="justify-between w-full">
                       <div className="flex w-4/5  gap-5">
                       <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
                       <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                          <h4 className="text-small font-semibold leading-none text-default-600">Task Requesting Name</h4>
-                          <h5 className="text-small tracking-tight text-default-400">@zoeylang</h5>
+                          <h4 className="text-small font-semibold leading-none text-default-600">{apply.Agreement}</h4>
+                          <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}</h5>
                       </div>
                       </div>
                       <div className="w-2/6">
@@ -934,8 +941,8 @@ const [theme, setTheme] = useState(getCurrentTheme());
                               <div className="flex gap-5">
                                 <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
                                 <div className="flex flex-col gap-1 items-start justify-center">
-                                  <h4 className="text-small font-semibold leading-none text-default-600">task.FULL_NAME</h4>
-                                  <h5 className="text-small tracking-tight text-default-400">@task.userName</h5>
+                                  <h4 className="text-small font-semibold leading-none text-default-600">{apply.APPLYING_FULL_NAME}</h4>
+                                  <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}</h5>
                                 </div>
                               </div>
                               {/* <div className="flex w-2/6">
@@ -946,9 +953,9 @@ const [theme, setTheme] = useState(getCurrentTheme());
 
                           <div className='w-full px-2 flex flex-col'>
                             <h1 className="text-default-500 tracking-tight">Job description</h1>
-                            <h2 className="text-small tracking-tight text-default-500">Job titile : task.Agreement</h2>
+                            <h2 className="text-small tracking-tight text-default-500">Job titile : {apply.Agreement}</h2>
                             <div className='w-full inline-block mt-3'>
-                                task.Description
+                              {apply.description}
                             </div>
                             {/* <div className='w-full inline-block mt-3'>
                               this is specification
@@ -956,20 +963,20 @@ const [theme, setTheme] = useState(getCurrentTheme());
                             <div className='w-full flex flex-col'>
                                 <div className='w-2/4 flex flex-col mt-2'>
                                   <div>Amount</div>
-                                  <div>task.Amount FRW</div>
+                                  <div>{apply.Amount} FRW</div>
                                 </div>
                                 <div className='w-2/4 flex flex-col mt-2'>
                                   <div>Duration</div>
-                                  <div>task.Duration</div>
+                                  <div>{apply.Duration}</div>
                                 </div>
                               <div className='w-full flex justify-between gap-5 flex-row mt-2'>
                                   <div className='w-full flex flex-col'>
                                     <div>Start date</div>
-                                    <div>formatDate task.Start_date</div>
+                                    <div>{formatDate (apply.Start_date)}</div>
                                   </div>
                                   <div className='w-full flex flex-col'>
                                     <div>End date</div>
-                                    <div>formatDate task.End_date</div>
+                                    <div>{formatDate (apply.End_date)}</div>
                                   </div>
                               </div>
                             </div>
@@ -977,8 +984,8 @@ const [theme, setTheme] = useState(getCurrentTheme());
                               <h1 className="text-info">Our Contact</h1>
                               <div className="w-full flex flex-col">
                                 <div>Contact info</div>
-                                <div><Snippet>0788888888</Snippet></div>
-                                <div><Snippet>example@gmail.com</Snippet></div>
+                                <div><Snippet>{apply.APPLYING_TEL}</Snippet></div>
+                                <div><Snippet>{apply.APPLYING_EMAIL}</Snippet></div>
                               </div>
                             </div>
                             <div className="w-full flex flex-row justify-between gap-5 mt-10">
@@ -995,24 +1002,30 @@ const [theme, setTheme] = useState(getCurrentTheme());
                   </CardHeader>
                   <CardBody className="px-3 py-0 text-small text-default-400">
                     <span className="pt-2">
-                      Aimable requesting  
+                        {apply.APPLYING_USERNAME} requesting  
                       <span className="py-2 ml-2" aria-label="computer" role="img">
-                          Job Title u publishes.
+                        Job: {apply.Agreement}, you publishes.
                       </span>
                     </span>
                     <div>
-                      Frontend developer and UI/UX enthusiast. Join me on this coding adventure!
+                      {apply.description}
                     </div>
                 </CardBody>
               </Card>
+
+              ))) : (
+                loading && applyView.length !== 0 ? 'Loading..' : ''
+              )}
+              {!loading && inviteTaskPending.length !== 0 ? (
+                inviteTaskPending.map((invite) => (
 
               <Card className="w-full mt-2" style={{zIndex: '1'}}>
               <CardHeader className="justify-between w-full">
                       <div className="flex w-4/5  gap-5">
                       <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
                       <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                          <h4 className="text-small font-semibold leading-none text-default-600">Task Invitaion Name</h4>
-                          <h5 className="text-small tracking-tight text-default-400">@zoeylang</h5>
+                          <h4 className="text-small font-semibold leading-none text-default-600">{invite.Agreement}</h4>
+                          <h5 className="text-small tracking-tight text-default-400">@{invite.inviter}</h5>
                       </div>
                       </div>
                       <div className="w-2/6">
@@ -1038,8 +1051,8 @@ const [theme, setTheme] = useState(getCurrentTheme());
                               <div className="flex gap-5">
                                 <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
                                 <div className="flex flex-col gap-1 items-start justify-center">
-                                  <h4 className="text-small font-semibold leading-none text-default-600">task.FULL_NAME</h4>
-                                  <h5 className="text-small tracking-tight text-default-400">@task.userName</h5>
+                                  <h4 className="text-small font-semibold leading-none text-default-600">{invite.INVITER_FULL_NAME }</h4>
+                                  <h5 className="text-small tracking-tight text-default-400">@{invite.inviter}</h5>
                                 </div>
                               </div>
                               {/* <div className="flex w-2/6">
@@ -1050,9 +1063,9 @@ const [theme, setTheme] = useState(getCurrentTheme());
 
                           <div className='w-full px-2 flex flex-col'>
                             <h1 className="text-default-500 tracking-tight">Job description</h1>
-                            <h2 className="text-small tracking-tight text-default-500">Job titile : task.Agreement</h2>
+                            <h2 className="text-small tracking-tight text-default-500">Job titile : {invite.Agreement}</h2>
                             <div className='w-full inline-block mt-3'>
-                                task.Description
+                                {invite.Description}
                             </div>
                             {/* <div className='w-full inline-block mt-3'>
                               this is specification
@@ -1060,20 +1073,20 @@ const [theme, setTheme] = useState(getCurrentTheme());
                             <div className='w-full flex flex-col'>
                                 <div className='w-2/4 flex flex-col mt-2'>
                                   <div>Amount</div>
-                                  <div>task.Amount FRW</div>
+                                  <div>{invite.Amount} FRW</div>
                                 </div>
                                 <div className='w-2/4 flex flex-col mt-2'>
                                   <div>Duration</div>
-                                  <div>task.Duration</div>
+                                  <div>{invite.Duration}</div>
                                 </div>
                               <div className='w-full flex justify-between gap-5 flex-row mt-2'>
                                   <div className='w-full flex flex-col'>
                                     <div>Start date</div>
-                                    <div>formatDate task.Start_date</div>
+                                    <div>{formatDate (invite.Start_date)}</div>
                                   </div>
                                   <div className='w-full flex flex-col'>
                                     <div>End date</div>
-                                    <div>formatDate task.End_date</div>
+                                    <div>{formatDate (invite.End_date)}</div>
                                   </div>
                               </div>
                             </div>
@@ -1081,8 +1094,8 @@ const [theme, setTheme] = useState(getCurrentTheme());
                               <h1 className="text-info">Our Contact</h1>
                               <div className="w-full flex flex-col">
                                 <div>Contact info</div>
-                                <div><Snippet>0788888888</Snippet></div>
-                                <div><Snippet>example@gmail.com</Snippet></div>
+                                <div><Snippet>{invite.INVITER_TEL }</Snippet></div>
+                                <div><Snippet>{invite.INVITER_EMAIL}</Snippet></div>
                               </div>
                             </div>
                             <div className="w-full flex flex-row justify-between gap-5 mt-10">
@@ -1099,16 +1112,20 @@ const [theme, setTheme] = useState(getCurrentTheme());
                   </CardHeader>
                   <CardBody className="px-3 py-0 text-small text-default-400">
                     <div>
-                      Frontend developer and UI/UX enthusiast. Join me on this coding adventure!
+                      {invite.Description}
                     </div>
                     <span className="pt-2">
                       Amount: 
                       <span className="py-2 ml-2" aria-label="computer" role="img">
-                          3000 FRW
+                          {invite.Amount} FRW
                       </span>
                     </span>
                 </CardBody>
               </Card>
+              ))
+            ) : (
+              loading && inviteTaskPending.length !== 0 ? 'loading..' : ''
+            )}
             </div>
           <dialog id="my_modal_4" className="modal">
           <div className="modal-box">

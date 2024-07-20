@@ -13,7 +13,7 @@ const useTakeTask = () => {
     setLoading(true)
     try{
         const token = localStorage.getItem('on-user')
-        const res = await axios.post(`/api/task/take-task/${values}`, {
+        const res = await axios.post(`/api/task/apply_task/${values}`, {
             values 
         }, {
             headers: {
@@ -44,3 +44,6 @@ function handleErr (values){
         return true
     }
 }
+
+
+///take-task

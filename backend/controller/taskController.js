@@ -149,7 +149,7 @@ export const taskTaker = async (req, res) => {
                 throw err;
             }
             const checkTask = 'SELECT task_giverId, task_takerId FROM TASK WHERE taskId = ?';
-        connection.query(checkTask, [taskId], async (err, result) => {
+            connection.query(checkTask, [taskId], async (err, result) => {
             if(err){
                 console.log(401).json({error: 'error'})
             }
@@ -295,8 +295,27 @@ export const postInvitation = async (req, res) => {
 export const taskInviteeView = async (req, res) => {
     const USERID = req.user.userId
     console.log('userId :', USERID)
-    const selectTask = 'SELECT * FROM INVITEE WHERE TakerId = ?';
-    connection.query(selectTask, [USERID], (err, result) => {
+    const selectTask = 'SELECT * FROM INVITEE_VIEW WHERE TakerId = ? AND Approval = ?';
+    connection.query(selectTask, [USERID, "Approve"], (err, result) => {
+        if(err){
+            console.log('error :', err.message)
+            return res.status(409).json({message: 'error', status: false})
+        }
+        if(result.lenght === 0){
+            return res.status(404).json({message: 'No task found', status: false})
+        }
+        const data = result
+        console.log('data :', data)
+        return res.status(200).json(data)
+    })
+}
+
+
+export const taskInviteePending = async (req, res) => {
+    const USERID = req.user.userId
+    console.log('userId :', USERID)
+    const selectTask = 'SELECT * FROM INVITEE_VIEW WHERE TakerId = ? AND Approval = ? ';
+    connection.query(selectTask, [USERID, 'Pending..'], (err, result) => {
         if(err){
             console.log('error :', err.message)
             return res.status(409).json({message: 'error', status: false})

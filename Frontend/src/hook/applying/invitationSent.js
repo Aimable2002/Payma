@@ -1,26 +1,29 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 
-const useGetInvite = (activeButton) => {
+const invitationSent= (activeButton) => {
   const [loading, setLoading] = useState(false)
-  const [inviteTask, setInviteTask] = useState([])
+  const [inviteTaskPending, setInviteTaskPending] = useState([])
 
   useEffect(() => {
-    if(activeButton === 'Tasks') {
-        const getInviteTask = async () => {
+    if(activeButton === 'Notification') {
+        console.log('active Notification :', activeButton)
+        console.log('isNotification active :', activeButton === 'Notification')
+        const getInviteTaskPending = async () => {
             setLoading(true)
             try{
                 const token = localStorage.getItem('on-user')
-                const res = await axios.get('/api/task/get-Invite-task', {
+                const res = await axios.get('/api/task/get-Invite-Pending_view', {
                     headers: {
                         Authorization: `${JSON.parse(token).token}`
                     }
                 })
                 const data = res.data
+                console.log('reserver data :', data)
                 if(!data){
                     throw new Error ('missing data')
                 }
-                setInviteTask(data)
+                setInviteTaskPending(data)
             }catch(error){
                 console.log('error :', error.message)
                 alert('something went wrong refresh')
@@ -28,10 +31,10 @@ const useGetInvite = (activeButton) => {
                 setLoading(false)
             }
         }
-        getInviteTask()
+        getInviteTaskPending()
     }
   },[activeButton])
-  return {loading, inviteTask}
+  return {loading, inviteTaskPending}
 }
 
-export default useGetInvite
+export default invitationSent
