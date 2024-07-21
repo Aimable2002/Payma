@@ -40,7 +40,7 @@ export const applyTask = async (req, res) => {
                             return res.status(403).json('fail to select in apply task')
                         })
                     }
-                    console.log('results :', results)
+                    //console.log('results :', results)
                     console.log('apply :', results.Apply_Status)
                     if(results.Apply_Status !== 'PENDING'){
                         return connection.rollback(() => {
@@ -84,8 +84,8 @@ export const applyTask_view = async (req, res) => {
             if(err){
                 throw err
             }
-            const getApplyGranter = 'SELECT * FROM APPLYING_VIEW WHERE task_giverId = ?';
-            connection.query(getApplyGranter, [user], (err, result) => {
+            const getApplyGranter = 'SELECT * FROM APPLYING_VIEW WHERE task_giverId = ? AND Apply_Status = ?';
+            connection.query(getApplyGranter, [user, "PENDING"], (err, result) => {
                 if(err){
                     return connection.rollback(() => {
                         return res.status(400).json({message: 'fail', status: false})

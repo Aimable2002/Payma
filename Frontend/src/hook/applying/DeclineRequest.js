@@ -1,22 +1,20 @@
 import axios from 'axios';
 import React, { useState } from 'react'
 
-const useConfirm = () => {
+const useDecline = () => {
   const [loading, setLoading] = useState(false);
 
-  const [trackConfirm, setTrackConfirm] = useState(null)
+  const [trackDecline, setTrackDecline] = useState(null)
 
-  const confirmTask = async (taskId) => {
+  const declineTask = async (taskId) => {
     console.log('taskId :', taskId.taskId)
     console.log('applying user :', taskId.APPLYING_USERNAME)
     const task_id = taskId.taskId
     const applying_user = taskId.APPLYING_USERNAME
-    // const Success = handleErr(taskId.taskId, taskId.APPLYING_USERNAME)
-    // if(!Success)return
     setLoading(true)
     try{
         const token = localStorage.getItem('on-user')
-        const res = await axios.post('/api/task/take-task', {
+        const res = await axios.post('/api/task/decline/task', {
             taskId: task_id , 
             APPLYING_USERNAME: applying_user
         }, {
@@ -28,7 +26,7 @@ const useConfirm = () => {
         if(!data){
             throw new Error('error')
         }
-        setTrackConfirm((prevStatus) => ({
+        setTrackDecline((prevStatus) => ({
             ...prevStatus,
             [taskId] : data.status
         }))
@@ -39,20 +37,7 @@ const useConfirm = () => {
         setLoading(false)
     }
   }
-  return {loading, trackConfirm, confirmTask }
+  return {loading, trackDecline, declineTask }
 }
 
-export default useConfirm
-
-// function handleErr (){
-//     if(!taskId.taskId || !taskId.APPLYING_USERNAME){
-//         console.log('task in handle err :', taskId.taskId)
-//         console.log('user in handle err :', taskId.APPLYING_USERNAME)
-//         return false
-//     }else{
-//         return true
-//     }
-// }
-
-
-///take-task
+export default useDecline

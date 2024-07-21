@@ -1,17 +1,19 @@
 import axios from 'axios'
 import React, { useState } from 'react'
 
-const postApproval = () => {
+const useDeclineInvite = () => {
   const [loading, setLoading] = useState(false)
-  const [trackApprove, setTrackApprove] = useState(null)
 
-  const makePostAppr = async ({Status, taskId}) => {
+  const [tractDeclineInvite, setTractInviteDecline] = useState(null)
+
+  const postDecline = async (inviteeId) => {
     setLoading(true)
     try{
         const token = localStorage.getItem('on-user')
-        const res = await axios.post('/api/approval/appove', {
-            Status,
-            taskId
+        const res = await axios.post('/api/task/decline/invitation', {
+            inviteeId: inviteeId.inviteeId,
+            TakerId: inviteeId.TakerId,
+            Approval: inviteeId.Approval
         }, {
             headers: {
                 Authorization: `${JSON.parse(token).token}`
@@ -21,10 +23,10 @@ const postApproval = () => {
         if(!data){
             alert('missing data')
         }
-        setTrackApprove((prevStatus) => ({
+        setTractInviteDecline((prevStatus) => ({
             ...prevStatus,
-            [taskId] : data.Status
-        }))
+            [inviteeId]: data.status
+          }));
     }catch(error){
         console.log('error :', error.message)
         alert('something went wrong')
@@ -32,7 +34,7 @@ const postApproval = () => {
         setLoading(false)
     }
   }
-  return {loading, trackApprove, makePostAppr}
+  return {loading, tractDeclineInvite, postDecline }
 }
 
-export default postApproval
+export default useDeclineInvite

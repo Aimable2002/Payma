@@ -33,6 +33,9 @@ import {Snippet} from "@nextui-org/react";
 import usegetApplyView from '../../hook/applying/applyView';
 import invitationSent from '../../hook/applying/invitationSent';
 import useConfirm from '../../hook/applying/comfirm';
+import useAcceptInvitation from '../../hook/Invitation/useAcceptInvitation';
+import useDecline from '../../hook/applying/DeclineRequest';
+import useDeclineInvite from '../../hook/Invitation/useDeclineInvite';
 
 const Lhome = () => {
     const {loading, logout} = useLogout()
@@ -305,7 +308,7 @@ const Lhome = () => {
     const {trackConfirm, confirmTask } = useConfirm()
     const [trackConfirmId, setTrackConfirmId] = useState({})
 
-    const handleConfirmButton = async(apply) => {
+    const handleConfirmRequest = async(apply) => {
         
         const {taskId, APPLYING_USERNAME} = apply
         const input = {taskId, APPLYING_USERNAME}
@@ -317,10 +320,32 @@ const Lhome = () => {
         [apply.taskId] : !prevStatus[apply.taskId]
         }))
     }
-    const handleDEclineButton = (apply) => {
+    const {trackDecline, declineTask } = useDecline()
+
+    const handleDEclineRequest = async(apply) => {
         const {taskId, APPLYING_USERNAME} = apply
-        const input = {taskId}
+        const input = {taskId, APPLYING_USERNAME}
         console.log('decline id :', input)
+        await declineTask(input)
+    }
+    const { tractAcceptInvite, postAccept} = useAcceptInvitation();
+    const [tracktAccept, setTrackAccept] = useState({})
+    const handleAcceptInvit = async(invite) => {
+        const {inviteeId, TakerId, Approval} = invite
+        const input = {inviteeId, TakerId, Approval}
+        console.log('input :', input)
+        await postAccept(input)
+        setTrackAccept((prevStatus) => ({
+            ...prevStatus,
+            [invite.inviteeId] : !prevStatus[invite.inviteeId]
+        }))
+    }
+    const {tractDeclineInvite, postDecline } = useDeclineInvite()
+    const handleDeclineInvite = async (invite) => {
+        const {inviteeId, TakerId, Approval} = invite
+        const input = {inviteeId, TakerId, Approval}
+        console.log('input :', input)
+        await postDecline(input)
     }
   return (
     <div className='w-full flex flex-row fixed'>
@@ -1053,8 +1078,8 @@ const Lhome = () => {
                                                                 </div>
                                                             </div>
                                                             <div className="w-full flex flex-row justify-between gap-5 mt-10">
-                                                                    <Button onClick={() => handleConfirmButton(apply)}>{!loading && trackConfirmId[apply.taskId] ? 'well done' : loading ? 'loading..' : 'Confirm offer'}</Button>
-                                                                    <Button onClick={() => handleDEclineButton(apply)}>Decline offer</Button>
+                                                                    <Button onClick={() => handleConfirmRequest(apply)}>{!loading && trackConfirm ? 'well done' : loading ? 'loading..' : 'Confirm offer'}</Button>
+                                                                    <Button onClick={() => handleDEclineRequest(apply)}>{!loading && trackDecline ? 'oops You decline' : loading ? 'loading..' : 'Decline offer'}</Button>
                                                             </div>
                                                         </div>
                                                         {/* </div> */}
@@ -1159,13 +1184,13 @@ const Lhome = () => {
                                                         <h1 className="text-info">Our Contact</h1>
                                                         <div className="w-full flex flex-col">
                                                             <div>Contact info</div>
-                                                            <div><Snippet>{invite.INVITER_TEL }0788888888</Snippet></div>
+                                                            <div><Snippet>{invite.INVITER_TEL }</Snippet></div>
                                                             <div><Snippet>{invite.INVITER_EMAIL}</Snippet></div>
                                                         </div>
                                                     </div>
                                                     <div className="w-full flex flex-row justify-between gap-5 mt-10">
-                                                        <Button>Accept offer</Button>
-                                                        <Button>Decline offer</Button>
+                                                        <Button onClick={() => handleAcceptInvit(invite)}>{tractAcceptInvite ? 'Well done ' : 'Accept offer'}</Button>
+                                                        <Button onClick={() => handleDeclineInvite(invite)}>{tractDeclineInvite ? 'oops you decline' : 'Decline offer'}</Button>
                                                     </div>
                                                 </div>
                                                 {/* </div> */}

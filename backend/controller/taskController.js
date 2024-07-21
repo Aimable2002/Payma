@@ -136,11 +136,8 @@ export const taskGiverView = async (req, res) => {
 
 export const taskTaker = async (req, res) => {
     try {
-        console.log('called')
         const {taskId, APPLYING_USERNAME} = req.body;
-        console.log('req body :', req.body)
         const ConfirmId = req.user.userId
-        console.log('confirm id :', ConfirmId )
          if (!taskId || !ConfirmId ) {
              return res.status(404).json('Missing data');
          }
@@ -228,6 +225,82 @@ export const taskTaker = async (req, res) => {
 
 
 
+export const DeclineRequest = async (req, res) => {
+    const { taskId, APPLYING_USERNAME } = req.body;
+    const DeclinedId = req.user.userId;
+  
+    if (!taskId || !APPLYING_USERNAME) {
+      return res.status(404).json('Missing data');
+    }
+  
+    connection.beginTransaction(err => {
+      if (err) {
+        return res.status(500).json({ error: 'Transaction start error' });
+      }
+  
+      const checkTask = 'SELECT task_giverId, task_takerId FROM TASK WHERE taskId = ?';
+      connection.query(checkTask, [taskId], (err, result) => {
+        if (err) {
+          return connection.rollback(() => {
+            return res.status(400).json({ error: 'Error checking task' });
+          });
+        }
+  
+        if (result.length === 0) {
+          return connection.rollback(() => {
+            return res.status(404).json('No task found');
+          });
+        }
+  
+        if (DeclinedId !== result[0].task_giverId) {
+          return connection.rollback(() => {
+            return res.status(401).json('You cannot decline ');
+          });
+        }
+  
+        const getName = 'SELECT userId FROM USERS WHERE userName = ?';
+        connection.query(getName, [APPLYING_USERNAME], (err, results) => {
+          if (err) {
+            return connection.rollback(() => {
+              return res.status(400).json('Some issue occurred');
+            });
+          }
+  
+          if (results.length === 0) {
+            return connection.rollback(() => {
+              return res.status(404).json('User not found');
+            });
+          }
+  
+          const taker_Id = results[0].userId;
+          if (taker_Id === result[0].task_giverId) {
+            return connection.rollback(() => {
+              return res.status(400).json('You cannot take your own task');
+            });
+          }
+  
+          const updateApplyTask = 'UPDATE APPLY_TASK SET Apply_Status = ? WHERE taskId = ? AND task_giverId = ? AND applying_user = ?';
+          connection.query(updateApplyTask, ['Declined', taskId, DeclinedId, taker_Id], (err, result) => {
+            if (err) {
+              return connection.rollback(() => {
+                return res.status(400).json('Failed to update apply task');
+              });
+            }
+  
+            connection.commit(commitErr => {
+              if (commitErr) {
+                return connection.rollback(() => {
+                  return res.status(500).json('Transaction commit error');
+                });
+              }
+              return res.status(200).json({ message: 'Successfully declined', status: true });
+            });
+          });
+        });
+      });
+    });
+  };
+  
 
 export const taskTakerView = async(req, res) => {
     try{
@@ -325,7 +398,7 @@ export const postInvitation = async (req, res) => {
 
 export const taskInviteeView = async (req, res) => {
     const USERID = req.user.userId
-    console.log('userId :', USERID)
+    //console.log('userId :', USERID)
     const selectTask = 'SELECT * FROM INVITEE_VIEW WHERE TakerId = ? AND Approval = ?';
     connection.query(selectTask, [USERID, "Approve"], (err, result) => {
         if(err){
@@ -336,7 +409,7 @@ export const taskInviteeView = async (req, res) => {
             return res.status(404).json({message: 'No task found', status: false})
         }
         const data = result
-        console.log('data :', data)
+        //console.log('data :', data)
         return res.status(200).json(data)
     })
 }
@@ -344,7 +417,7 @@ export const taskInviteeView = async (req, res) => {
 
 export const taskInviteePending = async (req, res) => {
     const USERID = req.user.userId
-    console.log('userId :', USERID)
+    //console.log('userId :', USERID)
     const selectTask = 'SELECT * FROM INVITEE_VIEW WHERE TakerId = ? AND Approval = ? ';
     connection.query(selectTask, [USERID, 'Pending..'], (err, result) => {
         if(err){
@@ -355,7 +428,7 @@ export const taskInviteePending = async (req, res) => {
             return res.status(404).json({message: 'No task found', status: false})
         }
         const data = result
-        console.log('data :', data)
+        //console.log('data :', data)
         return res.status(200).json(data)
     })
 }
@@ -365,12 +438,12 @@ export const taskInviteePending = async (req, res) => {
 
 export const acceptInvitation = async (req, res) => {
     try{
-        const {inviteeId, inviter} = req.body
+        const {inviteeId, TakerId, Approval} = req.body
         console.log('req body :', req.body)
-        const invitee = req.user.userId
-        console.log('invitee :', invitee)
+        const userId = req.user.userId
+        console.log('accepter :', userId)
 
-        if(!inviteeId || !inviter){
+        if(!inviteeId || !TakerId || !Approval){
             return res.status(404).json('missing data')
         }
 
@@ -379,6 +452,37 @@ export const acceptInvitation = async (req, res) => {
                 throw err
             }
 
+            const checkAccepter = 'SELECT * FROM INVITEE WHERE inviteeId = ? AND TakerId = ? AND Approval = ?';
+            connection.query(checkAccepter, [inviteeId, TakerId, Approval], (err, result) => {
+                if(err){
+                    return connection.rollback(() => {
+                        return res.status(400).json(err.message)
+                    })
+                }
+                console.log('results :', result[0].Approval)
+
+                if(result[0].Approval !== 'Pending..'){
+                    return connection.rollback(() => {
+                        return res.status(409).json({message: 'not expected status', status: false})
+                    })
+                }
+                const updateApprovalStatue = 'UPDATE INVITEE SET Approval = ? WHERE inviteeId = ? AND TakerId = ?';
+                connection.query(updateApprovalStatue, ["Approve", inviteeId, TakerId], (err, updateResult) => {
+                    if(err){
+                        return connection.rollback(() => {
+                            return res.status(403).json('fail to update')
+                        })
+                    }
+                    connection.commit(err => {
+                        if(err){
+                            return connection.rollback(() => {
+                                return res.status(408).json('fail to commit')
+                            })
+                        }
+                        return res.status(200).json({message: 'succeffull accept', status: true})
+                    })
+                })
+            })
         })
 
     }catch(error){
@@ -386,3 +490,62 @@ export const acceptInvitation = async (req, res) => {
         return res.status(500).json({error: 'internal serer error'})
     }
 }
+
+
+export const DeclineInvitation = async (req, res) => {
+    try{
+        const {inviteeId, TakerId, Approval} = req.body
+        console.log('req body :', req.body)
+        const userId = req.user.userId
+        console.log('accepter :', userId)
+
+        if(!inviteeId || !TakerId || !Approval){
+            return res.status(404).json('missing data')
+        }
+
+        connection.beginTransaction(err => {
+            if(err){
+                throw err
+            }
+
+            const checkAccepter = 'SELECT * FROM INVITEE WHERE inviteeId = ? AND TakerId = ? AND Approval = ?';
+            connection.query(checkAccepter, [inviteeId, TakerId, Approval], (err, result) => {
+                if(err){
+                    return connection.rollback(() => {
+                        return res.status(400).json(err.message)
+                    })
+                }
+                console.log('results :', result[0].Approval)
+
+                if(result[0].Approval !== 'Pending..'){
+                    return connection.rollback(() => {
+                        return res.status(409).json({message: 'not expected status', status: false})
+                    })
+                }
+                const updateApprovalStatue = 'UPDATE INVITEE SET Approval = ? WHERE inviteeId = ? AND TakerId = ?';
+                connection.query(updateApprovalStatue, ["Declined", inviteeId, TakerId], (err, updateResult) => {
+                    if(err){
+                        return connection.rollback(() => {
+                            return res.status(403).json('fail to update')
+                        })
+                    }
+                    connection.commit(err => {
+                        if(err){
+                            return connection.rollback(() => {
+                                return res.status(408).json('fail to commit')
+                            })
+                        }
+                        return res.status(200).json({message: 'succeffull accept', status: true})
+                    })
+                })
+            })
+        })
+
+    }catch(error){
+        console.log('internal server error :', error.message)
+        return res.status(500).json({error: 'internal serer error'})
+    }
+}
+
+
+

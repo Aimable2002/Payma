@@ -37,6 +37,9 @@ import {Snippet} from "@nextui-org/react";
 import usegetApplyView from "../../hook/applying/applyView";
 import invitationSent from "../../hook/applying/invitationSent";
 import useConfirm from "../../hook/applying/comfirm";
+import useAcceptInvitation from "../../hook/Invitation/useAcceptInvitation";
+import useDecline from "../../hook/applying/DeclineRequest";
+import useDeclineInvite from "../../hook/Invitation/useDeclineInvite";
 
 const truncateString = (str, maxLength) => {
     if(str.length <= maxLength ){
@@ -351,27 +354,42 @@ const [theme, setTheme] = useState(getCurrentTheme());
 
   const {trackConfirm, confirmTask } = useConfirm()
 
-  const [isconfirm, setIsConfirm] = useState(false)
   const [trackConfirmId, setTrackConfirmId] = useState({})
 
-  const handleConfirmButton = async(apply) => {
+  const handleConfirmRequest = async(apply) => {
         
     const {taskId, APPLYING_USERNAME} = apply
     const input = {taskId, APPLYING_USERNAME}
     console.log('confrim id :', input)
     console.log('confrim id :', apply)
-    //await confirmTask (input)
-    setIsConfirm(true)
+    await confirmTask (input)
     setTrackConfirmId((prevStatus) => ({
       ...prevStatus,
       [apply.taskId] : !prevStatus[apply.taskId]
     }))
   }
-  const handleDEclineButton = (apply) => {
-    const {taskId, APPLYING_USERNAME} = apply
-    const input = {taskId}
-    console.log('decline id :', input)
+  const {trackDecline, declineTask } = useDecline()
+
+    const handleDEclineRequest = async(apply) => {
+        const {taskId, APPLYING_USERNAME} = apply
+        const input = {taskId, APPLYING_USERNAME}
+        console.log('decline id :', input)
+        await declineTask(input)
+    }
+  const { tractAcceptInvite, postAccept} = useAcceptInvitation();
+    const handleAcceptInvit = async(invite) => {
+    const {inviteeId, TakerId, Approval} = invite
+    const input = {inviteeId, TakerId, Approval}
+    console.log('input :', input)
+    await postAccept(input)
   }
+  const {tractDeclineInvite, postDecline } = useDeclineInvite()
+    const handleDeclineInvite = async (invite) => {
+      const {inviteeId, TakerId, Approval} = invite
+      const input = {inviteeId, TakerId, Approval}
+      console.log('input :', input)
+      await postDecline(input)
+    }
   return (
     <div className="w-full flex flex-col overflow-auto">
         <div className=" w-full">
@@ -1015,8 +1033,8 @@ const [theme, setTheme] = useState(getCurrentTheme());
                               </div>
                             </div>
                             <div className="w-full flex flex-row justify-between gap-5 mt-10">
-                              <Button onClick={() => handleConfirmButton(apply)}>{!loading && trackConfirmId[apply.taskId] ? 'well done' : loading ? 'loading..' : 'Confirm offer'}</Button>
-                              <Button onClick={() => handleDEclineButton(apply)}>Decline offer</Button>
+                              <Button onClick={() => handleConfirmRequest(apply)}>{!loading && trackConfirm ? 'well done' : loading ? 'loading..' : 'Confirm offer'}</Button>
+                              <Button onClick={() => handleDEclineRequest(apply)}>{!loading && trackDecline ? 'oops You decline' : loading ? 'loading..' : 'Decline offer'}</Button>
                             </div>
                         </div>
                     {/* </div> */}
@@ -1126,8 +1144,8 @@ const [theme, setTheme] = useState(getCurrentTheme());
                               </div>
                             </div>
                             <div className="w-full flex flex-row justify-between gap-5 mt-10">
-                              <Button>Accept offer</Button>
-                              <Button>Decline offer</Button>
+                              <Button onClick={() => handleAcceptInvit(invite)}>{tractAcceptInvite ? 'Well done ' : 'Accept offer'}</Button>
+                              <Button onClick={() => handleDeclineInvite(invite)}>{tractDeclineInvite ? 'oops you decline' : 'Decline offer'}</Button>
                             </div>
                         </div>
                     {/* </div> */}
@@ -1210,12 +1228,12 @@ const [theme, setTheme] = useState(getCurrentTheme());
                       <div className="mt-10">
                         <Button
                         onClick={() => handleApprove(user)}
-                        className={!approveStatus[user.taskId] ? " bg-transparent text-foreground border-default-200" : "border-primary"}
+                        className={!trackApprove ? " bg-transparent text-foreground border-default-200" : "border-primary"}
                         color="primary"
                         radius="full"
                         size="sm"
                         >
-                          {approveStatus[user.taskId] ? 'Approved' : user.Approval}
+                          {trackApprove ? 'Approved' : user.Approval}
                         </Button>
                       </div>
                     </div>
