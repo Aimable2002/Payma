@@ -4,6 +4,7 @@ import { Button } from '@nextui-org/react'
 import CallIcon from '@mui/icons-material/Call';
 import useLogin from '../../hook/registration/login';
 import useSignup from '../../hook/registration/signup';
+import googleReg from './googleReg';
 
 const Lsign = () => {
 
@@ -62,6 +63,10 @@ const Lsign = () => {
       const {First_name, Last_name, Email, Title, userName, Password, confirmPassword, Phone_number} = inputValues
       console.log('inputs :', inputValues)
       await signup(inputValues)
+    }
+    const {LogGoo} = googleReg()
+    const handleGoogle = async () => {
+      await LogGoo()
     }
   return (
     <div className='w-full flex flex-col'>
@@ -140,6 +145,7 @@ const Lsign = () => {
                     </div>
                     <div className='relative mt-5'>
                         <p>Terms and condition <span className='text-info cursor-pointer'> here</span></p>
+                        <p>signup with google <span className='text-info cursor-pointer' onClick={handleGoogle}> here</span></p>
                     </div>
                 </form>
             ) : (

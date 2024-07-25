@@ -1,4 +1,3 @@
-import { response } from "express";
 import connectDatabase from "../database/connectDatabase.js";
 
 const connection = connectDatabase();

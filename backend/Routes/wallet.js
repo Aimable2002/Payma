@@ -7,7 +7,7 @@ import { cashIn, cashOut } from '../controller/MoneyController.js';
 const router = express.Router();
 
 
-router.post('/deposite', protectRoute, cashIn);
+router.post('/deposite', protectRoute, deposite);
 router.post('/cash-in', deposite)
 router.post('/withdrow', protectRoute, cashOut, Withdrowal);
 router.get('/wallet', wallet)

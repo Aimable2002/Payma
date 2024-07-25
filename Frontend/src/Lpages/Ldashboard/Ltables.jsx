@@ -9,7 +9,6 @@ const Ltables = () => {
   const {task = []} = usegetTaskView()
   const {taskTaker} = usegetTaskTaker()
   const {inviteTaskDash} = inviteData();
-  console.log('task :', task)
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
@@ -69,7 +68,6 @@ const Ltables = () => {
     ...taskTaker.map(item => ({ ...item, type: 'taskTaker' })),
     ...inviteTaskDash.map(item => ({ ...item, type: 'inviteTaskDash' }))
   ];
-console.log('combine :', combinedData)
   const columnx = (type) => (type === 'taskTaker' ? columnss : columnssx);
 
   return (

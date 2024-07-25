@@ -18,7 +18,8 @@ const Lhistory = () => {
                     <th>Job</th>
                     <th>Assignee</th>
                     <th>Assignee tel:</th>
-                    <th>Amount</th>
+                    <th>Amount in FR</th>
+                    <th>Repprt</th>
                     <th>Status</th>
                     <th>Start Date</th>
                     <th>End Date</th>
@@ -32,7 +33,8 @@ const Lhistory = () => {
                             <td>{hist.Agreement}</td>
                             <td>{hist.task_taker_name}</td>
                             <td>{hist.Phone_number}</td>
-                            <td>{hist.Amount}</td>
+                            <td>{hist.TaskAmount}</td>
+                            <td>{hist.Status}</td>
                             <td>{hist.Approval}</td>
                             <td>{formatDate(hist.Start_date)}</td>
                             <td>{formatDate(hist.End_date)}</td>
@@ -46,7 +48,8 @@ const Lhistory = () => {
                     <th>Job</th>
                     <th>Assignee</th>
                     <th>Assignee tel:</th>
-                    <th>Amount</th>
+                    <th>Amount in FR</th>
+                    <th>Report</th>
                     <th>Status</th>
                     <th>Start Date</th>
                     <th>End Date</th>

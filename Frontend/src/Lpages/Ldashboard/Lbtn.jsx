@@ -57,6 +57,7 @@ const Lbtn = () => {
                                             <input
                                                 id={field}
                                                 name={field}
+                                                className="bg-transparent"
                                                 onChange={handleChangeLogin}
                                                 type={field.includes('Phone_number' && 'Amount') ? 'number' : 'text'}
                                                 onFocus={() => handleFocus2(field)}
@@ -88,6 +89,7 @@ const Lbtn = () => {
                                             <input
                                                 id={field}
                                                 name={field}
+                                                className="bg-transparent"
                                                 onChange={handleChangeLogin}
                                                 type={field.includes('Phone_number' && 'Amount') ? 'number' : 'text'}
                                                 onFocus={() => handleFocus2(field)}

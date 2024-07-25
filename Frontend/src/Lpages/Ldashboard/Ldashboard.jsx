@@ -202,7 +202,7 @@ const Ldashboard = () => {
       }
       const {task} = usegetTaskView()
       const {taskTaker} = usegetTaskTaker();
-      const {usersOn} = useGetUserOn()
+      const {usersOn} = useGetUserOn(activeButton)
 
       const totalEarnPending = useMemo(() => {
         return taskTaker
@@ -221,7 +221,7 @@ const Ldashboard = () => {
           .filter(item => item.Approval !== 'Approved')
           .reduce((sum, item) => sum + (item.Amount || 0), 0);
       }, [task]);
-      const TotalPend = totalAmount + totalEarnPending
+      const TotalPend = totalEarn
 
       const TotalTaskPaid = useMemo(() => {
         return task
@@ -269,7 +269,7 @@ const Ldashboard = () => {
     <div className='w-full flex flex-row fixed'>
         <div className={`w-2/12 overflow-y-auto ${bgColorClass}`} style={{zIndex: '2'}}>
             <div className='w-full flex flex-row justify-between'>
-                <Link to='/'><h1 className='cursor-pointer'>Web App</h1></Link>
+                <Link to='/'><h1 className='cursor-pointer text-info'>Web App</h1></Link>
                 <div onClick={handleMenu} className="text-info"><PersonIcon /></div>
             </div>
             <div className={`w-full flex flex-col ${bgColorClass}`}>
@@ -504,7 +504,7 @@ const Ldashboard = () => {
                           <CardHeader className="justify-between ">
                             <div className="flex w-full  gap-5">
                               <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                                <h5 className="text-small tracking-tight text-default-400">Total Pending</h5>
+                                <h5 className="text-small tracking-tight text-default-400">Total Earnings</h5>
                                 <h4 className=" w-3/4 text-small font-semibold leading-none text-default-600">{TotalPend} FRW</h4>
                               </div>
                             </div>

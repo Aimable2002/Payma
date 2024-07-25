@@ -33,9 +33,13 @@ const PORT = process.env.PORT || 3000
 app.use(express.json()); 
 app.use(bodyParser.json());
 app.use(cors())
+// app.use(cors({
+//     origin: 'http://localhost:3000', // Frontend's origin
+//     credentials: true // Allow credentials (cookies, authorization headers, etc.)
+// }));
 
 app.use(session({
-    secret: 'your-session-secret',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true
 }));

@@ -24,7 +24,10 @@ const useTakeTask = () => {
         if(!data){
             throw new Error('error')
         }
-        setTrackEvent(data.status)
+        setTrackEvent((prevStatus) => ({
+            ...prevStatus,
+            [values] : data.status
+        }))
     }catch(error){
         console.log('error :', error.message)
         alert('something went wrong')

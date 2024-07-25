@@ -6,8 +6,8 @@ const usepostTask = () => {
 
   const [isTrue, setIsTrue] = useState(null)
 
-  const tasked = async({Agreement, Amount, Currency, Start_date, End_date}) => {
-    const Success = handleErr(Agreement, Currency, Amount, Start_date, End_date)
+  const tasked = async({Agreement, Description, Amount, Currency, Start_date, End_date}) => {
+    const Success = handleErr(Agreement, Description, Currency, Amount, Start_date, End_date)
     if(!Success)return
 
     const startDate = new Date(Start_date);
@@ -33,6 +33,7 @@ const usepostTask = () => {
         const res = await axios.post('/api/task/assign-task', {
             Agreement,
             Amount,
+            Description,
             Currency,
             Start_date,
             End_date,

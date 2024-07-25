@@ -1,7 +1,7 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 
-const inviteData = () => {
+const inviteData = (activeButton) => {
       const [loading, setLoading] = useState(false)
       const [inviteTaskDash, setInviteTaskDash] = useState([])
     
@@ -20,7 +20,6 @@ const inviteData = () => {
                         throw new Error ('missing data')
                     }
                     setInviteTaskDash(data)
-                    console.log('data :', data)
                 }catch(error){
                     console.log('error :', error.message)
                     alert('something went wrong refresh')

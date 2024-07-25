@@ -21,7 +21,6 @@ const usegetTaskView = () => {
                   throw new Error(data.error)
               }
               setTask(data)
-              console.log('data :', data)
           }catch(error){
               console.log('error :', error.message)
           }finally{

@@ -31,6 +31,7 @@ const useSignup = () => {
         window.location = '/'
     }catch(error){
         console.log('error in signup')
+        alert('something went wrong')
     }finally{
         setLoading(false)
     }

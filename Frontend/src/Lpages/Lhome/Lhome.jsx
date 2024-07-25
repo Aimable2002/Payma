@@ -36,6 +36,17 @@ import useConfirm from '../../hook/applying/comfirm';
 import useAcceptInvitation from '../../hook/Invitation/useAcceptInvitation';
 import useDecline from '../../hook/applying/DeclineRequest';
 import useDeclineInvite from '../../hook/Invitation/useDeclineInvite';
+import getLogUser from '../../hook/getUsers/getLogUser';
+
+
+const truncateString = (str, maxLength) => {
+    if(str.length <= maxLength ){
+      return str;
+    }else{
+      const truncatedString = str.slice(0, maxLength);
+      return truncatedString + (truncatedString.endsWith('') ? '.....' : '...');
+    }
+}
 
 const Lhome = () => {
     const {loading, logout} = useLogout()
@@ -150,12 +161,12 @@ const Lhome = () => {
     
     const handleApply = async(task) => {
         console.log('task apply :', task)
-    //   const values = task.taskId;
-    //   await takeTask(values)
-    //   setTaskStatus((prevStatus) => ({
-    //     ...prevStatus,
-    //     [task.taskId]: !prevStatus[task.taskId],
-    //   }));
+      const values = task.taskId;
+      await takeTask(values)
+      setTaskStatus((prevStatus) => ({
+        ...prevStatus,
+        [task.taskId]: !prevStatus[task.taskId],
+      }));
       
     }
     const {isData} = useTakeTaskView(activeButton);
@@ -204,8 +215,9 @@ const Lhome = () => {
     const {isTrue, tasked} = usepostTask()
     const handleTaskSubmit = async(e) => {
         e.preventDefault();
-        const {Agreement, Amount, Currency, Start_date, End_date} = inputValues
+        const {Agreement, Description, Amount, Currency, Start_date, End_date} = inputValues
         await tasked(inputValues)
+        console.log('description :', inputValues)
       }
       const [focusedInput22, setFocusedInput22] = useState('');
       const [inputValues2, setInputValues2] = useState({
@@ -276,20 +288,20 @@ const Lhome = () => {
 
     const [isFollowed, setIsFollowed] = React.useState(false);
 
-    const [tAll, setIsTAll] = useState(true)
+    const [isAll, setIsAll] = useState(true)
     const [isRequest, setIsRequest] = useState(false)
     const [isInvitation, setIsInvitation] = useState(false)
 
     const[ActiveType, setActiveType] = useState('ALL')
 
     const handleNotificationsType = (e) => {
-        setIsTAll(false)
+        setIsAll(false)
         setIsRequest(false)
         setIsInvitation(false)
         setActiveType(e)
         switch (e) {
         case 'ALL' :
-            setIsTAll(true)
+            setIsAll(true)
         break;
         case 'Request' :
             setIsRequest(true)
@@ -347,6 +359,7 @@ const Lhome = () => {
         console.log('input :', input)
         await postDecline(input)
     }
+    const {logUser} = getLogUser();
   return (
     <div className='w-full flex flex-row fixed'>
         <div className={`w-2/12 overflow-y-auto ${bgColorClass}`} style={{zIndex: '2'}}>
@@ -374,26 +387,27 @@ const Lhome = () => {
                     <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                     </form>
                     <h3 className="font-bold text-lg">Pearsonal Details</h3>
+                    {logUser.map((user) => (
                     <div className='flex flex-col align-middle justify-center'>
                         <h2>Your detail info</h2>
                         <div className='flex flex-row gap-4'>
                             <div className='flex flex-col text-sm'>
                                 <h2>First_Name</h2>
-                                <div>Aimable 1 <span className='ml-2 text-info'> Edit</span></div>
+                                <div>{user.First_name}</div>
                             </div>
                             <div className='flex flex-col text-sm'>
                                 <h2>Last_Name</h2>
-                                <div>Aimable 2  <span className='ml-2 text-info'> Edit</span></div>
+                                <div>{user.Last_name}</div>
                             </div>
                             <div className='flex flex-col text-sm'>
                                 <h2>User_Name</h2>
-                                <div>@Aimable  <span className='ml-2 text-info'> Apply</span></div>
+                                <div>@{user.userName}</div>
                             </div>
                         </div>
                         <div className='flex flex-col mt-4'>
                             <h2>Title</h2>
                             <div className='flex flex-row gap-4'>
-                                <div>Dev <span className='ml-2 text-info'> Edit</span></div>
+                                <div>{user.Title} <span className='ml-2 text-info'> Edit</span></div>
                             </div>
                         </div>
                         <div className='flex flex-col gap-2 mt-4'>
@@ -406,6 +420,7 @@ const Lhome = () => {
                                             <input type="password" 
                                             id='old'
                                             name='OldPassword'
+                                            className="bg-transparent"
                                             onChange={handleChange22}
                                             onFocus={() => handleFocus22('OldPassword')}/>
                                         </div>
@@ -414,6 +429,7 @@ const Lhome = () => {
                                             <input type="password"
                                             id='new'
                                             name='NewPassword'
+                                            className="bg-transparent"
                                             onChange={handleChange22}
                                             onFocus={() => handleFocus22('NewPassword')} />
                                         </div>
@@ -425,11 +441,11 @@ const Lhome = () => {
                                         <h2>Address</h2>
                                         <div className='flex flex-col'>
                                             <div>Email</div>
-                                            <div>aimable@gmail <span className='text-info'> Edit</span></div>
+                                            <div>{user.EMAIL} <span className='text-info'> Edit</span></div>
                                         </div>
                                         <div className='flex flex-col'>
                                             <div>Phone_number</div>
-                                            <div>(+255) 555 5555 <span className='text-info'> Edit</span></div>
+                                            <div>{user.Phone_number} <span className='text-info'> Edit</span></div>
                                         </div>
                                         <div className='mt-4'>
                                             <button>Save all</button>
@@ -439,6 +455,7 @@ const Lhome = () => {
                             </div>
                         </div>
                     </div>
+                    ))}
                 </div>
         </dialog>
         </div>
@@ -506,12 +523,11 @@ const Lhome = () => {
                 {isHome && (
                     <>
                 {usersTask.map((task) => {
-                    console.log('task status :', task.Task_Status)
                     return (
                     <Card  style={{zIndex: '1'}}>
                         <CardHeader className="justify-between">
                             <div className="flex gap-5">
-                            <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                            {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
                             <div className="flex flex-col gap-1 items-start justify-center">
                                 <h4 className="text-small font-semibold leading-none text-default-600">{task.FULL_NAME}</h4>
                                 <h5 className="text-small tracking-tight text-default-400">@{task.userName}</h5>
@@ -523,7 +539,7 @@ const Lhome = () => {
                         </CardHeader>
                         <CardBody className="px-3 py-0 text-small text-default-400">
                             <p>
-                                {task.Description}
+                                {truncateString(task.Description, 90)}
                             </p>
                             <span className="pt-2">
                             #FrontendWithZoey 
@@ -543,7 +559,7 @@ const Lhome = () => {
                             </div>
                             <div className="flex gap-1">
                                 <button className="btn" onClick={()=>document.getElementById(task.taskId).showModal()}>
-                                    {loading ? <span className="loading loading-ring"></span> :  !loading  && TaskStatus[task.taskId] ? 'Apply' : task.Task_Status }
+                                    {loading ? <span className="loading loading-ring"></span> :  !loading  && trackEvent ? 'Apply' : task.Task_Status }
                                     {/* {task.Task_Status} */}
                                 </button>
                             </div>
@@ -667,6 +683,7 @@ const Lhome = () => {
                                                     <input
                                                     id={field}
                                                     name={field}
+                                                    className="bg-transparent"
                                                     onChange={handleChange00}
                                                     type={field.includes('date') ? 'date' : field.toLowerCase() === 'amount' ? 'number' : 'text'}
                                                     onFocus={() => handleFocus(field)}
@@ -809,6 +826,7 @@ const Lhome = () => {
                                 <input
                                     id="Agreement"
                                     name="Agreement"
+                                    className="bg-transparent"
                                     type="text"
                                     onChange={handleChange}
                                     onFocus={() => handleFocus('Agreement')}
@@ -822,6 +840,7 @@ const Lhome = () => {
                                 <input
                                     id="Description"
                                     name="Description"
+                                    className="bg-transparent"
                                     type="text"
                                     onChange={handleChange}
                                     onFocus={() => handleFocus('Description')}
@@ -836,6 +855,7 @@ const Lhome = () => {
                                     <input
                                     id="Amount"
                                     name="Amount"
+                                    className="bg-transparent"
                                     type="number"
                                     onChange={handleChange}
                                     onFocus={() => handleFocus('Amount')}
@@ -849,6 +869,7 @@ const Lhome = () => {
                                     <input
                                     id="Currency"
                                     name="Currency"
+                                    className="bg-transparent"
                                     type="text"
                                     onChange={handleChange}
                                     onFocus={() => handleFocus('Currency')}
@@ -864,6 +885,7 @@ const Lhome = () => {
                                     <input
                                     id="Start_date"
                                     name="Start_date"
+                                    className="bg-transparent"
                                     type="date"
                                     onChange={handleChange}
                                     onFocus={() => handleFocus('Start_date')}
@@ -877,6 +899,7 @@ const Lhome = () => {
                                     <input
                                     id="End_date"
                                     name="End_date"
+                                    className="bg-transparent"
                                     type="date"
                                     onChange={handleChange}
                                     onFocus={() => handleFocus('End_date')}
@@ -904,6 +927,7 @@ const Lhome = () => {
                                     <input
                                         id="Agreement"
                                         name="Agreement"
+                                        className="bg-transparent"
                                         type="text"
                                         onChange={handleChange}
                                         onFocus={() => handleFocus('Agreement')}
@@ -917,6 +941,7 @@ const Lhome = () => {
                                     <input
                                         id="Description"
                                         name="Description"
+                                        className="bg-transparent"
                                         type="text"
                                         onChange={handleChange}
                                         onFocus={() => handleFocus('Description')}
@@ -931,6 +956,7 @@ const Lhome = () => {
                                         <input
                                         id="Amount"
                                         name="Amount"
+                                        className="bg-transparent"
                                         type="number"
                                         onChange={handleChange}
                                         onFocus={() => handleFocus('Amount')}
@@ -944,6 +970,7 @@ const Lhome = () => {
                                         <input
                                         id="Currency"
                                         name="Currency"
+                                        className="bg-transparent"
                                         type="text"
                                         onChange={handleChange}
                                         onFocus={() => handleFocus('Currency')}
@@ -959,6 +986,7 @@ const Lhome = () => {
                                         <input
                                         id="Start_date"
                                         name="Start_date"
+                                        className="bg-transparent"
                                         type="date"
                                         onChange={handleChange}
                                         onFocus={() => handleFocus('Start_date')}
@@ -971,6 +999,7 @@ const Lhome = () => {
                                         </label>
                                         <input
                                         id="End_date"
+                                        className="bg-transparent"
                                         name="End_date"
                                         type="date"
                                         onChange={handleChange}
@@ -996,117 +1025,348 @@ const Lhome = () => {
                 {isNotification  && (
                     <>
                         {/* <div className="w-full gap-2"> */}
-                        {!loading && applyView.length !== 0 ? (
-                            applyView.map((apply) => (
-                                <Card className="w-full mt-2" style={{zIndex: '1'}}>
-                                    <CardHeader className="justify-between w-full">
-                                        <div className="flex w-4/5  gap-5">
-                                            <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
-                                            <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                                                <h4 className="text-small font-semibold leading-none text-default-600">{apply.Agreement}</h4>
-                                                <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}</h5>
-                                            </div>
-                                        </div>
-                                        <div className="w-2/6">
-                                            <Button
-                                                className={isFollowed ? " bg-transparent text-foreground border-default-200" : "border-primary"}
-                                                color="primary"
-                                                radius="full"
-                                                size="sm"
-                                                onClick={() => document.getElementById(apply.taskId).showModal()}
-                                            >
-                                            Accept /Decline
-                                            </Button>
-                                            <dialog id={apply.taskId} className="modal">
-                                                <div className="modal-box">
-                                                    <form method="dialog">
-                                                        {/* if there is a button in form, it will close the modal */}
-                                                        <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-                                                    </form>
-                                                    <h3 className="font-bold text-lg">Job Request!</h3>
-                                                    <div className='mb-4'>
-                                                        <Card>
-                                                            <CardHeader className="justify-between">
-                                                                <div className="flex gap-5">
-                                                                    <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
-                                                                    <div className="flex flex-col gap-1 items-start justify-center">
-                                                                        <h4 className="text-small font-semibold leading-none text-default-600">{apply.Agreement}</h4>
-                                                                        <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}, {apply.taskId}</h5>
-                                                                    </div>
-                                                                </div>
-                                                                {/* <div className="flex w-2/6">
-                                                                <p>Job: {task.Agreement}</p>
-                                                                </div> */}
-                                                            </CardHeader>
-                                                        </Card> 
-
-                                                        <div className='w-full px-2 flex flex-col'>
-                                                            <h1 className="text-default-500 tracking-tight">Job description</h1>
-                                                            <h2 className="text-small tracking-tight text-default-500">Job titile : {apply.Agreement}</h2>
-                                                            <div className='w-full inline-block mt-3'>
-                                                                {apply.description}
-                                                            </div>
-                                                            {/* <div className='w-full inline-block mt-3'>
-                                                            this is specification
-                                                            </div> */}
-                                                            <div className='w-full flex flex-col'>
-                                                                <div className='w-2/4 flex flex-col mt-2'>
-                                                                    <div>Amount</div>
-                                                                    <div>{apply.Amount} FRW</div>
-                                                                </div>
-                                                                <div className='w-2/4 flex flex-col mt-2'>
-                                                                    <div>Duration</div>
-                                                                    <div>{apply.Duration}</div>
-                                                                </div>
-                                                                <div className='w-full flex justify-between gap-5 flex-row mt-2'>
-                                                                    <div className='w-full flex flex-col'>
-                                                                        <div>Start date</div>
-                                                                        <div>{formatDate (apply.Start_date)}</div>
-                                                                    </div>
-                                                                    <div className='w-full flex flex-col'>
-                                                                        <div>End date</div>
-                                                                        <div>{formatDate (apply.End_date)}</div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="w-full flex flex-col mt-4">
-                                                                <h1 className="text-info">Our Contact</h1>
-                                                                <div className="w-full flex flex-col">
-                                                                    <div>Contact info</div>
-                                                                    <div><Snippet>{apply.APPLYING_TEL}</Snippet></div>
-                                                                    <div><Snippet>{apply.APPLYING_EMAIL}</Snippet></div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="w-full flex flex-row justify-between gap-5 mt-10">
-                                                                    <Button onClick={() => handleConfirmRequest(apply)}>{!loading && trackConfirm ? 'well done' : loading ? 'loading..' : 'Confirm offer'}</Button>
-                                                                    <Button onClick={() => handleDEclineRequest(apply)}>{!loading && trackDecline ? 'oops You decline' : loading ? 'loading..' : 'Decline offer'}</Button>
-                                                            </div>
-                                                        </div>
-                                                        {/* </div> */}
-
+                        {isAll && (
+                            <>
+                                {!loading && applyView.length !== 0 ? (
+                                    applyView.map((apply) => (
+                                        <Card className="w-full mt-2" style={{zIndex: '1'}}>
+                                            <CardHeader className="justify-between w-full">
+                                                <div className="flex w-4/5  gap-5">
+                                                    <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                                    <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                                                        <h4 className="text-small font-semibold leading-none text-default-600">{apply.Agreement}</h4>
+                                                        <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}</h5>
                                                     </div>
                                                 </div>
-                                            </dialog>
-                                        </div>
-                                    </CardHeader>
-                                    <CardBody className="px-3 py-0 text-small text-default-400">
-                                        <span className="pt-2 text-default-700">
-                                            {apply.APPLYING_USERNAME} requesting  
-                                            <span className="py-2 ml-2" aria-label="computer" role="img">
-                                                Job: {apply.Agreement}, you published.
+                                                <div className="w-2/6">
+                                                    <Button
+                                                        className={isFollowed ? " bg-transparent text-foreground border-default-200" : "border-primary"}
+                                                        color="primary"
+                                                        radius="full"
+                                                        size="sm"
+                                                        onClick={() => document.getElementById(apply.taskId).showModal()}
+                                                    >
+                                                    Accept /Decline
+                                                    </Button>
+                                                    <dialog id={apply.taskId} className="modal">
+                                                        <div className="modal-box">
+                                                            <form method="dialog">
+                                                                {/* if there is a button in form, it will close the modal */}
+                                                                <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                                                            </form>
+                                                            <h3 className="font-bold text-lg">Job Request!</h3>
+                                                            <div className='mb-4'>
+                                                                <Card>
+                                                                    <CardHeader className="justify-between">
+                                                                        <div className="flex gap-5">
+                                                                            <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                                                            <div className="flex flex-col gap-1 items-start justify-center">
+                                                                                <h4 className="text-small font-semibold leading-none text-default-600">{apply.Agreement}</h4>
+                                                                                <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}, {apply.taskId}</h5>
+                                                                            </div>
+                                                                        </div>
+                                                                        {/* <div className="flex w-2/6">
+                                                                        <p>Job: {task.Agreement}</p>
+                                                                        </div> */}
+                                                                    </CardHeader>
+                                                                </Card> 
+    
+                                                                <div className='w-full px-2 flex flex-col'>
+                                                                    <h1 className="text-default-500 tracking-tight">Job description</h1>
+                                                                    <h2 className="text-small tracking-tight text-default-500">Job titile : {apply.Agreement}</h2>
+                                                                    <div className='w-full inline-block mt-3'>
+                                                                        {truncateString(apply.description, 90)}
+                                                                    </div>
+                                                                    {/* <div className='w-full inline-block mt-3'>
+                                                                    this is specification
+                                                                    </div> */}
+                                                                    <div className='w-full flex flex-col'>
+                                                                        <div className='w-2/4 flex flex-col mt-2'>
+                                                                            <div>Amount</div>
+                                                                            <div>{apply.Amount} FRW</div>
+                                                                        </div>
+                                                                        <div className='w-2/4 flex flex-col mt-2'>
+                                                                            <div>Duration</div>
+                                                                            <div>{apply.Duration}</div>
+                                                                        </div>
+                                                                        <div className='w-full flex justify-between gap-5 flex-row mt-2'>
+                                                                            <div className='w-full flex flex-col'>
+                                                                                <div>Start date</div>
+                                                                                <div>{formatDate (apply.Start_date)}</div>
+                                                                            </div>
+                                                                            <div className='w-full flex flex-col'>
+                                                                                <div>End date</div>
+                                                                                <div>{formatDate (apply.End_date)}</div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="w-full flex flex-col mt-4">
+                                                                        <h1 className="text-info">Our Contact</h1>
+                                                                        <div className="w-full flex flex-col">
+                                                                            <div>Contact info</div>
+                                                                            <div><Snippet>{apply.APPLYING_TEL}</Snippet></div>
+                                                                            <div><Snippet>{apply.APPLYING_EMAIL}</Snippet></div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="w-full flex flex-row justify-between gap-5 mt-10">
+                                                                        <Button onClick={() => handleConfirmRequest(apply)}>{!loading && trackConfirm ? 'well done' : loading ? 'loading..' : 'Confirm offer'}</Button>
+                                                                        <Button onClick={() => handleDEclineRequest(apply)}>{!loading && trackDecline ? 'oops You decline' : loading ? 'loading..' : 'Decline offer'}</Button>
+                                                                    </div>
+                                                                </div>
+                                                                {/* </div> */}
+    
+                                                            </div>
+                                                        </div>
+                                                    </dialog>
+                                                </div>
+                                            </CardHeader>
+                                            <CardBody className="px-3 py-0 text-small text-default-400">
+                                                <span className="pt-2 text-default-700">
+                                                    {apply.APPLYING_USERNAME} requesting  
+                                                    <span className="py-2 ml-2" aria-label="computer" role="img">
+                                                        Job: {apply.Agreement}, you published.
+                                                    </span>
+                                                </span>
+                                                <div>
+                                                    {apply.description}
+                                                </div>
+                                            </CardBody>
+                                        </Card>
+                                    ))
+                                ) : (
+                                    loading && applyView.length !== 0 ? 'lodding....' : ''
+                                )}
+
+
+                                {!loading && inviteTaskPending.length !== 0 ? (
+                                    inviteTaskPending.map((invite) => (
+
+                                    <Card className="w-full mt-2" style={{zIndex: '1'}}>
+                                        <CardHeader className="justify-between w-full">
+                                            <div className="flex w-4/5  gap-5">
+                                                <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                                <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                                                    <h4 className="text-small font-semibold leading-none text-default-600">{invite.Agreement}</h4>
+                                                    <h5 className="text-small tracking-tight text-default-400">@{invite.inviter}</h5>
+                                                </div>
+                                            </div>
+                                            <div className="w-2/6">
+                                                <Button
+                                                    className={isFollowed ? " bg-transparent text-foreground border-default-200" : "border-primary"}
+                                                    color="primary"
+                                                    radius="full"
+                                                    size="sm"
+                                                    onClick={() => document.getElementById(invite.inviteeId).showModal()}
+                                                >
+                                                    Accept/Decline
+                                                </Button>
+                                                <dialog id={invite.inviteeId} className="modal">
+                                                    <div className="modal-box">
+                                                        <form method="dialog">
+                                                        {/* if there is a button in form, it will close the modal */}
+                                                            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                                                        </form>
+                                                        <h3 className="font-bold text-lg">Invitation!</h3>
+                                                        <div className='mb-4'>
+                                                            <Card>
+                                                                <CardHeader className="justify-between">
+                                                                    <div className="flex gap-5">
+                                                                        <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                                                        <div className="flex flex-col gap-1 items-start justify-center">
+                                                                            <h4 className="text-small font-semibold leading-none text-default-600">{invite.INVITER_FULL_NAME }</h4>
+                                                                            <h5 className="text-small tracking-tight text-default-400">@{invite.inviter}</h5>
+                                                                        </div>
+                                                                    </div>
+                                                                    {/* <div className="flex w-2/6">
+                                                                    <p>Job: {task.Agreement}</p>
+                                                                    </div> */}
+                                                                </CardHeader>
+                                                            </Card> 
+
+                                                            <div className='w-full px-2 flex flex-col'>
+                                                                <h1 className="text-default-500 tracking-tight">Job description</h1>
+                                                                <h2 className="text-small tracking-tight text-default-500">Job titile : {invite.Agreement}</h2>
+                                                                <div className='w-full inline-block mt-3'>
+                                                                    {invite.Description}
+                                                                </div>
+                                                                {/* <div className='w-full inline-block mt-3'>
+                                                                    this is specification
+                                                                </div> */}
+                                                                <div className='w-full flex flex-col'>
+                                                                    <div className='w-2/4 flex flex-col mt-2'>
+                                                                        <div>Amount</div>
+                                                                        <div>{invite.Amount} FRW</div>
+                                                                    </div>
+                                                                    <div className='w-2/4 flex flex-col mt-2'>
+                                                                        <div>Duration</div>
+                                                                        <div>{invite.Duration}</div>
+                                                                    </div>
+                                                                    <div className='w-full flex justify-between gap-5 flex-row mt-2'>
+                                                                        <div className='w-full flex flex-col'>
+                                                                            <div>Start date</div>
+                                                                            <div>{formatDate (invite.Start_date)}</div>
+                                                                        </div>
+                                                                        <div className='w-full flex flex-col'>
+                                                                            <div>End date</div>
+                                                                            <div>{formatDate (invite.End_date)}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="w-full flex flex-col mt-4">
+                                                                    <h1 className="text-info">Our Contact</h1>
+                                                                    <div className="w-full flex flex-col">
+                                                                        <div>Contact info</div>
+                                                                        <div><Snippet>{invite.INVITER_TEL }</Snippet></div>
+                                                                        <div><Snippet>{invite.INVITER_EMAIL}</Snippet></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="w-full flex flex-row justify-between gap-5 mt-10">
+                                                                    <Button onClick={() => handleAcceptInvit(invite)}>{tractAcceptInvite ? 'Well done ' : 'Accept offer'}</Button>
+                                                                    <Button onClick={() => handleDeclineInvite(invite)}>{tractDeclineInvite ? 'oops you decline' : 'Decline offer'}</Button>
+                                                                </div>
+                                                            </div>
+                                                            {/* </div> */}
+
+                                                        </div>
+                                                    </div>
+                                                </dialog>
+                                            </div>
+                                        </CardHeader>
+                                        <CardBody className="px-3 py-0 text-small text-default-400">
+                                            <div>
+                                                {invite.Description}
+                                            </div>
+                                            <span className="pt-2 text-default-700">
+                                                Amount: 
+                                                <span className="py-2 ml-2" aria-label="computer" role="img">
+                                                    {invite.Amount} FRW
+                                                </span>
                                             </span>
-                                        </span>
-                                        <div>
-                                            {apply.description}
-                                        </div>
-                                    </CardBody>
-                                </Card>
-                            ))
-                        ) : (
-                            loading && applyView.length !== 0 ? 'lodding....' : ''
+                                        </CardBody>
+                                    </Card>
+                                ))
+                                    ) : (
+                                        loading && inviteTaskPending.length !== 0 ? 'loading..' : ''
+                                )}
+                            </>
+                        )}
+                        {isRequest && (
+                            <>
+                            {!loading && applyView.length !== 0 ? (
+                                applyView.map((apply) => (
+                                    <Card className="w-full mt-2" style={{zIndex: '1'}}>
+                                        <CardHeader className="justify-between w-full">
+                                            <div className="flex w-4/5  gap-5">
+                                                <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                                <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                                                    <h4 className="text-small font-semibold leading-none text-default-600">{apply.Agreement}</h4>
+                                                    <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}</h5>
+                                                </div>
+                                            </div>
+                                            <div className="w-2/6">
+                                                <Button
+                                                    className={isFollowed ? " bg-transparent text-foreground border-default-200" : "border-primary"}
+                                                    color="primary"
+                                                    radius="full"
+                                                    size="sm"
+                                                    onClick={() => document.getElementById(apply.taskId).showModal()}
+                                                >
+                                                Accept /Decline
+                                                </Button>
+                                                <dialog id={apply.taskId} className="modal">
+                                                    <div className="modal-box">
+                                                        <form method="dialog">
+                                                            {/* if there is a button in form, it will close the modal */}
+                                                            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                                                        </form>
+                                                        <h3 className="font-bold text-lg">Job Request!</h3>
+                                                        <div className='mb-4'>
+                                                            <Card>
+                                                                <CardHeader className="justify-between">
+                                                                    <div className="flex gap-5">
+                                                                        <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                                                        <div className="flex flex-col gap-1 items-start justify-center">
+                                                                            <h4 className="text-small font-semibold leading-none text-default-600">{apply.Agreement}</h4>
+                                                                            <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}, {apply.taskId}</h5>
+                                                                        </div>
+                                                                    </div>
+                                                                    {/* <div className="flex w-2/6">
+                                                                    <p>Job: {task.Agreement}</p>
+                                                                    </div> */}
+                                                                </CardHeader>
+                                                            </Card> 
+    
+                                                            <div className='w-full px-2 flex flex-col'>
+                                                                <h1 className="text-default-500 tracking-tight">Job description</h1>
+                                                                <h2 className="text-small tracking-tight text-default-500">Job titile : {apply.Agreement}</h2>
+                                                                <div className='w-full inline-block mt-3'>
+                                                                    {truncateString(apply.description, 90)}
+                                                                </div>
+                                                                {/* <div className='w-full inline-block mt-3'>
+                                                                this is specification
+                                                                </div> */}
+                                                                <div className='w-full flex flex-col'>
+                                                                    <div className='w-2/4 flex flex-col mt-2'>
+                                                                        <div>Amount</div>
+                                                                        <div>{apply.Amount} FRW</div>
+                                                                    </div>
+                                                                    <div className='w-2/4 flex flex-col mt-2'>
+                                                                        <div>Duration</div>
+                                                                        <div>{apply.Duration}</div>
+                                                                    </div>
+                                                                    <div className='w-full flex justify-between gap-5 flex-row mt-2'>
+                                                                        <div className='w-full flex flex-col'>
+                                                                            <div>Start date</div>
+                                                                            <div>{formatDate (apply.Start_date)}</div>
+                                                                        </div>
+                                                                        <div className='w-full flex flex-col'>
+                                                                            <div>End date</div>
+                                                                            <div>{formatDate (apply.End_date)}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="w-full flex flex-col mt-4">
+                                                                    <h1 className="text-info">Our Contact</h1>
+                                                                    <div className="w-full flex flex-col">
+                                                                        <div>Contact info</div>
+                                                                        <div><Snippet>{apply.APPLYING_TEL}</Snippet></div>
+                                                                        <div><Snippet>{apply.APPLYING_EMAIL}</Snippet></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="w-full flex flex-row justify-between gap-5 mt-10">
+                                                                        <Button onClick={() => handleConfirmRequest(apply)}>{!loading && trackConfirm ? 'well done' : loading ? 'loading..' : 'Confirm offer'}</Button>
+                                                                        <Button onClick={() => handleDEclineRequest(apply)}>{!loading && trackDecline ? 'oops You decline' : loading ? 'loading..' : 'Decline offer'}</Button>
+                                                                </div>
+                                                            </div>
+                                                            {/* </div> */}
+    
+                                                        </div>
+                                                    </div>
+                                                </dialog>
+                                            </div>
+                                        </CardHeader>
+                                        <CardBody className="px-3 py-0 text-small text-default-400">
+                                            <span className="pt-2 text-default-700">
+                                                {apply.APPLYING_USERNAME} requesting  
+                                                <span className="py-2 ml-2" aria-label="computer" role="img">
+                                                    Job: {apply.Agreement}, you published.
+                                                </span>
+                                            </span>
+                                            <div>
+                                                {apply.description}
+                                            </div>
+                                        </CardBody>
+                                    </Card>
+                                ))
+                            ) : (
+                                loading && applyView.length !== 0 ? 'lodding....' : ''
+                            )}
+                            </>
                         )}
                         
-                        {!loading && inviteTaskPending.length !== 0 ? (
+                        {isInvitation && (
+                            <>
+                                {!loading && inviteTaskPending.length !== 0 ? (
                             inviteTaskPending.map((invite) => (
 
                         <Card className="w-full mt-2" style={{zIndex: '1'}}>
@@ -1213,8 +1473,10 @@ const Lhome = () => {
                             </CardBody>
                         </Card>
                         ))
-                        ) : (
-                            loading && inviteTaskPending.length !== 0 ? 'loading..' : ''
+                                ) : (
+                                    loading && inviteTaskPending.length !== 0 ? 'loading..' : ''
+                                )}
+                            </>
                         )}
                         {/* </div> */}
                         <dialog id="my_modal_4" className="modal">

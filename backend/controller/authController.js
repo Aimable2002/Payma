@@ -1,6 +1,7 @@
 import connectDatabase from "../database/connectDatabase.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
+import passport from 'passport';
 
 const connection = connectDatabase();
 
@@ -34,7 +35,6 @@ export const signup = async (req, res) => {
                     return res.status(409).json('error inserting user data')
                 }
                 const user = result
-                console.log('user :', user)
                 const token = jwt.sign({userId: user.insertId}, process.env.SECRET_KEY_AUTH, {expiresIn: '5d'})
                 return res.status(200).json({
                     token
@@ -104,13 +104,18 @@ export const logout = (req, res) => {
 }
 
 
-export const googleCallback = async (req, res) => {
-    try {
-      const user = req.user;
-      return res.status(200).json({ token: user.token });
-    } catch (error) {
-      console.log('Error in Google callback:', error.message);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  };
+export const googleLogin = passport.authenticate('google', { scope: ['profile', 'email'] });
+
+// Google callback route
+export const googleCallback = (req, res) => {
+    passport.authenticate('google', (err, user, info) => {
+        if (err) {
+            return res.status(500).json({ error: 'Authentication failed' });
+        }
+        if (!user) {
+            return res.status(401).json({ error: 'User not authenticated' });
+        }
+        res.status(200).json({ token: user.token });
+    })(req, res);
+};
   

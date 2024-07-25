@@ -81,7 +81,7 @@ const [isScrolled, setIsScrolled] = useState(false)
   const handleAssignerClick = () => {
     setIsAssignerDisabled(!isAssignerDisabled); // Disable the Assigner button
   };
-  const {loading, usersOn} = useGetUserOn();
+  const {loading, usersOn} = useGetUserOn(activeButton);
   const {taskGiver} = usegetTaskGiver();
   const [focusedInput2, setFocusedInput2] = useState('');
   const [inputValues2, setInputValues2] = useState({
@@ -129,7 +129,7 @@ const getRowStyle = (item) => {
     }
     return {};
   };
-  const {inviteTaskDash} = inviteData()
+  const {inviteTaskDash} = inviteData(activeButton)
   console.log('invitee task :', inviteTaskDash)
   return (
     <div className="w-full flex flex-col overflow-auto">
@@ -204,6 +204,7 @@ const getRowStyle = (item) => {
                                             <input
                                                 id={field}
                                                 name={field}
+                                                className="bg-transparent"
                                                 onChange={handleChangeLogin}
                                                 type={field.includes('Phone_number' && 'Amount') ? 'number' : 'text'}
                                                 onFocus={() => handleFocus2(field)}
@@ -235,6 +236,7 @@ const getRowStyle = (item) => {
                                             <input
                                                 id={field}
                                                 name={field}
+                                                className="bg-transparent"
                                                 onChange={handleChangeLogin}
                                                 type={field.includes('Phone_number' && 'Amount') ? 'number' : 'text'}
                                                 onFocus={() => handleFocus2(field)}

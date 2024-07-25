@@ -1,12 +1,13 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 
-const useGetUserOn = () => {
+const useGetUserOn = (activeButton) => {
   const [loading, setLoading] = useState(false);
 
   const [usersOn, setUsersOn] = useState([]);
 
   useEffect(() => {
+    if(activeButton === 'isHome' || 'isAlert'){
     const getUsersOn = async () => {
         setLoading(true)
         try{
@@ -29,7 +30,8 @@ const useGetUserOn = () => {
         }
       }
       getUsersOn()
-  },[])
+    }
+  },[activeButton])
   return {loading, usersOn}
 }
 

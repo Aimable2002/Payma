@@ -79,3 +79,23 @@ export const getHistory = async (req, res) => {
         return res.status(500).json({error : 'internal server error'})
     }
 }
+
+
+
+export const getLogUser = async (req, res) => {
+    try{
+        const user = req.user.userId
+
+        const fecthuser = 'SELECT * FROM USERS WHERE userId = ?';
+        connection.query(fecthuser, [user], (err, result) => {
+            if(err){
+                return res.status(400).json({message: 'fail to fetch user', status: false})
+            }
+            console.log('user :', result)
+            return res.status(200).json(result)
+        })
+    }catch(error){
+        console.log('internal server error :', error.message)
+        return res.status(500).json({error : 'internal server error'})
+    }
+}

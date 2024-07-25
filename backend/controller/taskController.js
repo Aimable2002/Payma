@@ -5,11 +5,12 @@ const connection = connectDatabase();
 
 export const assignTask = async (req, res) => {
     try{
-        const {Agreement, Start_date, End_date, Duration, Amount} = req.body;
+        const {Agreement, Start_date, End_date, Duration, Amount, Description} = req.body;
+        console.log('req.body :', req.body)
         const task_giverId = req.user.userId
         console.log('Duration :', Duration)
         const formattedDuration = `${Duration} Day${Duration > 1 ? 's' : ''}`;
-        if(!Agreement || !Start_date || !End_date || !Amount || !task_giverId){
+        if(!Agreement || !Start_date || !End_date || !Amount || !task_giverId || !Description){
             return res.status(409).json('missing data')
         }
         connection.beginTransaction(err => {
@@ -30,8 +31,8 @@ export const assignTask = async (req, res) => {
                     return res.status(303).json({message: 'low balance'})
                 }else{
                 // return res.status(200).json({message: 'task inserted', status: true})
-                const insertTask = 'INSERT INTO TASK (Agreement, Start_date, End_date, Amount, Duration, task_giverId) VALUES (?, ?, ?, ?, ?, ?)';
-                connection.query(insertTask, [Agreement, Start_date, End_date, Amount, formattedDuration, task_giverId], async(err, result) => {
+                const insertTask = 'INSERT INTO TASK (Agreement, Start_date, End_date, Amount, Duration, task_giverId, Description) VALUES (?, ?, ?, ?, ?, ?, ?)';
+                connection.query(insertTask, [Agreement, Start_date, End_date, Amount, formattedDuration, task_giverId, Description], async(err, result) => {
                     if (err) {
                         return connection.rollback(() => {
                             console.log('Error inserting task:', err);
