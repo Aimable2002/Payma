@@ -13,7 +13,8 @@ const useDeclineInvite = () => {
         const res = await axios.post('/api/task/decline/invitation', {
             inviteeId: inviteeId.inviteeId,
             TakerId: inviteeId.TakerId,
-            Approval: inviteeId.Approval
+            Approval: inviteeId.Approval,
+            inviterId: inviteeId.inviterId
         }, {
             headers: {
                 Authorization: `${JSON.parse(token).token}`

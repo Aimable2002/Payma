@@ -134,6 +134,7 @@ const Lsign = () => {
                             <input
                                 id={field}
                                 name={field}
+                                className='bg-transparent'
                                 onChange={handleChange}
                                 type={field.includes('password') ? 'password' : 'text'}
                                 onFocus={() => handleFocus(field)}
@@ -143,10 +144,10 @@ const Lsign = () => {
                     <div className='mt-10'>
                     <button className="btn btn-outline btn-accent" type='submit'>Signup</button>
                     </div>
-                    <div className='relative mt-5'>
+                    {/* <div className='relative mt-5'>
                         <p>Terms and condition <span className='text-info cursor-pointer'> here</span></p>
                         <p>signup with google <span className='text-info cursor-pointer' onClick={handleGoogle}> here</span></p>
-                    </div>
+                    </div> */}
                 </form>
             ) : (
               <form className='flex w-3/4 flex-col self-center align-middle justify-center' onSubmit={handleLoginSubmit}>
@@ -158,6 +159,7 @@ const Lsign = () => {
                           <input
                               id={field}
                               name={field}
+                              className='bg-transparent'
                               onChange={handleChangeLogin}
                               type={field.includes('password') ? 'password' : 'text'}
                               onFocus={() => handleFocus2(field)}
@@ -180,3 +182,6 @@ const Lsign = () => {
 }
 
 export default Lsign
+
+
+

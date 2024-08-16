@@ -4,16 +4,14 @@ import React, { useState } from 'react'
 const useWithdrowal = () => {
   const [loading, setLoading] = useState(false);
 const [isWithdrowal, setIsWithdrowal] = useState(null)
-  const PostWithdrowal = async ({userName, Email, Amount, Phone_number}) => {
-    const success = handleError(userName, Email, Amount, Phone_number)
+  const PostWithdrowal = async ({Amount, Phone_number}) => {
+    const success = handleError(Amount, Phone_number)
     if(!success)return
     setLoading(true)
     try{
         const token = localStorage.getItem('on-user')
 
         const res = await axios.post('/api/A/C/withdrow', {
-            userName,
-            Email,
             Amount,
             Phone_number
         }, {
@@ -39,8 +37,8 @@ const [isWithdrowal, setIsWithdrowal] = useState(null)
 
 export default useWithdrowal
 
-function handleError (userName, Email, Amount, Phone_number){
-    if(!userName || !Email || !Amount || !Phone_number){
+function handleError (Amount, Phone_number){
+    if(!Amount || !Phone_number){
         return false
     }else{
         return true

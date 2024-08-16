@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.post('/deposite', protectRoute, deposite);
 router.post('/cash-in', deposite)
-router.post('/withdrow', protectRoute, cashOut, Withdrowal);
+router.post('/withdrow', protectRoute, Withdrowal);
 router.get('/wallet', wallet)
 
 

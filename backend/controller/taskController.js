@@ -1,4 +1,4 @@
-
+import nodemailer from 'nodemailer';
 import connectDatabase from "../database/connectDatabase.js";
 
 const connection = connectDatabase();
@@ -108,8 +108,8 @@ export const taskerView = async (req, res) => {
     try{
         const USERID = req.user.userId;
         //console.log('dashboard user :', USERID)
-        const findAssigneer = 'SELECT * FROM USERS_TASK_VIEW WHERE task_takerId = ?';
-        connection.query(findAssigneer, [USERID], (err, result) => {
+        const findAssigneer = 'SELECT * FROM USERS_TASK_VIEW WHERE task_takerId = ? AND Approval = ?';
+        connection.query(findAssigneer, [USERID, "Approve"], (err, result) => {
             if(err){
                 throw err
             }
@@ -193,24 +193,60 @@ export const taskTaker = async (req, res) => {
                             return res.status(400).json({ err: 'Error updating task' , status: false});
                         });
                     }
-                
-                const updateApplyTask = 'UPDATE APPLY_TASK SET Apply_Status = ? WHERE taskId = ? AND task_giverId = ? AND applying_user = ?';
-                connection.query(updateApplyTask, ['Taken', taskId, ConfirmId, taker_Id], (err, result) => {
-                    if(err){
-                        return connection.rollback(() => {
-                            console.log('fail to update apply task')
-                            return res.status(400).json('fail to update apply task')
-                        })
-                    }
-                    connection.commit(err => {
-                        if (err) {
+
+                    const getTakerEmail = 'SELECT EMAIL FROM USERS WHERE userId = ?';
+                    connection.query(getTakerEmail, [taker_Id], (err, resultTakerEmail) => {
+                        if(err){
                             return connection.rollback(() => {
-                                throw err;
-                            });
+                                return res.status(408).json('cant get email')
+                            })
                         }
 
-                        return res.status(200).json({message: 'tast taken', status: true});
-                    });
+                        const TakerEmail = resultTakerEmail[0].EMAIL
+
+                    
+                
+                            const updateApplyTask = 'UPDATE APPLY_TASK SET Apply_Status = ? WHERE taskId = ? AND task_giverId = ? AND applying_user = ?';
+                            connection.query(updateApplyTask, ['Taken', taskId, ConfirmId, taker_Id], (err, result) => {
+                                if(err){
+                                    return connection.rollback(() => {
+                                        console.log('fail to update apply task')
+                                        return res.status(400).json('fail to update apply task')
+                                    })
+                                }
+                            connection.commit(err => {
+                                if (err) {
+                                    return connection.rollback(() => {
+                                        throw err;
+                                    });
+                                }
+
+                                let transporter = nodemailer.createTransport({
+                                    service: 'gmail',
+                                    auth: {
+                                        user: process.env.EMAIL_USER,
+                                        pass: process.env.EMAIL_PASS
+                                    }
+                                });
+                
+                                let mailOptions = {
+                                    from: process.env.EMAIL_USER,
+                                    to: TakerEmail,
+                                    subject: 'Task Confrimation',
+                                    text: 'Your request has been confirmed you can vist website for more details'
+                                };
+                
+                                transporter.sendMail(mailOptions, (error, info) => {
+                                    if (error) {
+                                        console.log(error);
+                                    } else {
+                                        console.log('Email sent: ' + info.response);
+                                    }
+                                });
+
+                            return res.status(200).json({message: 'tast taken', status: true});
+                        });
+                    })
                 })
                 });
             });
@@ -276,7 +312,7 @@ export const DeclineRequest = async (req, res) => {
           const taker_Id = results[0].userId;
           if (taker_Id === result[0].task_giverId) {
             return connection.rollback(() => {
-              return res.status(400).json('You cannot take your own task');
+              return res.status(400).json('You cannot Decline your own task');
             });
           }
   
@@ -287,15 +323,52 @@ export const DeclineRequest = async (req, res) => {
                 return res.status(400).json('Failed to update apply task');
               });
             }
+
+            const getApplyedEmail = 'SELECT EMAIL FROM USERS WHERE userId = ?';
+            connection.query(getApplyedEmail, [taker_Id], (err, AppliedEmail) => {
+                if(err){
+                    return connection.rollback(() => {
+                        return res.status(406).json('can not get Email')
+                    })
+                }
+
+                const EmailApply = AppliedEmail[0].EMAIL
+                console.log('EmailApply :', EmailApply)
+            
   
-            connection.commit(commitErr => {
-              if (commitErr) {
-                return connection.rollback(() => {
-                  return res.status(500).json('Transaction commit error');
+                connection.commit(commitErr => {
+                if (commitErr) {
+                    return connection.rollback(() => {
+                    return res.status(500).json('Transaction commit error');
+                    });
+                }
+
+                let transporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                        user: process.env.EMAIL_USER,
+                        pass: process.env.EMAIL_PASS
+                    }
                 });
-              }
-              return res.status(200).json({ message: 'Successfully declined', status: true });
-            });
+
+                let mailOptions = {
+                    from: process.env.EMAIL_USER,
+                    to: EmailApply,
+                    subject: 'Task Invitation',
+                    text: 'Your request has been declined visite the app for more details'
+                };
+
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        console.log('Email sent: ' + info.response);
+                    }
+                });
+
+                return res.status(200).json({ message: 'Successfully declined', status: true });
+                });
+            })
           });
         });
       });
@@ -373,24 +446,59 @@ export const postInvitation = async (req, res) => {
                         return res.status(409).json({err: 'error'})
                     })
                 }
-            const substractAmount = 'UPDATE USERS SET Balance = Balance - ? WHERE userId = ?';
-            connection.query(substractAmount, [Amount, GiverId], (err, subResult) => {
-                if(err){
-                    return connection.rollback(() => {
-                        return res.status(303).json(err.message)
-                    })
-                }
-            
-                connection.commit(err => {
+                const substractAmount = 'UPDATE USERS SET Balance = Balance - ? WHERE userId = ?';
+                connection.query(substractAmount, [Amount, GiverId], (err, subResult) => {
                     if(err){
                         return connection.rollback(() => {
-                            console.log('fail to commit :', err.message)
-                            return res.status(409).json({message: 'fail to commit :', status: false})
+                            return res.status(303).json(err.message)
                         })
                     }
-                    return res.status(200).json({message: 'successfully invited', status: true})
+                    const getTakerName = 'SELECT EMAIL FROM USERS WHERE userId = ?';
+                    connection.query(getTakerName, [TakerId], (err, TakerEma) => {
+                        if(err){
+                            return connection.rollback(() => {
+                                return res.status(408).json('can not get Email')
+                            })
+                        }
+                        const EmailTaker = TakerEma[0].EMAIL
+                        console.log('emailTaker :', EmailTaker)
+                    
+                    
+                        connection.commit(err => {
+                            if(err){
+                                return connection.rollback(() => {
+                                    console.log('fail to commit :', err.message)
+                                    return res.status(409).json({message: 'fail to commit :', status: false})
+                                })
+                            }
+
+                            let transporter = nodemailer.createTransport({
+                                service: 'gmail',
+                                auth: {
+                                    user: process.env.EMAIL_USER,
+                                    pass: process.env.EMAIL_PASS
+                                }
+                            });
+    
+                            let mailOptions = {
+                                from: process.env.EMAIL_USER,
+                                to: EmailTaker,
+                                subject: 'Task Invitation',
+                                text: 'You have been invited on Task, check on app and confirm'
+                            };
+    
+                            transporter.sendMail(mailOptions, (error, info) => {
+                                if (error) {
+                                    console.log(error);
+                                } else {
+                                    console.log('Email sent: ' + info.response);
+                                }
+                            });
+
+                            return res.status(200).json({message: 'successfully invited', status: true})
+                        })
+                    })
                 })
-            })
             })
         })
     })
@@ -480,6 +588,30 @@ export const acceptInvitation = async (req, res) => {
                                 return res.status(408).json('fail to commit')
                             })
                         }
+
+                        let transporter = nodemailer.createTransport({
+                            service: 'gmail',
+                            auth: {
+                                user: process.env.EMAIL_USER,
+                                pass: process.env.EMAIL_PASS
+                            }
+                        });
+
+                        let mailOptions = {
+                            from: process.env.EMAIL_USER,
+                            to: taskGiverEmail,
+                            subject: 'Task Request Confirmation',
+                            text: 'You have a task request you need to confirm.'
+                        };
+
+                        transporter.sendMail(mailOptions, (error, info) => {
+                            if (error) {
+                                console.log(error);
+                            } else {
+                                console.log('Email sent: ' + info.response);
+                            }
+                        });
+
                         return res.status(200).json({message: 'succeffull accept', status: true})
                     })
                 })
@@ -495,12 +627,11 @@ export const acceptInvitation = async (req, res) => {
 
 export const DeclineInvitation = async (req, res) => {
     try{
-        const {inviteeId, TakerId, Approval} = req.body
+        const {inviteeId, TakerId, Approval, inviterId} = req.body
         console.log('req body :', req.body)
         const userId = req.user.userId
-        console.log('accepter :', userId)
 
-        if(!inviteeId || !TakerId || !Approval){
+        if(!inviteeId || !TakerId || !Approval || !inviterId){
             return res.status(404).json('missing data')
         }
 
@@ -523,20 +654,56 @@ export const DeclineInvitation = async (req, res) => {
                         return res.status(409).json({message: 'not expected status', status: false})
                     })
                 }
-                const updateApprovalStatue = 'UPDATE INVITEE SET Approval = ? WHERE inviteeId = ? AND TakerId = ?';
-                connection.query(updateApprovalStatue, ["Declined", inviteeId, TakerId], (err, updateResult) => {
+
+                const getTakerEmail = 'SELECT EMAIL FROM USERS WHERE userId = ?';
+                connection.query(getTakerEmail, [inviterId], (err, resultEmail) => {
                     if(err){
                         return connection.rollback(() => {
-                            return res.status(403).json('fail to update')
+                            return res.status(406).json('missing Email')
                         })
                     }
-                    connection.commit(err => {
+                    const inviterIdEmail = resultEmail[0].EMAIL
+                    console.log('inviterEmail :', inviterIdEmail)
+                
+                    const updateApprovalStatue = 'UPDATE INVITEE SET Approval = ? WHERE inviteeId = ? AND TakerId = ?';
+                    connection.query(updateApprovalStatue, ["Declined", inviteeId, TakerId], (err, updateResult) => {
                         if(err){
                             return connection.rollback(() => {
-                                return res.status(408).json('fail to commit')
+                                return res.status(403).json('fail to update')
                             })
                         }
-                        return res.status(200).json({message: 'succeffull accept', status: true})
+                        connection.commit(err => {
+                            if(err){
+                                return connection.rollback(() => {
+                                    return res.status(408).json('fail to commit')
+                                })
+                            }
+
+                            let transporter = nodemailer.createTransport({
+                                service: 'gmail',
+                                auth: {
+                                    user: process.env.EMAIL_USER,
+                                    pass: process.env.EMAIL_PASS
+                                }
+                            });
+    
+                            let mailOptions = {
+                                from: process.env.EMAIL_USER,
+                                to: inviterIdEmail,
+                                subject: 'Task inviation Declined',
+                                text: 'Your Task invitation has been decined.'
+                            };
+    
+                            transporter.sendMail(mailOptions, (error, info) => {
+                                if (error) {
+                                    console.log(error);
+                                } else {
+                                    console.log('Email sent: ' + info.response);
+                                }
+                            });
+
+                            return res.status(200).json({message: 'succeffull accept', status: true})
+                        })
                     })
                 })
             })

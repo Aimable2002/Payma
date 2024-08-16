@@ -24,10 +24,11 @@ export const StatusApproval = async (req, res) => {
             if (result.length > 0) {
                 console.log('reported task to u')
                 return res.status(200).json(result);
-            } else {
-                console.log(' no reported task to u')
-                return res.status(404).json('No reported tasks found');
             }
+            //  else {
+            //     console.log(' no reported task to u')
+            //     return res.status(404).json('No reported tasks found');
+            // }
         })
     }catch(error){
         console.log('internal server approval error :', error.message)
@@ -131,6 +132,17 @@ export const approval = async (req, res) => {
                         //             return res.status(400).json('something went wrong resetting task amount');
                         //         });
                         //     }
+
+                        const GetTaskTakerEmail = 'SELECT EMAIL FROM USERS WHERE userId = ?';
+                        connection.query(GetTaskTakerEmail, [taskTakerId], (err, resultEmail) => {
+                            if(err){
+                                return connection.rollback(() => {
+                                    return res.status(408).json('can not get email')
+                                })
+                            }
+
+                            const EmailTaker = resultEmail[0].EMAIL 
+                        
                         
                             connection.commit(err => {
                                 if (err) {
@@ -138,9 +150,32 @@ export const approval = async (req, res) => {
                                         throw err;
                                     });
                                 }
+
+                                let transporter = nodemailer.createTransport({
+                                    service: 'gmail',
+                                    auth: {
+                                        user: process.env.EMAIL_USER,
+                                        pass: process.env.EMAIL_PASS
+                                    }
+                                });
+        
+                                let mailOptions = {
+                                    from: process.env.EMAIL_USER,
+                                    to: EmailTaker,
+                                    subject: 'Task Request Declined',
+                                    text: 'Your Task has been approved visit app for more details.'
+                                };
+        
+                                transporter.sendMail(mailOptions, (error, info) => {
+                                    if (error) {
+                                        console.log(error);
+                                    } else {
+                                        console.log('Email sent: ' + info.response);
+                                    }
+                                });
     
                                 res.status(200).json({message: 'tast Approved', status: true});
-                            // })
+                                })
                             })
                         });
 

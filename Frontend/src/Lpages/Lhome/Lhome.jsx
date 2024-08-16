@@ -364,7 +364,7 @@ const Lhome = () => {
     <div className='w-full flex flex-row fixed'>
         <div className={`w-2/12 overflow-y-auto ${bgColorClass}`} style={{zIndex: '2'}}>
             <div className='w-full flex flex-row justify-between'>
-                <h1>Web App</h1>
+                <h1 className="cursor-pointer">Web App</h1>
                 <div onClick={handleMenu} className="text-info"><PersonIcon /></div>
             </div>
             <div className={`w-full flex flex-col ${bgColorClass}`}>
@@ -533,9 +533,9 @@ const Lhome = () => {
                                 <h5 className="text-small tracking-tight text-default-400">@{task.userName}</h5>
                             </div>
                             </div>
-                            <div className="flex w-2/6">
+                            {/* <div className="flex w-2/6">
                                 <p>Job: {task.Agreement}</p>
-                            </div>
+                            </div> */}
                         </CardHeader>
                         <CardBody className="px-3 py-0 text-small text-default-400">
                             <p>
@@ -651,21 +651,21 @@ const Lhome = () => {
                                     </div>
                                     </div>
                                     <div className="flex w-2/6">
-                                        <p>Title: Manager</p>
+                                        <button className="btn" onClick={()=>document.getElementById(user.userId).showModal()}>invite</button>
                                     </div>
                                 </CardHeader>
                                 <CardFooter className="gap-3">
-                                    <div className="flex gap-1">
+                                    {/* <div className="flex gap-1">
                                         <p className="font-semibold text-default-400 text-small">4</p>
                                         <p className=" text-default-400 text-small">Skills</p>
                                     </div>
                                     <div className="flex gap-1">
                                         <p className="font-semibold text-default-400 text-small">97.1K</p>
                                         <p className="text-default-400 text-small">Task Done</p>
-                                    </div>
-                                    <div className="flex gap-1">
+                                    </div> */}
+                                    {/* <div className="flex gap-1">
                                         <button className="btn" onClick={()=>document.getElementById(user.userId).showModal()}>invite</button>
-                                    </div>
+                                    </div> */}
 
                                     <dialog id={user.userId} className="modal">
                                         <div className="modal-box">
@@ -704,106 +704,326 @@ const Lhome = () => {
                     <>
                         
                         {isTaskToApprove.map((user) => (
-                            <Card key={user.taskId} className="w-full mb-1" style={{zIndex: '1'}}>
-                                <CardHeader className="justify-between w-full">
-                                    <div className="flex w-4/5  gap-5">
-                                    {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
-                                    <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                                        <h4 className="text-small font-semibold leading-none text-default-600">{user.Agreement}</h4>
-                                        <h5 className="text-small tracking-tight text-default-400">@{user.userName}</h5>
-                                    </div>
-                                    </div>
-                                    <Button
-                                    onClick={()=>document.getElementById(user.taskId).showModal()}
-                                    className={!approveStatus[user.taskId] ? " bg-transparent text-foreground border-default-200" : "border-primary"}
-                                    color="primary"
-                                    radius="full"
-                                    size="sm"
-                                    // variant={isFollowed ? "bordered" : "solid"}
-                                    // onPress={() => setIsFollowed(!isFollowed)}
-                                    >
-                                        {approveStatus[user.taskId] ? 'Approved' : user.Approval}
-                                    </Button>
-                                    <dialog id={user.taskId} className="modal">
-                                        <div className="modal-box">
-                                        <form method="dialog">
-                                            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-                                        </form>
-                                        <div className="w-full flex flex-col">
-                                            <h3 className="font-bold text-lg">Approve Task</h3>
-                                            <p className="py-4">Details</p>
+                            <>
+                                <dialog id={user.taskId} className="modal">
+                      <div className="modal-box">
+                        <form method="dialog">
+                          {/* if there is a button in form, it will close the modal */}
+                          <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                        </form>
+                        <div className='mb-4'>
+                          <Card>
+                            <CardHeader className="justify-between">
+                              <div className="flex gap-5">
+                                <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                <div className="flex flex-col gap-1 items-start justify-center">
+                                  <h4 className="text-small font-semibold leading-none text-default-600">{user.FULL_NAME}</h4>
+                                  <h5 className="text-small tracking-tight text-default-400">@{user.userName}</h5>
+                                </div>
+                              </div>
+                              {/* <div className="flex w-2/6">
+                                <p>Job: {task.Agreement}</p>
+                              </div> */}
+                            </CardHeader>
+                          </Card> 
+
+                          <div className='w-full px-2 flex flex-col'>
+                            <h1 className="text-default-500 tracking-tight">Job description</h1>
+                            <h2 className="text-small tracking-tight text-default-500">Job titile : {user.Agreement}</h2>
+                            <div className='w-full inline-block mt-3'>
+                                {user.Description}
+                            </div>
+                            {/* <div className='w-full inline-block mt-3'>
+                              this is specification
+                            </div> */}
+                            <div className='w-full flex flex-col'>
+                                <div className='w-2/4 flex flex-col mt-2'>
+                                  <div>Amount</div>
+                                  <div>{user.Amount} FRW</div>
+                                </div>
+                                <div className='w-2/4 flex flex-col mt-2'>
+                                  <div>Duration</div>
+                                  <div>{user.Duration}</div>
+                                </div>
+                              <div className='w-full flex justify-between gap-5 flex-row mt-2'>
+                                  <div className='w-full flex flex-col'>
+                                    <div>Start date</div>
+                                    <div>{formatDate(user.Start_date)}</div>
+                                  </div>
+                                  <div className='w-full flex flex-col'>
+                                    <div>End date</div>
+                                    <div>{formatDate(user.End_date)}</div>
+                                  </div>
+                              </div>
+                            </div>
+                        </div>
+                    {/* </div> */}
+
+                    <h1 className="mt-5">User done task</h1>
+                        <Card className="mt-5">
+                            <CardHeader className="justify-between">
+                              <div className="flex gap-5">
+                                <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                <div className="flex flex-col gap-1 items-start justify-center">
+                                  <h4 className="text-small font-semibold leading-none text-default-600">{user.task_taker_name}</h4>
+                                  <h5 className="text-small tracking-tight text-default-400">@{user.Status}</h5>
+                                </div>
+                              </div>
+                              {/* <div className="flex w-2/6">
+                              <p>Job: {task.Agreement}</p>
+                              </div> */}
+                            </CardHeader>
+                        </Card>
+
+                        </div>
+                        {/* {task.Task_Status === 'Taken' ? (
+                          <Button className="btn">
+                            Task Taken
+                          </Button>
+                        ) : (
+                          <button className="btn" onClick={() => handleApply(task)}>
+                            Apply/contact
+                          </button>
+                        )} */}
+                      </div>
+                  </dialog>
+                                <Card key={user.taskId} className="w-full mb-1" style={{zIndex: '1'}}>
+                                    <CardHeader className="justify-between w-full">
+                                        <div className="flex w-4/5  gap-5" onClick={()=>document.getElementById(user.taskId).showModal()}>
+                                        {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
+                                        <div className=" cursor-pointer flex flex-col gap-1 items-start justify-center w-3/4">
+                                            <h4 className="text-small font-semibold leading-none text-default-600">{user.Agreement}</h4>
+                                            <h5 className="text-small tracking-tight text-default-400">@{user.userName}</h5>
                                         </div>
-                                        <div className="w-full flex gap-5 flex-col">
-                                            <div>task_giver: <span>{user.userName}</span></div>
-                                            <div>task_taker: <span> {user.task_taker_name}</span></div>
-                                            <div>Amount: <span>{user.Amount}</span></div>
                                         </div>
-                                        <div className="mt-10">
-                                            <Button
-                                            onClick={() => handleApprove(user)}
-                                            className={!approveStatus[user.taskId] ? " bg-transparent text-foreground border-default-200" : "border-primary"}
-                                            color="primary"
-                                            radius="full"
-                                            size="sm"
-                                            >
+                                        <Button
+                                        onClick={()=>document.getElementById(user.taskId).showModal()}
+                                        className={!approveStatus[user.taskId] ? " bg-transparent text-foreground border-default-200" : "border-primary"}
+                                        color="primary"
+                                        radius="full"
+                                        size="sm"
+                                        // variant={isFollowed ? "bordered" : "solid"}
+                                        // onPress={() => setIsFollowed(!isFollowed)}
+                                        >
                                             {approveStatus[user.taskId] ? 'Approved' : user.Approval}
-                                            </Button>
-                                        </div>
-                                        </div>
-                                    </dialog>
-                                </CardHeader>
-                            </Card>
+                                        </Button>
+                                        <dialog id={user.taskId} className="modal">
+                                            <div className="modal-box">
+                                            <form method="dialog">
+                                                <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                                            </form>
+                                            <div className="w-full flex flex-col">
+                                                <h3 className="font-bold text-lg">Approve Task</h3>
+                                                <p className="py-4">Details</p>
+                                            </div>
+                                            <div className="w-full flex gap-5 flex-col">
+                                                <div>task_giver: <span>{user.userName}</span></div>
+                                                <div>task_taker: <span> {user.task_taker_name}</span></div>
+                                                <div>Amount: <span>{user.Amount}</span></div>
+                                            </div>
+                                            <div className="mt-10">
+                                                <Button
+                                                onClick={() => handleApprove(user)}
+                                                className={!approveStatus[user.taskId] ? " bg-transparent text-foreground border-default-200" : "border-primary"}
+                                                color="primary"
+                                                radius="full"
+                                                size="sm"
+                                                >
+                                                {approveStatus[user.taskId] ? 'Approved' : user.Approval}
+                                                </Button>
+                                            </div>
+                                            </div>
+                                        </dialog>
+                                    </CardHeader>
+                                </Card>
+                            </>
                         ))}
                     </>
                 )}
                 {isTask && (
                     <>
                         {isData.map((user) => (
-                            <Card key={user.taskId} className="w-full mb-1" style={{zIndex: '1'}}>
-                                <CardHeader className="justify-between w-full">
-                                    <div className="flex w-4/5  gap-5">
-                                    {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
-                                    <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                                        <h4 className="text-small font-semibold leading-none text-default-600">{user.Agreement}</h4>
-                                        <h5 className="text-small tracking-tight text-default-400">@{user.userName}</h5>
-                                    </div>
-                                    </div>
-                                    <Button
-                                    onClick={() => handleReport(user)}
-                                    className={!reportStatus[user.taskId] ? " bg-transparent text-foreground border-default-200" : "border-primary"}
-                                    color="primary"
-                                    radius="full"
-                                    size="sm"
-                                    >
-                                    {reportStatus[user.taskId] ? 'Reported' : user.Status}
-                                    {/* {reportStatus[user.taskId] ? <span>Reported</span> : <span>pending</span>} */}
-                                    </Button>
-                                </CardHeader>
-                            </Card>
+                            <>
+                                <dialog id={user.taskId} className="modal">
+                      <div className="modal-box">
+                        <form method="dialog">
+                          {/* if there is a button in form, it will close the modal */}
+                          <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                        </form>
+                        <div className='mb-4'>
+                          <Card>
+                            <CardHeader className="justify-between">
+                              <div className="flex gap-5">
+                                <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                <div className="flex flex-col gap-1 items-start justify-center">
+                                  <h4 className="text-small font-semibold leading-none text-default-600">{user.FULL_NAME}</h4>
+                                  <h5 className="text-small tracking-tight text-default-400">@{user.userName}</h5>
+                                </div>
+                              </div>
+                              {/* <div className="flex w-2/6">
+                                <p>Job: {task.Agreement}</p>
+                              </div> */}
+                            </CardHeader>
+                          </Card> 
+
+                          <div className='w-full px-2 flex flex-col'>
+                            <h1 className="text-default-500 tracking-tight">Job description</h1>
+                            <h2 className="text-small tracking-tight text-default-500">Job titile : {user.Agreement}</h2>
+                            <div className='w-full inline-block mt-3'>
+                                {user.Description}
+                            </div>
+                            {/* <div className='w-full inline-block mt-3'>
+                              this is specification
+                            </div> */}
+                            <div className='w-full flex flex-col'>
+                                <div className='w-2/4 flex flex-col mt-2'>
+                                  <div>Amount</div>
+                                  <div>{user.Amount} FRW</div>
+                                </div>
+                                <div className='w-2/4 flex flex-col mt-2'>
+                                  <div>Duration</div>
+                                  <div>{user.Duration}</div>
+                                </div>
+                              <div className='w-full flex justify-between gap-5 flex-row mt-2'>
+                                  <div className='w-full flex flex-col'>
+                                    <div>Start date</div>
+                                    <div>{formatDate(user.Start_date)}</div>
+                                  </div>
+                                  <div className='w-full flex flex-col'>
+                                    <div>End date</div>
+                                    <div>{formatDate(user.End_date)}</div>
+                                  </div>
+                              </div>
+                            </div>
+                        </div>
+                    {/* </div> */}
+
+                        </div>
+                        {/* {task.Task_Status === 'Taken' ? (
+                          <Button className="btn">
+                            Task Taken
+                          </Button>
+                        ) : (
+                          <button className="btn" onClick={() => handleApply(task)}>
+                            Apply/contact
+                          </button>
+                        )} */}
+                      </div>
+                  </dialog>
+                                <Card key={user.taskId} className="w-full mb-1" style={{zIndex: '1'}}>
+                                    <CardHeader className="justify-between w-full">
+                                        <div className="flex w-4/5  gap-5" onClick={()=>document.getElementById(user.taskId).showModal()}>
+                                        {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
+                                        <div className=" cursor-pointer flex flex-col gap-1 items-start justify-center w-3/4">
+                                            <h4 className="text-small font-semibold leading-none text-default-600">{user.Agreement}</h4>
+                                            <h5 className="text-small tracking-tight text-default-400">@{user.userName}</h5>
+                                        </div>
+                                        </div>
+                                        <Button
+                                        onClick={() => handleReport(user)}
+                                        className={!reportStatus[user.taskId] ? " bg-transparent text-foreground border-default-200" : "border-primary"}
+                                        color="primary"
+                                        radius="full"
+                                        size="sm"
+                                        >
+                                        {reportStatus[user.taskId] ? 'Reported' : user.Status}
+                                        {/* {reportStatus[user.taskId] ? <span>Reported</span> : <span>pending</span>} */}
+                                        </Button>
+                                    </CardHeader>
+                                </Card>
+                            </>
                         ))}
                         {!loading && inviteTask.length !== 0 ? (
                             inviteTask.map((user) => (
-                            <Card key={user.taskId} className="w-full mb-1" style={{zIndex: '1'}}>
-                            <CardHeader className="justify-between w-full">
-                                    <div className="flex w-4/5  gap-5">
-                                    {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
-                                    <div className="flex flex-col gap-1 items-start justify-center w-3/4">
-                                        <h4 className="text-small font-semibold leading-none text-default-600">{user.Agreement}</h4>
-                                        <h5 className="text-small tracking-tight text-default-400">@{user.inviter}</h5>
-                                    </div>
-                                    </div>
-                                    <Button
-                                    onClick={() => handleReport(user)}
-                                    className={!reportStatus[user.inviteeId] ? " bg-transparent text-foreground border-default-200" : "border-primary"}
-                                    color="primary"
-                                    radius="full"
-                                    size="sm"
-                                    >
-                                    {reportStatus[user.inviteeId] ? 'Reported' : user.Report}
-                                    {/* {reportStatus[user.taskId] ? <span>Reported</span> : <span>pending</span>} */}
-                                    </Button>
-                                </CardHeader>
-                            </Card>
+                            <>
+                                <dialog id={user.inviteeId} className="modal">
+                        <div className="modal-box">
+                          <form method="dialog">
+                            {/* if there is a button in form, it will close the modal */}
+                            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                          </form>
+                          <h3 className="font-bold text-lg">Invitation!</h3>
+                          <div className='mb-4'>
+                          <Card>
+                            <CardHeader className="justify-between">
+                              <div className="flex gap-5">
+                                <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                <div className="flex flex-col gap-1 items-start justify-center">
+                                  <h4 className="text-small font-semibold leading-none text-default-600">{user.INVITER_FULL_NAME }</h4>
+                                  <h5 className="text-small tracking-tight text-default-400">@{user.inviter}</h5>
+                                </div>
+                              </div>
+                              {/* <div className="flex w-2/6">
+                                <p>Job: {task.Agreement}</p>
+                              </div> */}
+                            </CardHeader>
+                          </Card> 
+
+                          <div className='w-full px-2 flex flex-col'>
+                            <h1 className="text-default-500 tracking-tight">Job description</h1>
+                            <h2 className="text-small tracking-tight text-default-500">Job titile : {user.Agreement}</h2>
+                            <div className='w-full inline-block mt-3'>
+                                {user.Description}
+                            </div>
+                            {/* <div className='w-full inline-block mt-3'>
+                              this is specification
+                            </div> */}
+                            <div className='w-full flex flex-col'>
+                                <div className='w-2/4 flex flex-col mt-2'>
+                                  <div>Amount</div>
+                                  <div>{user.Amount} FRW</div>
+                                </div>
+                                <div className='w-2/4 flex flex-col mt-2'>
+                                  <div>Duration</div>
+                                  <div>{user.Duration}</div>
+                                </div>
+                              <div className='w-full flex justify-between gap-5 flex-row mt-2'>
+                                  <div className='w-full flex flex-col'>
+                                    <div>Start date</div>
+                                    <div>{formatDate (user.Start_date)}</div>
+                                  </div>
+                                  <div className='w-full flex flex-col'>
+                                    <div>End date</div>
+                                    <div>{formatDate (user.End_date)}</div>
+                                  </div>
+                              </div>
+                            </div>
+                            <div className="w-full flex flex-col mt-4">
+                              <h1 className="text-info">Our Contact</h1>
+                              <div className="w-full flex flex-col">
+                                <div>Contact info</div>
+                                <div><Snippet>{user.INVITER_TEL }</Snippet></div>
+                                <div><Snippet>{user.INVITER_EMAIL}</Snippet></div>
+                              </div>
+                            </div>
+                        </div>
+                    {/* </div> */}
+
+                        </div>
+                        </div>
+                </dialog>
+                                <Card key={user.taskId} className="w-full mb-1" style={{zIndex: '1'}}>
+                                    <CardHeader className="justify-between w-full">
+                                        <div className="flex w-4/5  gap-5" onClick={()=>document.getElementById(user.inviteeId).showModal()}>
+                                        {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
+                                        <div className="flex flex-col gap-1 items-start justify-center w-3/4">
+                                            <h4 className="text-small font-semibold leading-none text-default-600">{user.Agreement}</h4>
+                                            <h5 className="text-small tracking-tight text-default-400">@{user.inviter}</h5>
+                                        </div>
+                                        </div>
+                                        <Button
+                                        onClick={() => handleReport(user)}
+                                        className={!reportStatus[user.inviteeId] ? " bg-transparent text-foreground border-default-200" : "border-primary"}
+                                        color="primary"
+                                        radius="full"
+                                        size="sm"
+                                        >
+                                        {reportStatus[user.inviteeId] ? 'Reported' : user.Report}
+                                        {/* {reportStatus[user.taskId] ? <span>Reported</span> : <span>pending</span>} */}
+                                        </Button>
+                                    </CardHeader>
+                                </Card>
+                            </>
                         ))) : ('')}
                         {/* ) : ( */}
                         <dialog id="my_modal_3" className="modal">
@@ -1147,7 +1367,7 @@ const Lhome = () => {
                                                 <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
                                                 <div className="flex flex-col gap-1 items-start justify-center w-3/4">
                                                     <h4 className="text-small font-semibold leading-none text-default-600">{invite.Agreement}</h4>
-                                                    <h5 className="text-small tracking-tight text-default-400">@{invite.inviter}</h5>
+                                                    <h5 className="text-small tracking-tight text-default-400">@{invite.invitee}</h5>
                                                 </div>
                                             </div>
                                             <div className="w-2/6">
@@ -1234,7 +1454,10 @@ const Lhome = () => {
                                         </CardHeader>
                                         <CardBody className="px-3 py-0 text-small text-default-400">
                                             <div>
-                                                {invite.Description}
+                                                <span className="flex flex-col">
+                                                    <span className="pt-2 text-default-700">{invite.inviter} has job for you</span>
+                                                    <span>{invite.Description}</span>
+                                                </span>
                                             </div>
                                             <span className="pt-2 text-default-700">
                                                 Amount: 
@@ -1375,7 +1598,7 @@ const Lhome = () => {
                                 <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
                                 <div className="flex flex-col gap-1 items-start justify-center w-3/4">
                                     <h4 className="text-small font-semibold leading-none text-default-600">{invite.Agreement}</h4>
-                                    <h5 className="text-small tracking-tight text-default-400">@{invite.inviter}</h5>
+                                    <h5 className="text-small tracking-tight text-default-400">@{invite.invitee}</h5>
                                 </div>
                                 </div>
                                 <div className="w-2/6">
@@ -1462,7 +1685,10 @@ const Lhome = () => {
                             </CardHeader>
                             <CardBody className="px-3 py-0 text-small text-default-400">
                                 <div>
-                                    {invite.Description}
+                                    <span className="flex flex-col">
+                                        <span className="pt-2 text-default-700">{invite.inviter} has job for you</span>
+                                        <span>{invite.Description}</span>
+                                    </span>
                                 </div>
                                 <span className="pt-2 text-default-700">
                                     Amount: 

@@ -4,16 +4,14 @@ import React, { useState } from 'react'
 const useDeposite = () => {
   const [loading, setLoading] = useState(false);
 const [isDeposited, setIsDeposited] = useState(null)
-  const PostDeposite = async ({userName, Email, Amount, Phone_number}) => {
-    const success = handleError(userName, Email, Amount, Phone_number)
+  const PostDeposite = async ({Amount, Phone_number}) => {
+    const success = handleError(Amount, Phone_number)
     if(!success)return
     setLoading(true)
     try{
         const token = localStorage.getItem('on-user')
 
         const res = await axios.post('/api/A/C/deposite', {
-            userName,
-            Email,
             Amount,
             Phone_number
         }, {
@@ -39,8 +37,8 @@ const [isDeposited, setIsDeposited] = useState(null)
 
 export default useDeposite
 
-function handleError (userName, Email, Amount, Phone_number){
-    if(!userName || !Email || !Amount || !Phone_number){
+function handleError (Amount, Phone_number){
+    if(!Amount || !Phone_number){
         return false
     }else{
         return true

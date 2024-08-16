@@ -193,6 +193,7 @@ const Sign = () => {
                                     <input
                                         id={field}
                                         name={field}
+                                        className='bg-transparent'
                                         onChange={handleChange}
                                         type={field.includes('password') ? 'password' : 'text'}
                                         onFocus={() => handleFocus(field)}
@@ -216,6 +217,7 @@ const Sign = () => {
                                     <input
                                         id={field}
                                         name={field}
+                                        className='bg-transparent'
                                         onChange={handleChange}
                                         type={'number'}
                                         onFocus={() => handleFocus(field)}
@@ -241,6 +243,7 @@ const Sign = () => {
                         <input
                             id={field}
                             name={field}
+                            className='bg-transparent'
                             onChange={handleChangeLogin}
                             type={field.includes('password') ? 'password' : 'text'}
                             onFocus={() => handleFocus2(field)}

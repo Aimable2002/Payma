@@ -67,6 +67,9 @@ export const applyTask = async (req, res) => {
                         })
                     }
 
+                    console.log('Email User:', process.env.EMAIL_USER);
+console.log('Email Pass:', process.env.EMAIL_PASS);
+
                 const insertApply = 'INSERT INTO APPLY_TASK (taskId, applying_user, task_giverId) VALUES(?,?, ?)';
                 connection.query(insertApply, [taskId, applyingId, taskGiver], (err, result) => {
                     if(err){

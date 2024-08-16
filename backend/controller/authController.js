@@ -35,7 +35,7 @@ export const signup = async (req, res) => {
                     return res.status(409).json('error inserting user data')
                 }
                 const user = result
-                const token = jwt.sign({userId: user.insertId}, process.env.SECRET_KEY_AUTH, {expiresIn: '5d'})
+                const token = jwt.sign({userId: user.insertId}, process.env.SECRET_KEY_AUTH, {expiresIn: '30d'})
                 return res.status(200).json({
                     token
                 })
@@ -79,7 +79,7 @@ export const login = async (req, res) => {
             // if(!isPasswordTrue){
             //     return res.status(400).json('incorrect password')
             // }
-            const token = jwt.sign({userId: user.userId}, process.env.SECRET_KEY_AUTH, {expiresIn: '5d'})
+            const token = jwt.sign({userId: user.userId}, process.env.SECRET_KEY_AUTH, {expiresIn: '30d'})
             res.status(200).json({
                 userId: user.userId,
                 token

@@ -40,8 +40,8 @@ export const getOnPeople = async(req, res) => {
 export const getUsersTask = async (req, res) => {
     try{
         const USERID = req.user.userId
-        const selectUsersTask = 'SELECT * FROM USERS_TASK_VIEW ORDER BY taskId DESC';
-        connection.query(selectUsersTask, (err, result) => {
+        const selectUsersTask = 'SELECT * FROM USERS_TASK_VIEW WHERE Approval = ? ORDER BY taskId DESC';
+        connection.query(selectUsersTask, ['Approve'], (err, result) => {
             if(err){
                 throw err
             }
@@ -67,6 +67,29 @@ export const getHistory = async (req, res) => {
             return res.status(400).json('missing data')
         }
         const fetchHistory = 'SELECT * FROM CLIENT_HISTORY WHERE task_giverId = ? OR task_takerId = ?';
+        connection.query(fetchHistory, [USERID, USERID], (err, result) => {
+            if(err){
+                console.log('error:', err.message)
+                return res.status(401).json({err: 'error'})
+            }
+            return res.status(200).json(result)
+        })
+    }catch(error){
+        console.log('internal server error :', error.message)
+        return res.status(500).json({error : 'internal server error'})
+    }
+}
+
+
+
+export const getHistory2 = async (req, res) => {
+    try{
+        const USERID = req.user.userId
+        if(!USERID){
+            console.log('missing data')
+            return res.status(400).json('missing data')
+        }
+        const fetchHistory = 'SELECT * FROM INVITEE_VIEW WHERE inviterId = ? OR TakerId = ?';
         connection.query(fetchHistory, [USERID, USERID], (err, result) => {
             if(err){
                 console.log('error:', err.message)
