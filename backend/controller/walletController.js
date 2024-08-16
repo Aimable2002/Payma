@@ -44,9 +44,9 @@ export const deposite = async (req, res) => {
 }
 
 
+
 export const Withdrowal = async (req, res) => {
     try{
-        // const cashtoWithdrowa = req.cashOutTrack
         const {Amount, Phone_number} = req.body;
         console.log('req body :', req.body)
 
@@ -58,6 +58,7 @@ export const Withdrowal = async (req, res) => {
             return res.status(400).json('missing data')
         }
         let fee = 0
+
         if(Amount <= 1000){
             fee = 10
         }else if(Amount >= 1001 && Amount <= 5000){
@@ -84,37 +85,49 @@ export const Withdrowal = async (req, res) => {
         console.log('current amount : ', currentAmount)
         const chargedAmount = Amount - currentAmount
         console.log('charged amount : ', chargedAmount)
-        // connection.beginTransaction(err => {
-        //     if(err){
-        //         throw err
-        //     }
-        //     const getUser = 'SELECT userName FROM USERS WHERE userId =?';
-        //     connection.query(getUser, [USERID], (err, userResult) => {
-        //         if(err){
-        //             return connection.rollback(() => {
-        //                 return res.status(404).json('userName issue')
-        //             })
-        //         }
-        //         const userName = userResult[0].userName
-        //         console.log('userName :', userName)
+        const Date = Date.now()
+        connection.beginTransaction(err => {
+            if(err){
+                throw err
+            }
+            const getUser = 'SELECT userName FROM USERS WHERE userId =?';
+            connection.query(getUser, [USERID], (err, userResult) => {
+                if(err){
+                    return connection.rollback(() => {
+                        return res.status(404).json('userName issue')
+                    })
+                }
+                const userName = userResult[0].userName
+                console.log('userName :', userName)
 
-        //         const insertWithdrowl = 'INSERT INTO WITHDROWAL (Amount, Currency, Phone_number, userName, USERID) VALUES (?, ?, ?, ?, ?)';
-        //         connection.query(insertWithdrowl, [Amount, Currency, Phone_number, userName, USERID], async(err, result) => {
-        //             if(err){
-        //                 console.log('error on withdrow server :', err)
-        //                 return res.status(400).json({err: 'error on withdrowal server', status: false})
-        //             }
-        //             connection.commit(err => {
-        //                 if(err){
-        //                     return connection.rollback(() => {
-        //                         return res.status(400).json('can not commit')
-        //                     })
-        //                 }
-        //                 res.status(200).json({message: 'withdrowal successfull', status: true})
-        //             })
-        //         })
-        //     })
-        // })
+                const insertWithdrowl = 'INSERT INTO WITHDROWAL (Amount, Currency, Phone_number, userName, USERID) VALUES (?, ?, ?, ?, ?)';
+                connection.query(insertWithdrowl, [Amount, Currency, Phone_number, userName, USERID], async(err, result) => {
+                    if(err){
+                        return connection.rollback(() => {
+                            console.log('error on withdrow server :', err)
+                            return res.status(400).json({err: 'error on withdrowal server', status: false})
+                        })
+                    }
+                    const insertFee = 'INSERT INTO MY_INCOME (Date, Amount) VALUES (?, ?)';
+                    connection.query(insertFee, [Date, chargedAmount], (err, insertedFee) => {
+                        if(err){
+                            return connection.rollback(() => {
+                                return res.status(400).json('issue with inserting fee')
+                            })
+                        }
+                    
+                        connection.commit(err => {
+                            if(err){
+                                return connection.rollback(() => {
+                                    return res.status(400).json('can not commit')
+                                })
+                            }
+                            res.status(200).json({message: 'withdrowal successfull', status: true})
+                        })
+                    })
+                })
+            })
+        })
     }catch(error){
         console.log('internal withdrowal error :', error.message)
         res.status(500).json({error: 'internal withdrowl server error'})
