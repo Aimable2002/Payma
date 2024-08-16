@@ -1,4 +1,5 @@
 import connectDatabase from "../database/connectDatabase.js";
+import nodemailer from 'nodemailer';
 
 const connection = connectDatabase();
 
@@ -18,7 +19,7 @@ export const deposite = async (req, res) => {
             if(err){
                 throw err
             }
-            const getUserName = 'SELECT userName FROM USERS WHERE userId = ?';
+            const getUserName = 'SELECT userName, EMAIL FROM USERS WHERE userId = ?';
             connection.query(getUserName, [USERID], (err, result) => {
                 if(err){
                     return connection.rollback(() => {
@@ -26,6 +27,8 @@ export const deposite = async (req, res) => {
                     })
                 }
                 const userName = result[0].userName
+                const userEmail = result[0].EMAIL 
+                console.log('user Email :', userEmail)
                 console.log('userName :', userName)
                 const insertDeposite = 'INSERT INTO DEPOSITE (Amount, Currency, Phone_number, userName, USERID) VALUES (?, ?, ?, ?, ?)';
                 connection.query(insertDeposite, [Amount, Currency, Phone_number, userName, USERID], async(err, result) => {
@@ -33,6 +36,29 @@ export const deposite = async (req, res) => {
                         console.log('error on deposite :', err)
                         return res.status(400).json({err: 'error on deposite', status: false})
                     }
+                    let transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        auth: {
+                            user: process.env.EMAIL_USER,
+                            pass: process.env.EMAIL_PASS
+                        }
+                    });
+    
+                    let mailOptions = {
+                        from: process.env.EMAIL_USER,
+                        to: userEmail,
+                        subject: 'Cash In Complete',
+                        text: 'deposite done. Thank you for using our website'
+                    };
+    
+                    transporter.sendMail(mailOptions, (error, info) => {
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            console.log('Email sent: ' + info.response);
+                        }
+                    });
+
                     res.status(200).json({message: 'deposited successfully', status: true})
                 })
             })
@@ -85,12 +111,12 @@ export const Withdrowal = async (req, res) => {
         console.log('current amount : ', currentAmount)
         const chargedAmount = Amount - currentAmount
         console.log('charged amount : ', chargedAmount)
-        const Date = Date.now()
+        const CurrentDate = Date.now()
         connection.beginTransaction(err => {
             if(err){
                 throw err
             }
-            const getUser = 'SELECT userName FROM USERS WHERE userId =?';
+            const getUser = 'SELECT userName, EMAIL FROM USERS WHERE userId =?';
             connection.query(getUser, [USERID], (err, userResult) => {
                 if(err){
                     return connection.rollback(() => {
@@ -98,6 +124,8 @@ export const Withdrowal = async (req, res) => {
                     })
                 }
                 const userName = userResult[0].userName
+                const userEmail = userResult[0].EMAIL
+                console.log('user email :', userEmail)
                 console.log('userName :', userName)
 
                 const insertWithdrowl = 'INSERT INTO WITHDROWAL (Amount, Currency, Phone_number, userName, USERID) VALUES (?, ?, ?, ?, ?)';
@@ -109,7 +137,7 @@ export const Withdrowal = async (req, res) => {
                         })
                     }
                     const insertFee = 'INSERT INTO MY_INCOME (Date, Amount) VALUES (?, ?)';
-                    connection.query(insertFee, [Date, chargedAmount], (err, insertedFee) => {
+                    connection.query(insertFee, [CurrentDate, chargedAmount], (err, insertedFee) => {
                         if(err){
                             return connection.rollback(() => {
                                 return res.status(400).json('issue with inserting fee')
@@ -122,6 +150,29 @@ export const Withdrowal = async (req, res) => {
                                     return res.status(400).json('can not commit')
                                 })
                             }
+                            let transporter = nodemailer.createTransport({
+                                service: 'gmail',
+                                auth: {
+                                    user: process.env.EMAIL_USER,
+                                    pass: process.env.EMAIL_PASS
+                                }
+                            });
+            
+                            let mailOptions = {
+                                from: process.env.EMAIL_USER,
+                                to: userEmail,
+                                subject: 'Cash Out Complete',
+                                text: 'cash out complete. Thank you for using our website'
+                            };
+            
+                            transporter.sendMail(mailOptions, (error, info) => {
+                                if (error) {
+                                    console.log(error);
+                                } else {
+                                    console.log('Email sent: ' + info.response);
+                                }
+                            });
+
                             res.status(200).json({message: 'withdrowal successfull', status: true})
                         })
                     })
