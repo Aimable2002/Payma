@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from "react";
-import {Card, CardHeader, CardBody, CardFooter, Avatar, Button} from "@nextui-org/react";
+import {Card, CardHeader, CardBody, CardFooter, Avatar, Image, Button} from "@nextui-org/react";
 import MenuIcon from '@mui/icons-material/Menu';
-import LinearScaleIcon from '@mui/icons-material/LinearScale';
 import WalletIcon from '@mui/icons-material/Wallet';
-import AssessmentIcon from '@mui/icons-material/Assessment';
 import SummarizeIcon from '@mui/icons-material/Summarize';
-import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutTwoToneIcon from '@mui/icons-material/LogoutTwoTone';
 import DeleteForeverTwoToneIcon from '@mui/icons-material/DeleteForeverTwoTone';
 import DragHandleTwoToneIcon from '@mui/icons-material/DragHandleTwoTone';
@@ -42,6 +39,16 @@ import useDecline from "../../hook/applying/DeclineRequest";
 import useDeclineInvite from "../../hook/Invitation/useDeclineInvite";
 import getLogUser from "../../hook/getUsers/getLogUser";
 
+import AddJob from '../AdDJob/addJob'
+import AddBusiness from '../addBusiness/addBusiness'
+import Otherpost from "./Otherpost";
+import BusinessPost from "../addBusiness/BusinessPost";
+
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import PhoneIcon from '@mui/icons-material/Phone';
+import LiveHelpIcon from '@mui/icons-material/LiveHelp';
+import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
+
 const truncateString = (str, maxLength) => {
     if(str.length <= maxLength ){
       return str;
@@ -65,15 +72,34 @@ const home = () => {
     const { name, value } = e.target;
     setInputValues((prevValues) => ({ ...prevValues, [name]: value }));
   };
+
+  const [theme, setTheme] = useState(getCurrentTheme());
+
+  useEffect(() => {
+    const handleThemeChange = () => {
+      setTheme(getCurrentTheme());
+    };
+
+    //Listen for changes in the data-theme attribute
+    const observer = new MutationObserver(handleThemeChange);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+  
+
+  const bgColorClass = theme === 'light' ? 'bg-white' : 'bg-base-100';
   const menuItems = [
-    { name: 'Dashboard', leftIcon: <AssessmentIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard'},
-    // { name: 'wallet', leftIcon: <WalletIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard' },
+    { name: 'Dashboard', leftIcon: <DashboardCustomizeIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard'},
+    { name: 'wallet', leftIcon: <WalletIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard' },
     // { name: '', leftIcon: <AssessmentIcon className="text-info"/>, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard' },
-    { name: 'Notification', leftIcon: <SummarizeIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>, onClick: () => handleButtonClick('Notification') },
-    { name: 'Account', leftIcon: <SettingsIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, onClick: () =>document.getElementById('my_modal_30').showModal() },
+    // { name: 'Notification', leftIcon: <CircleNotificationsIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>, onClick: () => handleButtonClick('Notification') },
+    { name: 'Account', leftIcon: <AccountCircleIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, onClick: () =>document.getElementById('my_modal_30').showModal() },
     { name: 'Theme', leftIcon: <ContrastIcon className="text-info" />, onClick: toggleTheme },
-    { name: 'Contact us', leftIcon: <LinearScaleIcon className="text-info"/>, rightIcon: <DragHandleTwoToneIcon />},
-    { name: 'FAQs', leftIcon: <SummarizeIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>},
+    { name: 'Contact us', leftIcon: <PhoneIcon className="text-info"/>, rightIcon: <DragHandleTwoToneIcon />},
+    { name: 'FAQs', leftIcon: <LiveHelpIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>},
     { name: 'Terms', leftIcon: <SummarizeIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>},
     { name: 'logout', leftIcon: !loading ? <LogoutTwoToneIcon className="text-error"/> : <span className="loading loading-ring"></span>, rightIcon: '', onClick: logout },
     { name: 'delete_account', leftIcon: <DeleteForeverTwoToneIcon className="text-error" />, rightIcon: '' }
@@ -91,6 +117,8 @@ const home = () => {
   const [isRank, setIsRank] = useState(false);
   const [isAlert, setIsAlert] = useState(false)
 
+  const [isBusiness, setIsBusiness] = useState(false)
+
   const [activeButton, setActiveButton] = useState('Home');
 
   const handleButtonClick = (e) => {
@@ -100,6 +128,8 @@ const home = () => {
     setIsNotification(false)
     setIsRank(false);
     setIsAlert(false)
+
+    setIsBusiness(false)
 
     setActiveButton(e);
     switch (e) {
@@ -117,6 +147,9 @@ const home = () => {
         break;
       case 'Alert':
         setIsAlert(true);
+        break;
+      case 'Business':
+        setIsBusiness(true);
         break;
     }
   };
@@ -162,7 +195,7 @@ const handleApply = async(task) => {
   
 }
 const {isData} = useTakeTaskView(activeButton);
-console.log('is data :', isData)
+//console.log('is data :', isData)
 const {trackReport, postReport} = reportTask();
 const [reportStatus, setReportStatus] = useState({});
 
@@ -173,7 +206,7 @@ const handleReport = async(user) => {
   await postReport(user)
   setReportStatus((prevStatus) => ({
     ...prevStatus,
-    [user.taskId]: !prevStatus[user.taskId], // Toggle report status for the clicked user
+    [user.taskId]: !prevStatus[user.taskId]
   }));
 }
 
@@ -194,13 +227,13 @@ const handleIsDefault = (e) => {
   }
 }
 const {isTaskToApprove} = approveTask(activeButton)
-console.log('isTaskTo approve :', isTaskToApprove)
+//console.log('isTaskTo approve :', isTaskToApprove)
 const {trackApprove, makePostAppr} = postApproval();
 
 const [approveStatus, setApproveStatus] = useState({});
 
 const handleApprove = async (user) => {
-  console.log('task am approving :', user)
+  //console.log('task am approving :', user)
   const {Status, taskId} = user
   const value = {Status, taskId}
   await makePostAppr(value)
@@ -209,23 +242,7 @@ const handleApprove = async (user) => {
     [user.taskId] : !prevStatus[user.taskId]
   }))
 }
-const [theme, setTheme] = useState(getCurrentTheme());
 
-  useEffect(() => {
-    const handleThemeChange = () => {
-      setTheme(getCurrentTheme());
-    };
-
-    // Listen for changes in the data-theme attribute
-    const observer = new MutationObserver(handleThemeChange);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
-  const bgColorClass = theme === 'light' ? 'bg-white' : 'bg-base-100';
   const {tractP, trackPStatus, updatePassword} = PUpdate()
   const [submitting, setSubmitting] = useState(false);
   const [focusedInput22, setFocusedInput22] = useState('');
@@ -387,25 +404,37 @@ const [theme, setTheme] = useState(getCurrentTheme());
     const handleDeclineInvite = async (invite) => {
       const {inviteeId, TakerId, Approval, inviterId} = invite
       const input = {inviteeId, TakerId, Approval, inviterId}
-      console.log('input :', input)
+      //console.log('input :', input)
       await postDecline(input)
     }
   const {logUser} = getLogUser();
+
+
+  const [isaddJob, setAddJob] = useState(false)
+  const [isaddBusiness, setAddBusiness] = useState(false)
+
+  const resetView = () => {
+    setAddJob(false);
+    setAddBusiness(false);
+  };
   
   return (
     <div className="w-full flex flex-col overflow-auto">
         <div className=" w-full">
-            <div className=" fixed flex flex-row justify-between px-2 align-middle" style={{width: 'calc(100% - 32px)', zIndex: '2'}}>
+            <div className=" fixed flex flex-row justify-between align-middle" style={{width: 'calc(100% - 32px)', zIndex: '2'}}>
                 <div className="cursor-pointer"><h1 className="cursor-pointer">{isScrolled ? '' : 'Web Apllication'}</h1></div>
                 <div className="w-2/6 flex flex-row justify-around">
                   <div className="text-info" onClick={() => handleButtonClick('Notification')}>{isScrolled ? '': <NotificationsActiveIcon />}</div>
                   <div onClick={handleMenu} className="text-info"><MenuIcon /></div>
                 </div>
                 {isMenu && (
-                    <div className={`drp-ctnt flex flex-col justify-between h-screen ${bgColorClass}`}>
+                    <div style={{zIndex: '10'}} className={`drp-ctnt flex flex-col justify-between h-screen ${bgColorClass}`}>
                         <div>
-                            <div className="flex justify-end" onClick={handleMenu}>
-                                <ClearTwoToneIcon />
+                            <div className='flex flex-row justify-between'>
+                              <h1>Menu</h1>
+                              <div className="flex justify-end" onClick={handleMenu}>
+                                  <ClearTwoToneIcon />
+                              </div>
                             </div>
                             {menuItems.map(({ name, leftIcon, rightIcon, onClick, link }) => (
                               <Link to={link || '#'} key={name}> 
@@ -513,15 +542,21 @@ const [theme, setTheme] = useState(getCurrentTheme());
                 </div>
         </dialog>
         </div>
-        <div className="mt-8 py-2 gap-4 overflow-x-auto w-full flex flex-row hide-scrollbar">
+        <div className="mt-8 py-2 gap-2 overflow-x-auto w-full flex flex-row hide-scrollbar">
           <div className={`${activeButton === 'Home' ? 'btn2 cursor-pointer' : 'btn1 cursor-pointer'}`} onClick={() => handleButtonClick('Home')}>Home</div>
           <div className={`${activeButton === 'Rank' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Rank')}>People</div>
           <div className={`${activeButton === 'Tasks' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Tasks')}>Tasks</div>
-          {/* <div className={`${activeButton === 'Report' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Report')}>Report</div> */}
+          <div className={`${activeButton === 'Business' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Business')}>Business</div>
           <div className={`${activeButton === 'Alert' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Alert')}>Alert</div>
         </div>
+
+        {isBusiness && (
+            <Otherpost />
+          )}
         {isHome && (
           <>
+
+            <Otherpost />
           {usersTask.map((task) => (
             <Card key={task.taskId} style={{zIndex: '1'}} className="mb-1">
                 <CardHeader className="justify-between ">
@@ -551,13 +586,13 @@ const [theme, setTheme] = useState(getCurrentTheme());
                       {truncateString(task.Description, 90)}
                     </p>
                     <span className="pt-2">
-                    #FrontendWithZoey 
+                    {/* #FrontendWithZoey  */}
                     <span className="py-2" aria-label="computer" role="img">
                         💻
                     </span>
                     </span>
                 </CardBody>
-                <CardFooter className="gap-3 w-full">
+                <CardFooter className="gap-3 w-full flex justify-around">
                     <div className="flex gap-1 flex-col">
                       <p className="font-semibold text-default-400 text-small">Price</p>
                       <p className=" text-default-400 text-small">FRW {task.Amount}</p>
@@ -567,9 +602,9 @@ const [theme, setTheme] = useState(getCurrentTheme());
                       <p className="text-default-400 text-small">{task.Duration}</p>
                     </div>
                     <div className="flex gap-1">
-                      <button className="btn" onClick={()=>document.getElementById(task.taskId).showModal()}>
+                      <Button className="text-tiny bg-base-100 outline-none border-none text-accent" onClick={()=>document.getElementById(task.taskId).showModal()}>
                         {loading ? <span className="loading loading-ring"></span> :  !loading  && TaskStatus[task.taskId] ? 'Apply' : task.Task_Status }
-                      </button>
+                      </Button>
                     </div>
                     <dialog id={task.taskId} className="modal">
                       <div className="modal-box">
@@ -581,7 +616,7 @@ const [theme, setTheme] = useState(getCurrentTheme());
                           <Card>
                             <CardHeader className="justify-between">
                               <div className="flex gap-5">
-                                <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                <Avatar showFallback src='https://images.unsplash.com/broken' />
                                 <div className="flex flex-col gap-1 items-start justify-center">
                                   <h4 className="text-small font-semibold leading-none text-default-600">{task.FULL_NAME}</h4>
                                   <h5 className="text-small tracking-tight text-default-400">@{task.userName}</h5>
@@ -596,29 +631,32 @@ const [theme, setTheme] = useState(getCurrentTheme());
                           <div className='w-full px-2 flex flex-col'>
                             <h1 className="text-default-500 tracking-tight">Job description</h1>
                             <h2 className="text-small tracking-tight text-default-500">Job titile : {task.Agreement}</h2>
-                            <div className='w-full inline-block mt-3'>
-                                {task.Description}
+                            <div className='w-full flex flex-col mt-3'>
+                                <h1 className="text-info">Description</h1>
+                                <p>{task.Description}</p>
                             </div>
                             {/* <div className='w-full inline-block mt-3'>
                               this is specification
                             </div> */}
                             <div className='w-full flex flex-col'>
-                                <div className='w-2/4 flex flex-col mt-2'>
-                                  <div>Amount</div>
-                                  <div>{task.Amount} FRW</div>
-                                </div>
-                                <div className='w-2/4 flex flex-col mt-2'>
-                                  <div>Duration</div>
-                                  <div>{task.Duration}</div>
+                                <div className='w-full flex flex-row justify-around mt-4'>
+                                  <div className='w-2/4 flex flex-col mt-2'>
+                                    <h2 className="text-info">Amount</h2>
+                                    <h3>{task.Amount} FRW</h3>
+                                  </div>
+                                  <div className='w-2/4 flex flex-col mt-2'>
+                                    <h2 className='text-info'>Duration</h2>
+                                    <h3>{task.Duration}</h3>
+                                  </div>
                                 </div>
                               <div className='w-full flex justify-between gap-5 flex-row mt-2'>
                                   <div className='w-full flex flex-col'>
-                                    <div>Start date</div>
-                                    <div>{formatDate(task.Start_date)}</div>
+                                    <h2 className="text-info">Start date</h2>
+                                    <h3>{formatDate(task.Start_date)}</h3>
                                   </div>
                                   <div className='w-full flex flex-col'>
-                                    <div>End date</div>
-                                    <div>{formatDate(task.End_date)}</div>
+                                    <h2 className='text-info'>End date</h2>
+                                    <h3>{formatDate(task.End_date)}</h3>
                                   </div>
                               </div>
                             </div>
@@ -627,21 +665,21 @@ const [theme, setTheme] = useState(getCurrentTheme());
 
                         </div>
                         {task.Task_Status === 'Taken' ? (
-                          <Button className="btn">
+                          <Button className="text-tiny bg-base-100 outline-none border-none text-accent">
                             Task Taken
                           </Button>
                         ) : (
-                          <button className="btn" onClick={() => handleApply(task)}>
+                          <Button className="text-tiny bg-base-100 outline-none border-none text-accent" onClick={() => handleApply(task)}>
                             {isApplyClicked ? 'Application sent' : 'Apply/contact'}
-                          </button>
+                          </Button>
                         )}
                       </div>
                   </dialog>
                 </CardFooter>
             </Card>
             ))}
-            </>
-          )}
+          </>
+        )}
         {/* {isTask && (
           <div>
             <h1 className="w-full text-center mt-5">Form to assign Task</h1>
@@ -685,7 +723,7 @@ const [theme, setTheme] = useState(getCurrentTheme());
           <div className="w-full">
             <div className="w-full flex justify-end self-end text-info"onClick={handleisAddTask}>
               {/* {!isAddTask ? ( */}
-                <div onClick={()=>document.getElementById('my_modal_3').showModal()}>
+                <div onClick={()=>document.getElementById('my_modal_30000').showModal()}>
                   <span>+ </span> <span>add New Task</span>
                 </div>
               {/* ) : (
@@ -779,7 +817,7 @@ const [theme, setTheme] = useState(getCurrentTheme());
                           </div>
                           <Button
                           onClick={() => handleReport(user)}
-                          className={!reportStatus[user.taskId] ? " bg-transparent text-foreground border-default-200" : "border-primary"}
+                          className={!reportStatus[user.taskId] ? " text-tiny bg-transparent text-foreground border-default-200" : "border-primary"}
                           color="primary"
                           radius="full"
                           size="sm"
@@ -871,7 +909,7 @@ const [theme, setTheme] = useState(getCurrentTheme());
                           </div>
                           <Button
                           onClick={() => handleReport(user)}
-                          className={!reportStatus[user.inviteeId] ? " bg-transparent text-foreground border-default-200" : "border-primary"}
+                          className={!reportStatus[user.inviteeId] ? "text-tiny bg-transparent text-foreground border-default-200" : "border-primary"}
                           color="primary"
                           radius="full"
                           size="sm"
@@ -1096,6 +1134,31 @@ const [theme, setTheme] = useState(getCurrentTheme());
         </div>
       </dialog>
       {/* )} */}
+        <dialog id="my_modal_30000" className="modal" style={{zIndex: '0'}}>
+          <div className="modal-box">
+            <form method="dialog">
+              {/* if there is a button in form, it will close the modal */}
+              <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+            </form>
+            
+            {isaddBusiness || isaddJob ? null : (
+              <>
+                <h3 className="font-bold text-lg">Hello!</h3> 
+                <p className="py-4 mb-4">Choose add Job or add Business Deal</p>
+              </>
+            )}
+            <form onSubmit={(e) => e.preventDefault()}>
+              {isaddJob || isaddBusiness ? null : (
+                <div className='w-full flex flex-col gap-10'>
+                <Button  className="bg-base-100 btn btn-outline btn-accent" type='button' onClick={() => setAddJob(!isaddJob)}>Add Job</Button>
+                <Button  className="bg-base-100 btn btn-outline btn-accent" type='button' onClick={() => setAddBusiness(!isaddBusiness)}>Bussiness Offer</Button>
+              </div>
+              )}
+              {isaddJob && (<AddJob resetView={resetView}/>)}
+              {isaddBusiness && (<AddBusiness resetView={resetView} />)}
+            </form>
+          </div>
+        </dialog>
       </>
     )}
 
@@ -1743,14 +1806,14 @@ const [theme, setTheme] = useState(getCurrentTheme());
               <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
               <CardHeader className="justify-between ">
                   <div className="flex  gap-5">
-                  <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                  <Avatar showFallback src='https://images.unsplash.com/broken' />
                   <div className="flex flex-col gap-1 items-start justify-center w-3/4">
                       <h4 className="text-small font-semibold leading-none text-default-600">{user.First_name} {user.Last_name}</h4>
                       <h5 className="text-small tracking-tight text-default-400">@{user.userName}</h5>
                   </div>
                   </div>
                   <div className="flex w-2/6">
-                    <button className="btn" onClick={()=>document.getElementById(user.userId).showModal()}>Invite</button>
+                    <Button className="text-tiny bg-base-100 outline-none border-none text-accent" onClick={()=>document.getElementById(user.userId).showModal()}>Invite</Button>
                   </div>
               </CardHeader>
               <CardFooter className="gap-3">
@@ -1789,7 +1852,7 @@ const [theme, setTheme] = useState(getCurrentTheme());
                           </div>
                       ))}
                       <div className='mt-10'>
-                        <button type='button' onClick={() => handleInvite(user)}>{!isInvited ? 'Invite' : 'Well Done'}</button>
+                        <Button className="text-tiny bg-base-100 outline-none border-none text-accent" type='button' onClick={() => handleInvite(user)}>{!isInvited ? 'Invite' : 'Well Done'}</Button>
                       </div>
                     </div>
                 </dialog>

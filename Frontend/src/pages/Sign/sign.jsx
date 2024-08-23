@@ -112,6 +112,7 @@ import React, { useState } from 'react';
 import './sign.css';
 import useLogin from '../../hook/registration/login';
 import useSignup from '../../hook/registration/signup';
+import { Button } from '@nextui-org/react';
 
 const Sign = () => {
     const {loading, login} = useLogin();
@@ -201,7 +202,7 @@ const Sign = () => {
                                 </div>
                             ))}
                             <div className='mt-10'>
-                                <button onClick={handleDirection} type='button'>Next</button>
+                                <Button className="bg-base-100 btn btn-outline btn-accent" onClick={handleDirection} type='button'>Next</Button>
                             </div>
                             <div className='relative mt-20'>
                                 <p>Already have account <span onClick={handleLoginState} className='text-info'>  Login</span></p>
@@ -225,7 +226,7 @@ const Sign = () => {
                                 </div>
                             ))}
                             <div className='mt-10'>
-                                <button type='submit'>Signup</button>
+                                <Button className="bg-base-100 btn btn-outline btn-accent" type='submit'>Signup</Button>
                             </div>
                             <div className='relative mt-20'>
                                 <p>Already have account <span onClick={() => setIsNext(!isNext)} className='text-info'> Go Back</span></p>
@@ -251,7 +252,7 @@ const Sign = () => {
                     </div>
                 ))}
                 <div className='mt-10'>
-                <button type='submit'>Login</button>
+                <Button className="bg-base-100 btn btn-outline btn-accent" type='submit'>Login</Button>
                 </div>
                 <div className='relative mt-20'>
                     <p>Dont have account <span onClick={() => setIsLogin(!isLogin)} className='text-info'> Signup</span></p>

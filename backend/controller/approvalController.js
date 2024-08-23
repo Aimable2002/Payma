@@ -1,4 +1,5 @@
 import connectDatabase from "../database/connectDatabase.js";
+import nodemailer from 'nodemailer';
 
 
 const connection = connectDatabase();
@@ -22,13 +23,8 @@ export const StatusApproval = async (req, res) => {
             }
 
             if (result.length > 0) {
-                console.log('reported task to u')
                 return res.status(200).json(result);
             }
-            //  else {
-            //     console.log(' no reported task to u')
-            //     return res.status(404).json('No reported tasks found');
-            // }
         })
     }catch(error){
         console.log('internal server approval error :', error.message)
@@ -162,7 +158,7 @@ export const approval = async (req, res) => {
                                 let mailOptions = {
                                     from: process.env.EMAIL_USER,
                                     to: EmailTaker,
-                                    subject: 'Task Request Declined',
+                                    subject: 'Task Approved',
                                     text: 'Your Task has been approved visit app for more details.'
                                 };
         

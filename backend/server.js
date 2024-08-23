@@ -19,6 +19,9 @@ import updateRoute from './Routes/updateRoute.js'
 import './passPortConfig.js'
 import emailRoute from './Routes/emailRoute.js'
 
+import BusinessRouter from './Routes/BusinessRoute.js'
+import connectCloudinary from './Cloudinary/connectCloudinary.js';
+
 // import path, { resolve } from 'path'
 
 const app = express();
@@ -57,10 +60,12 @@ app.use('/api/user', userRoute)
 app.use('/api/Update-Edit', updateRoute)
 
 app.use('/api/email', emailRoute)
+app.use('/api/business', BusinessRouter)
 
 
 
 app.listen(PORT, () => {
     connectDatabase()
+    connectCloudinary()
     console.log(`Server is running on port: ${PORT}`);
 });

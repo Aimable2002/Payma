@@ -35,20 +35,21 @@ export const getOnPeople = async(req, res) => {
         }
         return res.status(200).json(result)
     })
-}
+} 
 
 export const getUsersTask = async (req, res) => {
     try{
         const USERID = req.user.userId
-        const selectUsersTask = 'SELECT * FROM USERS_TASK_VIEW WHERE Approval = ? ORDER BY taskId DESC';
+        const selectUsersTask = 'SELECT * FROM USERS_TASK_VIEW  WHERE Approval = ? ORDER BY taskId DESC';
         connection.query(selectUsersTask, ['Approve'], (err, result) => {
             if(err){
                 throw err
             }
             if(result.length === 0){
                 console.log('No task yet ')
-                return res.status(300).json('No task yet')
+                return res.status(400).json('No task yet')
             }
+            // console.log('task :', result)
             return res.status(200).json(result)
         })
     }catch(error){
@@ -114,7 +115,7 @@ export const getLogUser = async (req, res) => {
             if(err){
                 return res.status(400).json({message: 'fail to fetch user', status: false})
             }
-            console.log('user :', result)
+            //console.log('user :', result)
             return res.status(200).json(result)
         })
     }catch(error){

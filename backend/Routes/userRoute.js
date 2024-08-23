@@ -7,7 +7,7 @@ const router = express.Router();
 
 
 router.get('/people', protectRoute, getPeople);
-router.get('/users-task', protectRoute, getUsersTask)
+router.get('/users-task',  protectRoute, getUsersTask)
 router.get('/onPeople', protectRoute, getOnPeople)
 router.get('/history', protectRoute, getHistory)
 router.get('/history/invitee', protectRoute, getHistory2)

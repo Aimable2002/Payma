@@ -18,6 +18,16 @@
     padding: 4px 10px 4px 10px;
     text-align: center;
 }
+.btn3{
+    /* border-bottom: 2px solid yellowgreen; */
+    /* border-bottom: 2px solid rgb(116, 189, 245); */
+    width: 30%;
+    /* color: rgb(230, 255, 181); */
+    color: rgb(72, 182, 255);
+    /* color: rgb(137, 204, 255); */
+    padding: 4px 10px 4px 10px;
+    text-align: center;
+}
 .btn1{
     width: 30%;
     padding: 4px 10px 4px 10px;

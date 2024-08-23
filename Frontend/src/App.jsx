@@ -13,6 +13,10 @@ import Lhome from './Lpages/Lhome/Lhome'
 import Ldashboard from './Lpages/Ldashboard/Ldashboard'
 import AfriPayForm from './context/afripay'
 
+import AddJob from './pages/AdDJob/addJob'
+import AddBusiness from './pages/addBusiness/addBusiness'
+import BusinessPost from './pages/addBusiness/BusinessPost'
+
 function App() {
 
   const {AuthUser} = useAuthContext()
@@ -34,6 +38,9 @@ function App() {
         <Route path='/' element={AuthUser ? <Home /> : <Navigate to ='sign' />} />
         <Route path='/dashboard' element={AuthUser ? <Dashboard /> : <Navigate to ='sign' />} />
         <Route path='/account' element={AuthUser ? <Profile /> : <Navigate to ='sign' />} />
+        <Route path='/job' element={AuthUser ? <AddJob /> : <Navigate to ='sign' />} />
+        <Route path='/business' element={AuthUser ? <AddBusiness /> : <Navigate to ='sign' />} />
+        <Route path='/test' element={AuthUser ? <BusinessPost /> : <Navigate to ='sign' />} />
       </Routes>
       ) : (
         <Routes>

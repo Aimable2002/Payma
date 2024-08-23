@@ -5,12 +5,12 @@ const connection = connectDatabase();
 
 export const assignTask = async (req, res) => {
     try{
-        const {Agreement, Start_date, End_date, Duration, Amount, Description} = req.body;
+        const {Agreement, Start_date, End_date, Duration, Amount, Description, Specification} = req.body;
         console.log('req.body :', req.body)
         const task_giverId = req.user.userId
         console.log('Duration :', Duration)
         const formattedDuration = `${Duration} Day${Duration > 1 ? 's' : ''}`;
-        if(!Agreement || !Start_date || !End_date || !Amount || !task_giverId || !Description){
+        if(!Agreement || !Start_date || !End_date || !Amount || !task_giverId || !Description || !Specification){
             return res.status(409).json('missing data')
         }
         connection.beginTransaction(err => {
@@ -31,8 +31,8 @@ export const assignTask = async (req, res) => {
                     return res.status(303).json({message: 'low balance'})
                 }else{
                 // return res.status(200).json({message: 'task inserted', status: true})
-                const insertTask = 'INSERT INTO TASK (Agreement, Start_date, End_date, Amount, Duration, task_giverId, Description) VALUES (?, ?, ?, ?, ?, ?, ?)';
-                connection.query(insertTask, [Agreement, Start_date, End_date, Amount, formattedDuration, task_giverId, Description], async(err, result) => {
+                const insertTask = 'INSERT INTO TASK (Agreement, Start_date, End_date, Amount, Duration, task_giverId, Description, Specification) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+                connection.query(insertTask, [Agreement, Start_date, End_date, Amount, formattedDuration, task_giverId, Description, Specification], async(err, result) => {
                     if (err) {
                         return connection.rollback(() => {
                             console.log('Error inserting task:', err);
@@ -46,7 +46,6 @@ export const assignTask = async (req, res) => {
                                 throw err;
                             });
                         }
-
                         res.status(200).json({message: 'task inserted', status: true});
                     });
                 })
@@ -131,6 +130,7 @@ export const taskGiverView = async (req, res) => {
 
     }catch(error){
         console.log('internal server error :', error.message)
+
         return res.status(500).json({error: 'internal server error'})
     }
 }
@@ -243,7 +243,6 @@ export const taskTaker = async (req, res) => {
                                         console.log('Email sent: ' + info.response);
                                     }
                                 });
-
                             return res.status(200).json({message: 'tast taken', status: true});
                         });
                     })
@@ -263,66 +262,67 @@ export const taskTaker = async (req, res) => {
 
 
 export const DeclineRequest = async (req, res) => {
-    const { taskId, APPLYING_USERNAME } = req.body;
-    const DeclinedId = req.user.userId;
+    try{
+        const { taskId, APPLYING_USERNAME } = req.body;
+        const DeclinedId = req.user.userId;
   
-    if (!taskId || !APPLYING_USERNAME) {
-      return res.status(404).json('Missing data');
-    }
-  
-    connection.beginTransaction(err => {
-      if (err) {
-        return res.status(500).json({ error: 'Transaction start error' });
-      }
-  
-      const checkTask = 'SELECT task_giverId, task_takerId FROM TASK WHERE taskId = ?';
-      connection.query(checkTask, [taskId], (err, result) => {
-        if (err) {
-          return connection.rollback(() => {
-            return res.status(400).json({ error: 'Error checking task' });
-          });
+        if (!taskId || !APPLYING_USERNAME) {
+        return res.status(404).json('Missing data');
         }
   
-        if (result.length === 0) {
-          return connection.rollback(() => {
-            return res.status(404).json('No task found');
-          });
-        }
-  
-        if (DeclinedId !== result[0].task_giverId) {
-          return connection.rollback(() => {
-            return res.status(401).json('You cannot decline ');
-          });
-        }
-  
-        const getName = 'SELECT userId FROM USERS WHERE userName = ?';
-        connection.query(getName, [APPLYING_USERNAME], (err, results) => {
-          if (err) {
-            return connection.rollback(() => {
-              return res.status(400).json('Some issue occurred');
-            });
-          }
-  
-          if (results.length === 0) {
-            return connection.rollback(() => {
-              return res.status(404).json('User not found');
-            });
-          }
-  
-          const taker_Id = results[0].userId;
-          if (taker_Id === result[0].task_giverId) {
-            return connection.rollback(() => {
-              return res.status(400).json('You cannot Decline your own task');
-            });
-          }
-  
-          const updateApplyTask = 'UPDATE APPLY_TASK SET Apply_Status = ? WHERE taskId = ? AND task_giverId = ? AND applying_user = ?';
-          connection.query(updateApplyTask, ['Declined', taskId, DeclinedId, taker_Id], (err, result) => {
+        connection.beginTransaction(err => {
             if (err) {
-              return connection.rollback(() => {
-                return res.status(400).json('Failed to update apply task');
-              });
+                return res.status(500).json({ error: 'Transaction start error' });
             }
+  
+            const checkTask = 'SELECT task_giverId, task_takerId FROM TASK WHERE taskId = ?';
+            connection.query(checkTask, [taskId], (err, result) => {
+                if (err) {
+                    return connection.rollback(() => {
+                        return res.status(400).json({ error: 'Error checking task' });
+                    });
+                }
+  
+                if (result.length === 0) {
+                    return connection.rollback(() => {
+                        return res.status(404).json('No task found');
+                    });
+                }
+  
+                if (DeclinedId !== result[0].task_giverId) {
+                    return connection.rollback(() => {
+                        return res.status(401).json('You cannot decline ');
+                    });
+                }
+  
+            const getName = 'SELECT userId FROM USERS WHERE userName = ?';
+            connection.query(getName, [APPLYING_USERNAME], (err, results) => {
+                if (err) {
+                    return connection.rollback(() => {
+                        return res.status(400).json('Some issue occurred');
+                    });
+                }
+  
+                if (results.length === 0) {
+                    return connection.rollback(() => {
+                        return res.status(404).json('User not found');
+                    });
+                }
+  
+                const taker_Id = results[0].userId;
+                if (taker_Id === result[0].task_giverId) {
+                    return connection.rollback(() => {
+                        return res.status(400).json('You cannot Decline your own task');
+                    });
+                }
+  
+            const updateApplyTask = 'UPDATE APPLY_TASK SET Apply_Status = ? WHERE taskId = ? AND task_giverId = ? AND applying_user = ?';
+            connection.query(updateApplyTask, ['Declined', taskId, DeclinedId, taker_Id], (err, result) => {
+                if (err) {
+                    return connection.rollback(() => {
+                        return res.status(400).json('Failed to update apply task');
+                    });
+                }
 
             const getApplyedEmail = 'SELECT EMAIL FROM USERS WHERE userId = ?';
             connection.query(getApplyedEmail, [taker_Id], (err, AppliedEmail) => {
@@ -336,8 +336,8 @@ export const DeclineRequest = async (req, res) => {
                 console.log('EmailApply :', EmailApply)
             
   
-                connection.commit(commitErr => {
-                if (commitErr) {
+                connection.commit(err => {
+                if (err) {
                     return connection.rollback(() => {
                     return res.status(500).json('Transaction commit error');
                     });
@@ -365,7 +365,6 @@ export const DeclineRequest = async (req, res) => {
                         console.log('Email sent: ' + info.response);
                     }
                 });
-
                 return res.status(200).json({ message: 'Successfully declined', status: true });
                 });
             })
@@ -373,7 +372,11 @@ export const DeclineRequest = async (req, res) => {
         });
       });
     });
-  };
+}catch(error){
+    console.log('internal server error :', error)
+    res.status(500).json({error: 'internal server error'})
+}
+}
   
 
 export const taskTakerView = async(req, res) => {
@@ -405,72 +408,73 @@ export const taskTakerView = async(req, res) => {
 
 
 export const postInvitation = async (req, res) => {
-    const GiverId = req.user.userId
+    try{
+        const GiverId = req.user.userId
 
-    const {TakerId, Taker_Name, Agreement, Description, Amount, Start_date, End_date} = req.body
+        const {TakerId, Taker_Name, Agreement, Description, Amount, Start_date, End_date} = req.body
 
-    if(!TakerId || !Taker_Name || !Agreement || !Description || !Amount || !Start_date || !End_date){
-        console.log('missing data')
-        return res.status(400).json({message: 'missing data', status: false})
-    }
-
-    connection.beginTransaction(err => {
-        if(err){
-            throw new Error (err)
+        if(!TakerId || !Taker_Name || !Agreement || !Description || !Amount || !Start_date || !End_date){
+            console.log('missing data')
+            return res.status(400).json({message: 'missing data', status: false})
         }
 
-        const getInvittingUser = 'SELECT * FROM USERS WHERE userId = ?'
-        connection.query(getInvittingUser, [GiverId], (err, result) => {
+        connection.beginTransaction(err => {
             if(err){
-                return connection.rollback(() => {
-                    console.log('error :', err.message)
-                    return res.status(404).json({message: 'user data missing', status: false})
-                })
-            }
-            console.log('result :', result)
-            const inviter = result[0].userName
-            console.log('userData :', inviter)
-            console.log( 'bal :', result[0].Balance)
-            console.log('check bal :', result[0].Balance < Amount)
-            if(result[0].Balance < Amount){
-                return connection.rollback(() => {
-                    return res.status(400).json({message: 'insufficient Amount', status: false})
-                })
+                throw new Error (err)
             }
 
-            const insertInviteData = 'INSERT INTO invitee (invitee, inviter, Agreement, Description, Start_date, End_date, Amount, inviterId, TakerId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
-            connection.query(insertInviteData, [Taker_Name, inviter, Agreement, Description, Start_date, End_date, Amount, GiverId, TakerId], (err, result) => {
+            const getInvittingUser = 'SELECT * FROM USERS WHERE userId = ?'
+            connection.query(getInvittingUser, [GiverId], (err, result) => {
                 if(err){
                     return connection.rollback(() => {
                         console.log('error :', err.message)
-                        return res.status(409).json({err: 'error'})
+                        return res.status(404).json({message: 'user data missing', status: false})
                     })
                 }
-                const substractAmount = 'UPDATE USERS SET Balance = Balance - ? WHERE userId = ?';
-                connection.query(substractAmount, [Amount, GiverId], (err, subResult) => {
+                console.log('result :', result)
+                const inviter = result[0].userName
+                console.log('userData :', inviter)
+                console.log( 'bal :', result[0].Balance)
+                console.log('check bal :', result[0].Balance < Amount)
+                if(result[0].Balance < Amount){
+                    return connection.rollback(() => {
+                        return res.status(400).json({message: 'insufficient Amount', status: false})
+                    })
+                }
+
+                const insertInviteData = 'INSERT INTO invitee (invitee, inviter, Agreement, Description, Start_date, End_date, Amount, inviterId, TakerId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+                connection.query(insertInviteData, [Taker_Name, inviter, Agreement, Description, Start_date, End_date, Amount, GiverId, TakerId], (err, result) => {
                     if(err){
                         return connection.rollback(() => {
-                            return res.status(303).json(err.message)
+                            console.log('error :', err.message)
+                            return res.status(409).json({err: 'error'})
                         })
                     }
-                    const getTakerName = 'SELECT EMAIL FROM USERS WHERE userId = ?';
-                    connection.query(getTakerName, [TakerId], (err, TakerEma) => {
+                    const substractAmount = 'UPDATE USERS SET Balance = Balance - ? WHERE userId = ?';
+                    connection.query(substractAmount, [Amount, GiverId], (err, subResult) => {
                         if(err){
                             return connection.rollback(() => {
-                                return res.status(408).json('can not get Email')
+                                return res.status(303).json(err.message)
                             })
                         }
-                        const EmailTaker = TakerEma[0].EMAIL
-                        console.log('emailTaker :', EmailTaker)
-                    
-                    
-                        connection.commit(err => {
+                        const getTakerName = 'SELECT EMAIL FROM USERS WHERE userId = ?';
+                        connection.query(getTakerName, [TakerId], (err, TakerEma) => {
                             if(err){
                                 return connection.rollback(() => {
-                                    console.log('fail to commit :', err.message)
-                                    return res.status(409).json({message: 'fail to commit :', status: false})
+                                    return res.status(408).json('can not get Email')
                                 })
                             }
+                            const EmailTaker = TakerEma[0].EMAIL
+                            console.log('emailTaker :', EmailTaker)
+                    
+                    
+                            connection.commit(err => {
+                                if(err){
+                                    return connection.rollback(() => {
+                                        console.log('fail to commit :', err.message)
+                                        return res.status(409).json({message: 'fail to commit :', status: false})
+                                    })
+                                }
 
                             let transporter = nodemailer.createTransport({
                                 service: 'gmail',
@@ -494,7 +498,6 @@ export const postInvitation = async (req, res) => {
                                     console.log('Email sent: ' + info.response);
                                 }
                             });
-
                             return res.status(200).json({message: 'successfully invited', status: true})
                         })
                     })
@@ -502,6 +505,10 @@ export const postInvitation = async (req, res) => {
             })
         })
     })
+}catch(error){
+    console.log('internal server error :', error)
+    res.status(500).json({error: 'internal server error'})
+}
 }
 
 
@@ -611,7 +618,6 @@ export const acceptInvitation = async (req, res) => {
                                 console.log('Email sent: ' + info.response);
                             }
                         });
-
                         return res.status(200).json({message: 'succeffull accept', status: true})
                     })
                 })
@@ -701,7 +707,6 @@ export const DeclineInvitation = async (req, res) => {
                                     console.log('Email sent: ' + info.response);
                                 }
                             });
-
                             return res.status(200).json({message: 'succeffull accept', status: true})
                         })
                     })

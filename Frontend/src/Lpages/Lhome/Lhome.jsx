@@ -1,11 +1,8 @@
 // src/pages/home/home.jsx
 import React, {useState, useEffect} from 'react';
 import { Link } from 'react-router-dom';
-import LinearScaleIcon from '@mui/icons-material/LinearScale';
-import WalletIcon from '@mui/icons-material/Wallet';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import SummarizeIcon from '@mui/icons-material/Summarize';
-import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutTwoToneIcon from '@mui/icons-material/LogoutTwoTone';
 import DeleteForeverTwoToneIcon from '@mui/icons-material/DeleteForeverTwoTone';
 import DragHandleTwoToneIcon from '@mui/icons-material/DragHandleTwoTone';
@@ -37,6 +34,16 @@ import useAcceptInvitation from '../../hook/Invitation/useAcceptInvitation';
 import useDecline from '../../hook/applying/DeclineRequest';
 import useDeclineInvite from '../../hook/Invitation/useDeclineInvite';
 import getLogUser from '../../hook/getUsers/getLogUser';
+
+import OtherPost from '../../pages/home/Otherpost'
+import AddJob from '../../pages/AdDJob/addJob'
+import AddBusiness from '../../pages/addBusiness/addBusiness';
+
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import PhoneIcon from '@mui/icons-material/Phone';
+import LiveHelpIcon from '@mui/icons-material/LiveHelp';
+import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
+import CircleNotificationsIcon from '@mui/icons-material/CircleNotifications';
 
 
 const truncateString = (str, maxLength) => {
@@ -89,12 +96,12 @@ const Lhome = () => {
     //     { name: 'delete_account', leftIcon: <DeleteForeverTwoToneIcon className="text-error" />, rightIcon: '' }
     // ];
     const menuItems = [
-        { name: 'Dashboard', leftIcon: <AssessmentIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard'},
-        { name: 'Notifications', leftIcon: <AssessmentIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, onClick: () => handleButtonClick('Notification')},
-        { name: 'Account', leftIcon: <SettingsIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, onClick: () =>document.getElementById('my_modal_30').showModal() },
+        { name: 'Dashboard', leftIcon: <DashboardCustomizeIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard'},
+        { name: 'Notifications', leftIcon: <CircleNotificationsIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, onClick: () => handleButtonClick('Notification')},
+        { name: 'Account', leftIcon: <AccountCircleIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, onClick: () =>document.getElementById('my_modal_30').showModal() },
         { name: 'Theme', leftIcon: <ContrastIcon className="text-info" />, onClick: toggleTheme },
-        { name: 'Contact us', leftIcon: <LinearScaleIcon className="text-info"/>, rightIcon: <DragHandleTwoToneIcon />},
-        { name: 'FAQs', leftIcon: <SummarizeIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>},
+        { name: 'Contact us', leftIcon: <PhoneIcon className="text-info"/>, rightIcon: <DragHandleTwoToneIcon />},
+        { name: 'FAQs', leftIcon: <LiveHelpIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>},
         { name: 'Terms', leftIcon: <SummarizeIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>},
         { name: 'logout', leftIcon: !loading ? <LogoutTwoToneIcon className="text-error"/> : <span className="loading loading-ring"></span>, rightIcon: '', onClick: logout },
         { name: 'delete_account', leftIcon: <DeleteForeverTwoToneIcon className="text-error" />, rightIcon: '' }
@@ -123,6 +130,9 @@ const Lhome = () => {
     const [isNotification, setIsNotification] = useState(false)
     const [isRank, setIsRank] = useState(false);
     const [isAlert, setIsAlert] = useState(false)
+
+    const [isBusiness, setIsBusiness] = useState(false)
+
     const [activeButton, setActiveButton] = useState('Home');
 
     const handleButtonClick = (e) => {
@@ -132,6 +142,8 @@ const Lhome = () => {
         setIsNotification(false)
         setIsRank(false);
         setIsAlert(false)
+
+        setIsBusiness(false)
 
         setActiveButton(e);
         switch (e) {
@@ -149,6 +161,9 @@ const Lhome = () => {
             break;
         case 'Alert':
             setIsAlert(true);
+            break;
+        case 'Business':
+            setIsBusiness(true);
             break;
         }
     };
@@ -360,6 +375,15 @@ const Lhome = () => {
         await postDecline(input)
     }
     const {logUser} = getLogUser();
+
+    const [isaddJob, setAddJob] = useState(false)
+    const [isaddBusiness, setAddBusiness] = useState(false)
+
+    const resetView = () => {
+        setAddJob(false);
+        setAddBusiness(false);
+    };
+
   return (
     <div className='w-full flex flex-row fixed'>
         <div className={`w-2/12 overflow-y-auto ${bgColorClass}`} style={{zIndex: '2'}}>
@@ -469,17 +493,44 @@ const Lhome = () => {
                     <div className={`${activeButton === 'Home' ? 'btn2 cursor-pointer' : 'btn1 cursor-pointer'}`} onClick={() => handleButtonClick('Home')}>Home</div>
                     <div className={`${activeButton === 'Rank' ? 'btn2 cursor-pointer' : 'btn1 cursor-pointer'}`} onClick={() => handleButtonClick('Rank')}>People</div>
                     <div className={`${activeButton === 'Tasks' ? 'btn2 cursor-pointer' : 'btn1 cursor-pointer'}`} onClick={() => handleButtonClick('Tasks')}>Tasks</div>
-                    {/* <div className={`${activeButton === 'Report' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Report')}>Report</div> */}
+                    <div className={`${activeButton === 'Business' ? 'btn2 cursor-pointer' : 'btn1 cursor-pointer'}`} onClick={() => handleButtonClick('Business')}>Business</div>
                     <div className={`${activeButton === 'Alert' ? 'btn2 cursor-pointer' : 'btn1 cursor-pointer'}`} onClick={() => handleButtonClick('Alert')}>Alert</div>
                 </div>
                 </div>
             </div>
             <div className='relative mt-14'>
+
+                    <dialog id="my_modal_30000" className="modal" style={{zIndex: '0'}}>
+                        <div className="modal-box">
+                            <form method="dialog">
+                            {/* if there is a button in form, it will close the modal */}
+                            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                            </form>
+                            
+                            {isaddBusiness || isaddJob ? null : (
+                            <>
+                                <h3 className="font-bold text-lg">Hello!</h3> 
+                                <p className="py-4 mb-4">Choose add Job or add Business Deal</p>
+                            </>
+                            )}
+                            <form onSubmit={(e) => e.preventDefault()}>
+                            {isaddJob || isaddBusiness ? null : (
+                                <div className='w-full flex flex-col gap-10'>
+                                <Button  className="bg-base-100 btn btn-outline btn-accent" type='button' onClick={() => setAddJob(!isaddJob)}>Add Job</Button>
+                                <Button  className="bg-base-100 btn btn-outline btn-accent" type='button' onClick={() => setAddBusiness(!isaddBusiness)}>Bussiness Offer</Button>
+                            </div>
+                            )}
+                            {isaddJob && (<AddJob resetView={resetView}/>)}
+                            {isaddBusiness && (<AddBusiness resetView={resetView} />)}
+                            </form>
+                        </div>
+                    </dialog>
+
                 {isTask && (
                     <div className="" style={{width: '95%'}}>
                         <div className="w-full flex justify-end self-end text-info">
                             {/* {!isAddTask ? ( */}
-                            <div className='cursor-pointer' onClick={()=>document.getElementById('my_modal_3').showModal()}>
+                            <div className='cursor-pointer' onClick={()=>document.getElementById('my_modal_30000').showModal()}>
                                 <span>+ </span> <span>add Your New Task</span>
                             </div>
                             {/* ) : (
@@ -520,8 +571,12 @@ const Lhome = () => {
                     </div>
                 )}
             <div className='grid grid-cols-3 gap-4 px-2 w-full'>
+                {isBusiness && (
+                    <OtherPost />
+                )}
                 {isHome && (
                     <>
+                    <OtherPost />
                 {usersTask.map((task) => {
                     return (
                     <Card  style={{zIndex: '1'}}>
@@ -548,7 +603,7 @@ const Lhome = () => {
                             </span>
                             </span>
                         </CardBody>
-                        <CardFooter className="gap-3 w-full">
+                        <CardFooter className="gap-3 w-full flex justify-between">
                             <div className="flex gap-1 flex-col">
                                 <p className="font-semibold text-default-400 text-small">Price</p>
                                 <p className=" text-default-400 text-small">FRW {task.Amount}</p>
@@ -558,10 +613,10 @@ const Lhome = () => {
                                 <p className="text-default-400 text-small">{task.Duration}</p>
                             </div>
                             <div className="flex gap-1">
-                                <button className="btn" onClick={()=>document.getElementById(task.taskId).showModal()}>
+                                <Button className="text-tiny bg-base-100 outline-none border-none text-accent" onClick={()=>document.getElementById(task.taskId).showModal()}>
                                     {loading ? <span className="loading loading-ring"></span> :  !loading  && trackEvent ? 'Apply' : task.Task_Status }
                                     {/* {task.Task_Status} */}
-                                </button>
+                                </Button>
                             </div>
                             <dialog id={task.taskId} className="modal">
                                 <div className="modal-box">
@@ -620,13 +675,13 @@ const Lhome = () => {
                                         </div>
                                     </div>
                                     {task.Task_Status === 'Taken' ? (
-                                        <Button className="btn">
+                                        <Button className="text-tiny bg-base-100 outline-none border-none text-accent">
                                             Task Taken
                                         </Button>
                                     ) : (
-                                        <button className="btn" onClick={() => handleApply(task)}>
+                                        <Button className="text-tiny bg-base-100 outline-none border-none text-accent" onClick={() => handleApply(task)}>
                                             Apply/contact
-                                        </button>
+                                        </Button>
                                     )}
                                 </div>
                             </dialog>
@@ -644,14 +699,15 @@ const Lhome = () => {
                             <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
                                 <CardHeader className="justify-between ">
                                     <div className="flex  gap-5">
-                                    <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                    {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
+                                    <Avatar showFallback src='https://images.unsplash.com/broken' />
                                     <div className="flex flex-col gap-1 items-start justify-center w-3/4">
                                         <h4 className="text-small font-semibold leading-none text-default-600">{user.Last_name}</h4>
                                         <h5 className="text-small tracking-tight text-default-400">@{user.userName}</h5>
                                     </div>
                                     </div>
                                     <div className="flex w-2/6">
-                                        <button className="btn" onClick={()=>document.getElementById(user.userId).showModal()}>invite</button>
+                                        <Button className="text-tiny bg-base-100 outline-none border-none text-accent" onClick={()=>document.getElementById(user.userId).showModal()}>invite</Button>
                                     </div>
                                 </CardHeader>
                                 <CardFooter className="gap-3">
@@ -691,7 +747,7 @@ const Lhome = () => {
                                                 </div>
                                             ))}
                                             <div className='mt-10'>
-                                                <button type='button' onClick={() => handleInvite(user)}>{!isInvited ? 'Invite' : 'Well Done'}</button>
+                                                <Button className='text-tiny bg-base-100 outline-none border-none text-accent' type='button' onClick={() => handleInvite(user)}>{!isInvited ? 'Invite' : 'Well Done'}</Button>
                                             </div>
                                         </div>
                                     </dialog>
@@ -715,7 +771,8 @@ const Lhome = () => {
                           <Card>
                             <CardHeader className="justify-between">
                               <div className="flex gap-5">
-                                <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
+                                <Avatar showFallback src='https://images.unsplash.com/broken' />
                                 <div className="flex flex-col gap-1 items-start justify-center">
                                   <h4 className="text-small font-semibold leading-none text-default-600">{user.FULL_NAME}</h4>
                                   <h5 className="text-small tracking-tight text-default-400">@{user.userName}</h5>
@@ -763,7 +820,8 @@ const Lhome = () => {
                         <Card className="mt-5">
                             <CardHeader className="justify-between">
                               <div className="flex gap-5">
-                                <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
+                                <Avatar showFallback src='https://images.unsplash.com/broken' />
                                 <div className="flex flex-col gap-1 items-start justify-center">
                                   <h4 className="text-small font-semibold leading-none text-default-600">{user.task_taker_name}</h4>
                                   <h5 className="text-small tracking-tight text-default-400">@{user.Status}</h5>
@@ -854,7 +912,8 @@ const Lhome = () => {
                           <Card>
                             <CardHeader className="justify-between">
                               <div className="flex gap-5">
-                                <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
+                                <Avatar showFallback src='https://images.unsplash.com/broken' />
                                 <div className="flex flex-col gap-1 items-start justify-center">
                                   <h4 className="text-small font-semibold leading-none text-default-600">{user.FULL_NAME}</h4>
                                   <h5 className="text-small tracking-tight text-default-400">@{user.userName}</h5>
@@ -947,7 +1006,8 @@ const Lhome = () => {
                           <Card>
                             <CardHeader className="justify-between">
                               <div className="flex gap-5">
-                                <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
+                                <Avatar showFallback src='https://images.unsplash.com/broken' />
                                 <div className="flex flex-col gap-1 items-start justify-center">
                                   <h4 className="text-small font-semibold leading-none text-default-600">{user.INVITER_FULL_NAME }</h4>
                                   <h5 className="text-small tracking-tight text-default-400">@{user.inviter}</h5>
@@ -1252,7 +1312,8 @@ const Lhome = () => {
                                         <Card className="w-full mt-2" style={{zIndex: '1'}}>
                                             <CardHeader className="justify-between w-full">
                                                 <div className="flex w-4/5  gap-5">
-                                                    <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                                    {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
+                                                    <Avatar showFallback src='https://images.unsplash.com/broken' />
                                                     <div className="flex flex-col gap-1 items-start justify-center w-3/4">
                                                         <h4 className="text-small font-semibold leading-none text-default-600">{apply.Agreement}</h4>
                                                         <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}</h5>
@@ -1364,7 +1425,8 @@ const Lhome = () => {
                                     <Card className="w-full mt-2" style={{zIndex: '1'}}>
                                         <CardHeader className="justify-between w-full">
                                             <div className="flex w-4/5  gap-5">
-                                                <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                                {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
+                                                <Avatar showFallback src='https://images.unsplash.com/broken' />
                                                 <div className="flex flex-col gap-1 items-start justify-center w-3/4">
                                                     <h4 className="text-small font-semibold leading-none text-default-600">{invite.Agreement}</h4>
                                                     <h5 className="text-small tracking-tight text-default-400">@{invite.invitee}</h5>
@@ -1480,7 +1542,8 @@ const Lhome = () => {
                                     <Card className="w-full mt-2" style={{zIndex: '1'}}>
                                         <CardHeader className="justify-between w-full">
                                             <div className="flex w-4/5  gap-5">
-                                                <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                                {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
+                                                <Avatar showFallback src='https://images.unsplash.com/broken' />
                                                 <div className="flex flex-col gap-1 items-start justify-center w-3/4">
                                                     <h4 className="text-small font-semibold leading-none text-default-600">{apply.Agreement}</h4>
                                                     <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}</h5>
@@ -1595,7 +1658,8 @@ const Lhome = () => {
                         <Card className="w-full mt-2" style={{zIndex: '1'}}>
                             <CardHeader className="justify-between w-full">
                                 <div className="flex w-4/5  gap-5">
-                                <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
+                                <Avatar showFallback src='https://images.unsplash.com/broken' />
                                 <div className="flex flex-col gap-1 items-start justify-center w-3/4">
                                     <h4 className="text-small font-semibold leading-none text-default-600">{invite.Agreement}</h4>
                                     <h5 className="text-small tracking-tight text-default-400">@{invite.invitee}</h5>

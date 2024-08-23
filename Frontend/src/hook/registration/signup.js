@@ -7,7 +7,7 @@ const useSignup = () => {
   const signup = async ({First_name, Last_name, userName, Title, Email, Phone_number, Password, confirmPassword}) => {
     const Success = handleLoginError(First_name, Last_name, userName, Title, Email, Phone_number, Password, confirmPassword);
     
-    if(!Success)return alert('something wrong')
+    if(!Success)return alert('fill the field')
     try{
         setLoading(true)
         const res = await axios.post('/api/authUser/signup', {
