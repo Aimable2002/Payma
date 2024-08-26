@@ -22,11 +22,11 @@ import emailRoute from './Routes/emailRoute.js'
 import BusinessRouter from './Routes/BusinessRoute.js'
 import connectCloudinary from './Cloudinary/connectCloudinary.js';
 
-// import path, { resolve } from 'path'
+import path from 'path'
 
 const app = express();
 
-// const __dirname = path.resolve();
+const __dirname = path.resolve();
 
 dotenv.config();
 
@@ -61,6 +61,13 @@ app.use('/api/Update-Edit', updateRoute)
 
 app.use('/api/email', emailRoute)
 app.use('/api/business', BusinessRouter)
+
+
+app.use(express.static(path.join(__dirname, "/Frontend/dist")));
+
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "Frontend", "dist", "index.html"))
+})
 
 
 

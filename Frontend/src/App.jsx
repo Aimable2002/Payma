@@ -15,7 +15,7 @@ import AfriPayForm from './context/afripay'
 
 import AddJob from './pages/AdDJob/addJob'
 import AddBusiness from './pages/addBusiness/addBusiness'
-import BusinessPost from './pages/addBusiness/BusinessPost'
+// import BusinessPost from './pages/addBusiness/BusinessPost'
 
 function App() {
 
@@ -40,7 +40,7 @@ function App() {
         <Route path='/account' element={AuthUser ? <Profile /> : <Navigate to ='sign' />} />
         <Route path='/job' element={AuthUser ? <AddJob /> : <Navigate to ='sign' />} />
         <Route path='/business' element={AuthUser ? <AddBusiness /> : <Navigate to ='sign' />} />
-        <Route path='/test' element={AuthUser ? <BusinessPost /> : <Navigate to ='sign' />} />
+        {/* <Route path='/test' element={AuthUser ? <BusinessPost /> : <Navigate to ='sign' />} /> */}
       </Routes>
       ) : (
         <Routes>

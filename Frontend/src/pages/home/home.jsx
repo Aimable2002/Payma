@@ -49,6 +49,9 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
 
+import Badge from '@mui/material/Badge';
+import MailIcon from '@mui/icons-material/Mail';
+
 const truncateString = (str, maxLength) => {
     if(str.length <= maxLength ){
       return str;
@@ -417,15 +420,37 @@ const handleApprove = async (user) => {
     setAddJob(false);
     setAddBusiness(false);
   };
-  
+  console.log('noti lenght :', applyView.length)
+  console.log('notif invite lenght :', inviteTaskPending.length)
+  const [invisible, setInvisible] = React.useState(false);
+
+  useEffect(() => {
+    if(!loading){
+      if (applyView.length <= 0 && inviteTaskPending.length <= 0) {
+      setInvisible(true);
+      } else {
+        setInvisible(false);
+      }
+    }
+    
+  }, [applyView, inviteTaskPending]);
   return (
     <div className="w-full flex flex-col overflow-auto">
         <div className=" w-full">
-            <div className=" fixed flex flex-row justify-between align-middle" style={{width: 'calc(100% - 32px)', zIndex: '2'}}>
+            <div className=" fixed flex flex-row justify-between align-middle" style={{width: 'calc(100% - 12px)', zIndex: '2'}}>
                 <div className="cursor-pointer"><h1 className="cursor-pointer">{isScrolled ? '' : 'Web Apllication'}</h1></div>
                 <div className="w-2/6 flex flex-row justify-around">
-                  <div className="text-info" onClick={() => handleButtonClick('Notification')}>{isScrolled ? '': <NotificationsActiveIcon />}</div>
+                  <div className="text-info" onClick={() => handleButtonClick('Notification')}>
+                    {isScrolled ? '': (
+                      <Badge color="secondary" variant="dot" invisible={invisible}>
+                        <NotificationsActiveIcon />
+                      </Badge>
+                    )}
+                  </div>
                   <div onClick={handleMenu} className="text-info"><MenuIcon /></div>
+                  <div>
+                    
+                  </div>
                 </div>
                 {isMenu && (
                     <div style={{zIndex: '10'}} className={`drp-ctnt flex flex-col justify-between h-screen ${bgColorClass}`}>
@@ -585,12 +610,12 @@ const handleApprove = async (user) => {
                     <p>
                       {truncateString(task.Description, 90)}
                     </p>
-                    <span className="pt-2">
-                    {/* #FrontendWithZoey  */}
+                    {/* <span className="pt-2">
+                      #FrontendWithZoey 
                     <span className="py-2" aria-label="computer" role="img">
                         💻
                     </span>
-                    </span>
+                    </span> */}
                 </CardBody>
                 <CardFooter className="gap-3 w-full flex justify-around">
                     <div className="flex gap-1 flex-col">
@@ -1207,7 +1232,7 @@ const handleApprove = async (user) => {
                                 <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
                                 <div className="flex flex-col gap-1 items-start justify-center">
                                   <h4 className="text-small font-semibold leading-none text-default-600">{apply.APPLYING_FULL_NAME}</h4>
-                                  <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}, {apply.taskId}</h5>
+                                  <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}</h5>
                                 </div>
                               </div>
                               {/* <div className="flex w-2/6">
@@ -1220,37 +1245,38 @@ const handleApprove = async (user) => {
                             <h1 className="text-default-500 tracking-tight">Job description</h1>
                             <h2 className="text-small tracking-tight text-default-500">Job titile : {apply.Agreement}</h2>
                             <div className='w-full inline-block mt-3'>
-                              {truncateString(apply.description, 90)}
+                              {apply.description}
                             </div>
                             {/* <div className='w-full inline-block mt-3'>
                               this is specification
                             </div> */}
                             <div className='w-full flex flex-col'>
-                                <div className='w-2/4 flex flex-col mt-2'>
-                                  <div>Amount</div>
-                                  <div>{apply.Amount} FRW</div>
-                                </div>
-                                <div className='w-2/4 flex flex-col mt-2'>
-                                  <div>Duration</div>
-                                  <div>{apply.Duration}</div>
+                                <div className='flex justify-between'>
+                                  <div className='w-2/4 flex flex-col mt-2'>
+                                    <h2 className='text-info'>Amount</h2>
+                                    <h3>{apply.Amount} FRW</h3>
+                                  </div>
+                                  <div className='w-2/4 flex flex-col mt-2'>
+                                    <h2 className='text-info'>Duration</h2>
+                                    <h3>{apply.Duration}</h3>
+                                  </div>
                                 </div>
                               <div className='w-full flex justify-between gap-5 flex-row mt-2'>
                                   <div className='w-full flex flex-col'>
-                                    <div>Start date</div>
-                                    <div>{formatDate (apply.Start_date)}</div>
+                                    <h2 className='text-info'>Start date</h2>
+                                    <h3>{formatDate (apply.Start_date)}</h3>
                                   </div>
                                   <div className='w-full flex flex-col'>
-                                    <div>End date</div>
-                                    <div>{formatDate (apply.End_date)}</div>
+                                    <h2 className='text-info'>End date</h2>
+                                    <h3>{formatDate (apply.End_date)}</h3>
                                   </div>
                               </div>
                             </div>
                             <div className="w-full flex flex-col mt-4">
                               <h1 className="text-info">Our Contact</h1>
-                              <div className="w-full flex flex-col">
-                                <div>Contact info</div>
-                                <div><Snippet>{apply.APPLYING_TEL}</Snippet></div>
-                                <div><Snippet>{apply.APPLYING_EMAIL}</Snippet></div>
+                              <div className="w-full gap-2 flex flex-col mt-4">
+                                <h3><Snippet>{apply.APPLYING_TEL}</Snippet></h3>
+                                <h3><Snippet>{apply.APPLYING_EMAIL}</Snippet></h3>
                               </div>
                             </div>
                             <div className="w-full flex flex-row justify-between gap-5 mt-10">
@@ -1273,7 +1299,7 @@ const handleApprove = async (user) => {
                       </span>
                     </span>
                     <div>
-                      {apply.description}
+                      {truncateString(apply.description, 90)}
                     </div>
                 </CardBody>
               </Card>
@@ -1337,31 +1363,32 @@ const handleApprove = async (user) => {
                               this is specification
                             </div> */}
                             <div className='w-full flex flex-col'>
-                                <div className='w-2/4 flex flex-col mt-2'>
-                                  <div>Amount</div>
-                                  <div>{invite.Amount} FRW</div>
-                                </div>
-                                <div className='w-2/4 flex flex-col mt-2'>
-                                  <div>Duration</div>
-                                  <div>{invite.Duration}</div>
+                                <div className='flex justify-between'>
+                                  <div className='w-2/4 flex flex-col mt-2'>
+                                    <h2 className='text-info'>Amount</h2>
+                                    <h3>{invite.Amount} FRW</h3>
+                                  </div>
+                                  <div className='w-2/4 flex flex-col mt-2'>
+                                    <h2 className='text-info'>Duration</h2>
+                                    <h3>{invite.Duration}</h3>
+                                  </div>
                                 </div>
                               <div className='w-full flex justify-between gap-5 flex-row mt-2'>
                                   <div className='w-full flex flex-col'>
-                                    <div>Start date</div>
-                                    <div>{formatDate (invite.Start_date)}</div>
+                                    <h2 className='text-info'>Start date</h2>
+                                    <h3>{formatDate (invite.Start_date)}</h3>
                                   </div>
                                   <div className='w-full flex flex-col'>
-                                    <div>End date</div>
-                                    <div>{formatDate (invite.End_date)}</div>
+                                    <h2 className='text-info'>End date</h2>
+                                    <h3>{formatDate (invite.End_date)}</h3>
                                   </div>
                               </div>
                             </div>
                             <div className="w-full flex flex-col mt-4">
                               <h1 className="text-info">Our Contact</h1>
-                              <div className="w-full flex flex-col">
-                                <div>Contact info</div>
-                                <div><Snippet>{invite.INVITER_TEL }</Snippet></div>
-                                <div><Snippet>{invite.INVITER_EMAIL}</Snippet></div>
+                              <div className="w-full flex flex-col gap-2">
+                                <h3><Snippet>{invite.INVITER_TEL }</Snippet></h3>
+                                <h3><Snippet>{invite.INVITER_EMAIL}</Snippet></h3>
                               </div>
                             </div>
                             <div className="w-full flex flex-row justify-between gap-5 mt-10">
@@ -1380,7 +1407,7 @@ const handleApprove = async (user) => {
                     <div>
                       <span className="flex flex-col">
                         <span className="pt-2 text-default-700">{invite.inviter} has job for you</span>
-                        <span>{invite.Description}</span>
+                        <span>{truncateString(invite.Description, 90)}</span>
                       </span>
                     </div>
                     <span className="pt-2 text-default-700">
@@ -1436,7 +1463,7 @@ const handleApprove = async (user) => {
                                   <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
                                   <div className="flex flex-col gap-1 items-start justify-center">
                                     <h4 className="text-small font-semibold leading-none text-default-600">{apply.APPLYING_FULL_NAME}</h4>
-                                    <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}, {apply.taskId}</h5>
+                                    <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}</h5>
                                   </div>
                                 </div>
                                 {/* <div className="flex w-2/6">
@@ -1449,37 +1476,38 @@ const handleApprove = async (user) => {
                               <h1 className="text-default-500 tracking-tight">Job description</h1>
                               <h2 className="text-small tracking-tight text-default-500">Job titile : {apply.Agreement}</h2>
                               <div className='w-full inline-block mt-3'>
-                                {truncateString(apply.description, 90)}
+                                {apply.description}
                               </div>
                               {/* <div className='w-full inline-block mt-3'>
                                 this is specification
                               </div> */}
                               <div className='w-full flex flex-col'>
-                                  <div className='w-2/4 flex flex-col mt-2'>
-                                    <div>Amount</div>
-                                    <div>{apply.Amount} FRW</div>
-                                  </div>
-                                  <div className='w-2/4 flex flex-col mt-2'>
-                                    <div>Duration</div>
-                                    <div>{apply.Duration}</div>
+                                  <div className='flex justify-between'>
+                                    <div className='w-2/4 flex flex-col mt-2'>
+                                      <h2 className='text-info'>Amount</h2>
+                                      <h3>{apply.Amount} FRW</h3>
+                                    </div>
+                                    <div className='w-2/4 flex flex-col mt-2'>
+                                      <h2 className='text-info'>Duration</h2>
+                                      <h3>{apply.Duration}</h3>
+                                    </div>
                                   </div>
                                 <div className='w-full flex justify-between gap-5 flex-row mt-2'>
                                     <div className='w-full flex flex-col'>
-                                      <div>Start date</div>
-                                      <div>{formatDate (apply.Start_date)}</div>
+                                      <h2 className='text-info'>Start date</h2>
+                                      <h3>{formatDate (apply.Start_date)}</h3>
                                     </div>
                                     <div className='w-full flex flex-col'>
-                                      <div>End date</div>
-                                      <div>{formatDate (apply.End_date)}</div>
+                                      <h2 className='text-info'>End date</h2>
+                                      <h3>{formatDate (apply.End_date)}</h3>
                                     </div>
                                 </div>
                               </div>
                               <div className="w-full flex flex-col mt-4">
                                 <h1 className="text-info">Our Contact</h1>
-                                <div className="w-full flex flex-col">
-                                  <div>Contact info</div>
-                                  <div><Snippet>{apply.APPLYING_TEL}</Snippet></div>
-                                  <div><Snippet>{apply.APPLYING_EMAIL}</Snippet></div>
+                                <div className="w-full flex flex-col gap-2">
+                                  <h3><Snippet>{apply.APPLYING_TEL}</Snippet></h3>
+                                  <h3><Snippet>{apply.APPLYING_EMAIL}</Snippet></h3>
                                 </div>
                               </div>
                               <div className="w-full flex flex-row justify-between gap-5 mt-10">
@@ -1502,7 +1530,7 @@ const handleApprove = async (user) => {
                         </span>
                       </span>
                       <div>
-                        {apply.description}
+                        {truncateString(apply.description, 90)}
                       </div>
                   </CardBody>
                 </Card>
@@ -1571,31 +1599,32 @@ const handleApprove = async (user) => {
                               this is specification
                             </div> */}
                             <div className='w-full flex flex-col'>
-                                <div className='w-2/4 flex flex-col mt-2'>
-                                  <div>Amount</div>
-                                  <div>{invite.Amount} FRW</div>
-                                </div>
-                                <div className='w-2/4 flex flex-col mt-2'>
-                                  <div>Duration</div>
-                                  <div>{invite.Duration}</div>
+                                <div className='flex justify-between'>
+                                  <div className='w-2/4 flex flex-col mt-2'>
+                                    <h2 className='text-info'>Amount</h2>
+                                    <h3>{invite.Amount} FRW</h3>
+                                  </div>
+                                  <div className='w-2/4 flex flex-col mt-2'>
+                                    <h2 className='text-info'>Duration</h2>
+                                    <h3>{invite.Duration}</h3>
+                                  </div>
                                 </div>
                               <div className='w-full flex justify-between gap-5 flex-row mt-2'>
                                   <div className='w-full flex flex-col'>
-                                    <div>Start date</div>
-                                    <div>{formatDate (invite.Start_date)}</div>
+                                    <h2 className='text-info'>Start date</h2>
+                                    <h3>{formatDate (invite.Start_date)}</h3>
                                   </div>
                                   <div className='w-full flex flex-col'>
-                                    <div>End date</div>
-                                    <div>{formatDate (invite.End_date)}</div>
+                                    <h2 className='text-info'>End date</h2>
+                                    <h3>{formatDate (invite.End_date)}</h3>
                                   </div>
                               </div>
                             </div>
                             <div className="w-full flex flex-col mt-4">
                               <h1 className="text-info">Our Contact</h1>
-                              <div className="w-full flex flex-col">
-                                <div>Contact info</div>
-                                <div><Snippet>{invite.INVITER_TEL }</Snippet></div>
-                                <div><Snippet>{invite.INVITER_EMAIL}</Snippet></div>
+                              <div className="w-full flex flex-col gap-2">
+                                <h3><Snippet>{invite.INVITER_TEL }</Snippet></h3>
+                                <h3><Snippet>{invite.INVITER_EMAIL}</Snippet></h3>
                               </div>
                             </div>
                             <div className="w-full flex flex-row justify-between gap-5 mt-10">
@@ -1614,7 +1643,7 @@ const handleApprove = async (user) => {
                     <div>
                         <span className="flex flex-col">
                           <span className="pt-2 text-default-700">{invite.inviter} has job for you</span>
-                          <span>{invite.Description}</span>
+                          <span>{truncateString(invite.Description, 90)}</span>
                         </span>
                     </div>
                     <span className="pt-2 text-default-700">
@@ -1837,14 +1866,14 @@ const handleApprove = async (user) => {
                       <h3 className="font-bold text-lg">Invite {user.userName}</h3>
 
                       {['Task Title', 'Task Description', 'Amount in FRW', 'Start_date', 'End_date'].map((field) => (
-                          <div key={field} className='flex w-full flex-col inputGroup'>
+                          <div key={field} className='flex w-full gap-4 flex-col inputGroup'>
                             <label htmlFor={field} className={`absolute ${InviteValue[field] ? 'trans2' : (focusedInput === field ? 'trans' : '')} ${field.toLowerCase().includes('date') ? 'tran' : ''}`}>
                               {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1').trim()}
                             </label>
                             <input
                               id={field}
                               name={field}
-                              className="bg-transparent"
+                              className={`${field.toLowerCase().includes('date') ? 'gap-4' : 'bg-transparent'}`}
                               onChange={handleChange00}
                               type={field.includes('date') ? 'date' : field.toLowerCase() === 'amount' ? 'number' : 'text'}
                               onFocus={() => handleFocus(field)}

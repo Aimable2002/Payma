@@ -48,7 +48,7 @@ import React, { useState } from 'react'
 const PostAddBusiness = () => {
     const [loading, setLoading] = useState(false);
 
-    const postBusiness = async (Business_Category, Description, Quantity, Amount, District, Product) => {
+    const postBusiness = async (Business_Category, Description, Quantity, Amount, District, Product, Location) => {
         
         const Business_Category1 = Business_Category.Business_Category
         const Description1 = Business_Category.Description
@@ -56,6 +56,7 @@ const PostAddBusiness = () => {
         const Amount1 = Business_Category.Amount
         const District1 = Business_Category.District
         const Product1 = Business_Category.Product
+        const Location1 = Business_Category.Location
         console.log('Business_Category:', Business_Category1)
 
         console.log('Description:', Description1)
@@ -63,6 +64,7 @@ const PostAddBusiness = () => {
         console.log('Amount:', Amount1)
         console.log('District:', District1)
         console.log('Product:', Product1)
+        console.log('Location :', Location1)
         const Success = handleError(Business_Category1, Description1, Quantity1, Amount1, District1, Product1)
         if(!Success) return alert('fill the field')
         setLoading(true);

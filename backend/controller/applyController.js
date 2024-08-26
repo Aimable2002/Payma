@@ -67,11 +67,23 @@ export const applyTask = async (req, res) => {
                         })
                     }
 
-                    console.log('Email User:', process.env.EMAIL_USER);
-console.log('Email Pass:', process.env.EMAIL_PASS);
+                    if (results[0].Apply_Status !== 'PENDING' && results[0].Apply_Status !== 'Declined') {
+                        return connection.rollback(() => {
+                            return res.status(410).json('can\'t continue');
+                        });
+                    }
+                
+                    if (results[0].applying_user === applyingId && results[0].Apply_Status !== 'Declined') {
+                        return connection.rollback(() => {
+                            return res.status(411).json('can\'t continue');
+                        });
+                    }
 
-                const insertApply = 'INSERT INTO APPLY_TASK (taskId, applying_user, task_giverId) VALUES(?,?, ?)';
-                connection.query(insertApply, [taskId, applyingId, taskGiver], (err, result) => {
+                    console.log('Email User:', process.env.EMAIL_USER);
+                console.log('Email Pass:', process.env.EMAIL_PASS);
+
+                const insertApply = 'INSERT INTO APPLY_TASK (taskId, applying_user, task_giverId, Status) VALUES(?,?, ?, ?)';
+                connection.query(insertApply, [taskId, applyingId, taskGiver, "Applied"], (err, result) => {
                     if(err){
                         console.log(err.message)
                         return res.status(400).json({err: 'error'})

@@ -5,6 +5,9 @@ import { Button } from '@nextui-org/react';
 import useWithdrowal from '../../hook/wallet/useWithdrowal';
 import useDeposite from '../../hook/wallet/useDeposite';
 
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
+
 const Lbtn = () => {
     const [focusedInput2, setFocusedInput2] = useState('');
       const [inputValues2, setInputValues2] = useState({
@@ -16,15 +19,35 @@ const Lbtn = () => {
     const handleFocus2 = (label) => {
         setFocusedInput2(label);
     };
-      const handleChangeLogin = (e) => {
-        e.preventDefault()
-        const { name, value } = e.target;
-        setInputValues2({
-            ...inputValues2,
-            [name]: value
-        });
+    //   const handleChangeLogin = (e) => {
+    //     e.preventDefault()
+    //     const { name, value } = e.target;
+    //     setInputValues2({
+    //         ...inputValues2,
+    //         [name]: value
+    //     });
     
+    // };
+
+    const handleChangeLogin = (eventOrValue) => {
+        let name, value;
+    
+        if (eventOrValue && eventOrValue.target) {
+            // Standard input event
+            name = eventOrValue.target.name;
+            value = eventOrValue.target.value;
+        } else {
+            // PhoneInput or other components providing direct values
+            name = 'Phone_number'; // Adjust if needed
+            value = eventOrValue;
+        }
+    
+        setInputValues2(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
     };
+
     const { isDeposited, PostDeposite} = useDeposite()
       const {loading, isWithdrowal, PostWithdrowal} = useWithdrowal()
       const handleWithdrowaleSubmit = async (e) => {
@@ -41,7 +64,7 @@ const Lbtn = () => {
     }
   return (
     <div className='w-full flex flex-row justify-around align-middle gap-5'>
-        <Button className='w-2/5 border-none outline-none bg-base-100 btn btn-outline btn-accent' onClick={()=>document.getElementById('my_modal_4').showModal()}>Cash Out</Button>
+        <Button className='w-2/5 border-accent text-tiny text-accent outline-none bg-base-100 btn btn-outline btn-accent' onClick={()=>document.getElementById('my_modal_4').showModal()}>Cash Out</Button>
                 <dialog id="my_modal_4" className="modal">
                     <div className="modal-box">
                         <form method="dialog">
@@ -54,14 +77,38 @@ const Lbtn = () => {
                                             <label htmlFor={field} className={`absolute ${inputValues2[field] ? 'trans2' : (focusedInput2 === field ? 'trans' : '')}`}>
                                                 {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1').trim()}
                                             </label>
-                                            <input
+                                            {/* <input
                                                 id={field}
                                                 name={field}
                                                 className="bg-transparent"
                                                 onChange={handleChangeLogin}
                                                 type={field.includes('Phone_number' && 'Amount') ? 'number' : 'text'}
                                                 onFocus={() => handleFocus2(field)}
+                                            /> */}
+
+                                            {field === 'Phone_number' ? (
+                                                <PhoneInput
+                                                    country={'rw'} // Default country code
+                                                    value={inputValues2[field]} // Your state value
+                                                    onChange={(phone) => handleChangeLogin({ target: { name: field, value: phone } })} // Handle change
+                                                    inputProps={{
+                                                        name: field,
+                                                        required: true,
+                                                        autoFocus: focusedInput2 === field
+                                                    }}
+                                                    inputClass="bg-transparent"
+                                                    className='bg-base-100 w-full'
+                                                />
+                                            ) : (
+                                                <input
+                                                id={field}
+                                                name={field}
+                                                className="bg-transparent"
+                                                onChange={handleChangeLogin}
+                                                type='number'
+                                                onFocus={() => handleFocus2(field)}
                                             />
+                                            )}
                                         </div>
                                     ))}
                                     <div className='mt-10'>
@@ -73,7 +120,7 @@ const Lbtn = () => {
                                 </form>
                     </div>
                 </dialog>
-                <Button className='w-2/5 border-none outline-none bg-base-100 btn btn-outline btn-accent' onClick={()=>document.getElementById('my_modal_3').showModal()}>Cash In</Button>
+                <Button className='w-2/5 border-accent text-tiny text-accent outline-none bg-base-100 btn btn-outline btn-accent' onClick={()=>document.getElementById('my_modal_3').showModal()}>Cash In</Button>
                 <dialog id="my_modal_3" className="modal">
                     <div className="modal-box">
                         <form method="dialog">
@@ -86,18 +133,42 @@ const Lbtn = () => {
                                             <label htmlFor={field} className={`absolute ${inputValues2[field] ? 'trans2' : (focusedInput2 === field ? 'trans' : '')}`}>
                                                 {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1').trim()}
                                             </label>
-                                            <input
+                                            {/* <input
                                                 id={field}
                                                 name={field}
                                                 className="bg-transparent"
                                                 onChange={handleChangeLogin}
                                                 type={field.includes('Phone_number' && 'Amount') ? 'number' : 'text'}
                                                 onFocus={() => handleFocus2(field)}
-                                            />
+                                            /> */}
+
+                                            {field === 'Phone_number' ? (
+                                                <PhoneInput
+                                                    country={'rw'} // Default country code
+                                                    value={inputValues2[field]} // Your state value
+                                                    onChange={(phone) => handleChangeLogin({ target: { name: field, value: phone } })} // Handle change
+                                                    inputProps={{
+                                                        name: field,
+                                                        required: true,
+                                                        autoFocus: focusedInput2 === field
+                                                    }}
+                                                    inputClass="bg-transparent"
+                                                    className='bg-transparent'
+                                                />
+                                            ) : (
+                                                <input
+                                                    id={field}
+                                                    name={field}
+                                                    className="bg-transparent"
+                                                    onChange={handleChangeLogin}
+                                                    type={field === 'Amount' ? 'number' : 'text'}
+                                                    onFocus={() => handleFocus2(field)}
+                                                />
+                                            )}
                                         </div>
                         ))}
                     <div className='mt-10'>
-                        <button className="btn btn-outline btn-accent" type='submit'>Cash In</button>
+                        <Button className='border-none outline-none bg-base-100 btn btn-outline btn-accent' type='submit'>Cash In</Button>
                     </div>
                     <div className='relative mt-20'>
                         <p>Cash In request {loading ? <span className='loading loading-ring '></span> : isDeposited ? <span className='text-fuchsia-500 '> Success</span> : <span className='text-info'> Start</span>}</p>

@@ -596,12 +596,12 @@ const Lhome = () => {
                             <p>
                                 {truncateString(task.Description, 90)}
                             </p>
-                            <span className="pt-2">
+                            {/* <span className="pt-2">
                             #FrontendWithZoey 
                             <span className="py-2" aria-label="computer" role="img">
                                 💻
                             </span>
-                            </span>
+                            </span> */}
                         </CardBody>
                         <CardFooter className="gap-3 w-full flex justify-between">
                             <div className="flex gap-1 flex-col">
@@ -627,7 +627,7 @@ const Lhome = () => {
                                         <Card>
                                             <CardHeader className="justify-between">
                                                 <div className="flex gap-5">
-                                                <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
+                                                <Avatar showFallback src='https://images.unsplash.com/broken' />
                                                 <div className="flex flex-col gap-1 items-start justify-center">
                                                     <h4 className="text-small font-semibold leading-none text-default-600">{task.FULL_NAME}</h4>
                                                     <h5 className="text-small tracking-tight text-default-400">@{task.userName}</h5>
@@ -644,30 +644,31 @@ const Lhome = () => {
                                             <div className='w-full inline-block'>
                                                 {task.Description}
                                             </div>
-                                            <div className='w-full flex flex-col'>
-                                                <div className='w-2/4 flex flex-col'>
-                                                    <div>Amount</div>
-                                                    <div>{task.Amount} FRW</div>
-                                                </div>
-                                                <div className='w-2/4 flex flex-col'>
-                                                    <div>Duration</div>
-                                                    <div>{task.Duration}</div>
+                                            <div className='w-full flex flex-col mt-4'>
+                                                <div className='flex justify-between'>
+                                                    <div className='w-2/5 flex flex-col'>
+                                                        <h2 className='text-info'>Amount</h2>
+                                                        <h3>{task.Amount} FRW</h3>
+                                                    </div>
+                                                    <div className='w-2/5 flex flex-col'>
+                                                        <h2 className='text-info'>Duration</h2>
+                                                        <h3>{task.Duration}</h3>
+                                                    </div>
                                                 </div>
                                                 <div className='w-full flex justify-between flex-row'>
                                                     <div className='w-2/5 flex flex-col'>
-                                                        <div>Start date</div>
-                                                        <div>{formatDate(task.Start_date)}</div>
+                                                        <h2 className='text-info'>Start date</h2>
+                                                        <h3>{formatDate(task.Start_date)}</h3>
                                                     </div>
                                                     <div className='w-2/5 flex flex-col'>
-                                                        <div>End date</div>
-                                                        <div>{formatDate(task.End_date)}</div>
+                                                        <h2 className='text-info'>End date</h2>
+                                                        <h3>{formatDate(task.End_date)}</h3>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="w-full flex flex-col mt-4">
                                                 <h1 className="text-info">Our Contact</h1>
-                                                <div className="w-full flex flex-col">
-                                                    <div>Contact info</div>
+                                                <div className="w-full flex flex-col gap-2 mt-4">
                                                     <div><Snippet>{task.Phone_number}</Snippet></div>
                                                     <div><Snippet>{task.EMAIL}</Snippet></div>
                                                 </div>
@@ -1343,7 +1344,7 @@ const Lhome = () => {
                                                                             <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
                                                                             <div className="flex flex-col gap-1 items-start justify-center">
                                                                                 <h4 className="text-small font-semibold leading-none text-default-600">{apply.Agreement}</h4>
-                                                                                <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}, {apply.taskId}</h5>
+                                                                                <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}</h5>
                                                                             </div>
                                                                         </div>
                                                                         {/* <div className="flex w-2/6">
@@ -1356,19 +1357,21 @@ const Lhome = () => {
                                                                     <h1 className="text-default-500 tracking-tight">Job description</h1>
                                                                     <h2 className="text-small tracking-tight text-default-500">Job titile : {apply.Agreement}</h2>
                                                                     <div className='w-full inline-block mt-3'>
-                                                                        {truncateString(apply.description, 90)}
+                                                                        {apply.description}
                                                                     </div>
                                                                     {/* <div className='w-full inline-block mt-3'>
                                                                     this is specification
                                                                     </div> */}
                                                                     <div className='w-full flex flex-col'>
-                                                                        <div className='w-2/4 flex flex-col mt-2'>
-                                                                            <div>Amount</div>
-                                                                            <div>{apply.Amount} FRW</div>
-                                                                        </div>
-                                                                        <div className='w-2/4 flex flex-col mt-2'>
-                                                                            <div>Duration</div>
-                                                                            <div>{apply.Duration}</div>
+                                                                        <div className='flex justify-between'>
+                                                                            <div className='w-2/4 flex flex-col mt-2'>
+                                                                                <h2 className='text-info'>Amount</h2>
+                                                                                <h3>{apply.Amount} FRW</h3>
+                                                                            </div>
+                                                                            <div className='w-2/4 flex flex-col mt-2'>
+                                                                                <h2 className='text-info'>Duration</h2>
+                                                                                <h3>{apply.Duration}</h3>
+                                                                            </div>
                                                                         </div>
                                                                         <div className='w-full flex justify-between gap-5 flex-row mt-2'>
                                                                             <div className='w-full flex flex-col'>
@@ -1383,10 +1386,9 @@ const Lhome = () => {
                                                                     </div>
                                                                     <div className="w-full flex flex-col mt-4">
                                                                         <h1 className="text-info">Our Contact</h1>
-                                                                        <div className="w-full flex flex-col">
-                                                                            <div>Contact info</div>
-                                                                            <div><Snippet>{apply.APPLYING_TEL}</Snippet></div>
-                                                                            <div><Snippet>{apply.APPLYING_EMAIL}</Snippet></div>
+                                                                        <div className="w-full flex flex-col gap-2">
+                                                                            <h3><Snippet>{apply.APPLYING_TEL}</Snippet></h3>
+                                                                            <h3><Snippet>{apply.APPLYING_EMAIL}</Snippet></h3>
                                                                         </div>
                                                                     </div>
                                                                     <div className="w-full flex flex-row justify-between gap-5 mt-10">
@@ -1409,7 +1411,7 @@ const Lhome = () => {
                                                     </span>
                                                 </span>
                                                 <div>
-                                                    {apply.description}
+                                                    {truncateString(apply.description, 90)}
                                                 </div>
                                             </CardBody>
                                         </Card>
@@ -1475,31 +1477,32 @@ const Lhome = () => {
                                                                     this is specification
                                                                 </div> */}
                                                                 <div className='w-full flex flex-col'>
-                                                                    <div className='w-2/4 flex flex-col mt-2'>
-                                                                        <div>Amount</div>
-                                                                        <div>{invite.Amount} FRW</div>
-                                                                    </div>
-                                                                    <div className='w-2/4 flex flex-col mt-2'>
-                                                                        <div>Duration</div>
-                                                                        <div>{invite.Duration}</div>
+                                                                    <div className='flex justify-between'>
+                                                                        <div className='w-2/4 flex flex-col mt-2'>
+                                                                            <h2 className='text-info'>Amount</h2>
+                                                                            <h3>{invite.Amount} FRW</h3>
+                                                                        </div>
+                                                                        <div className='w-2/4 flex flex-col mt-2'>
+                                                                            <h2 className='text-info'>Duration</h2>
+                                                                            <h3>{invite.Duration}</h3>
+                                                                        </div>
                                                                     </div>
                                                                     <div className='w-full flex justify-between gap-5 flex-row mt-2'>
                                                                         <div className='w-full flex flex-col'>
-                                                                            <div>Start date</div>
-                                                                            <div>{formatDate (invite.Start_date)}</div>
+                                                                            <h2 className='text-info'>Start date</h2>
+                                                                            <h3>{formatDate (invite.Start_date)}</h3>
                                                                         </div>
                                                                         <div className='w-full flex flex-col'>
-                                                                            <div>End date</div>
-                                                                            <div>{formatDate (invite.End_date)}</div>
+                                                                            <h2 className='text-info'>End date</h2>
+                                                                            <h3>{formatDate (invite.End_date)}</h3>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                                 <div className="w-full flex flex-col mt-4">
                                                                     <h1 className="text-info">Our Contact</h1>
-                                                                    <div className="w-full flex flex-col">
-                                                                        <div>Contact info</div>
-                                                                        <div><Snippet>{invite.INVITER_TEL }</Snippet></div>
-                                                                        <div><Snippet>{invite.INVITER_EMAIL}</Snippet></div>
+                                                                    <div className="w-full flex flex-col gap-2">
+                                                                        <h3><Snippet>{invite.INVITER_TEL }</Snippet></h3>
+                                                                        <h3><Snippet>{invite.INVITER_EMAIL}</Snippet></h3>
                                                                     </div>
                                                                 </div>
                                                                 <div className="w-full flex flex-row justify-between gap-5 mt-10">
@@ -1518,7 +1521,7 @@ const Lhome = () => {
                                             <div>
                                                 <span className="flex flex-col">
                                                     <span className="pt-2 text-default-700">{invite.inviter} has job for you</span>
-                                                    <span>{invite.Description}</span>
+                                                    <span>{truncateString(invite.Description, 90)}</span>
                                                 </span>
                                             </div>
                                             <span className="pt-2 text-default-700">
@@ -1573,7 +1576,7 @@ const Lhome = () => {
                                                                         <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" />
                                                                         <div className="flex flex-col gap-1 items-start justify-center">
                                                                             <h4 className="text-small font-semibold leading-none text-default-600">{apply.Agreement}</h4>
-                                                                            <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}, {apply.taskId}</h5>
+                                                                            <h5 className="text-small tracking-tight text-default-400">@{apply.APPLYING_USERNAME}</h5>
                                                                         </div>
                                                                     </div>
                                                                     {/* <div className="flex w-2/6">
@@ -1586,37 +1589,38 @@ const Lhome = () => {
                                                                 <h1 className="text-default-500 tracking-tight">Job description</h1>
                                                                 <h2 className="text-small tracking-tight text-default-500">Job titile : {apply.Agreement}</h2>
                                                                 <div className='w-full inline-block mt-3'>
-                                                                    {truncateString(apply.description, 90)}
+                                                                    {apply.description}
                                                                 </div>
                                                                 {/* <div className='w-full inline-block mt-3'>
                                                                 this is specification
                                                                 </div> */}
                                                                 <div className='w-full flex flex-col'>
-                                                                    <div className='w-2/4 flex flex-col mt-2'>
-                                                                        <div>Amount</div>
-                                                                        <div>{apply.Amount} FRW</div>
-                                                                    </div>
-                                                                    <div className='w-2/4 flex flex-col mt-2'>
-                                                                        <div>Duration</div>
-                                                                        <div>{apply.Duration}</div>
+                                                                    <div className='flex justify-between'>
+                                                                        <div className='w-2/4 flex flex-col mt-2'>
+                                                                            <h2 className='text-info'>Amount</h2>
+                                                                            <h3>{apply.Amount} FRW</h3>
+                                                                        </div>
+                                                                        <div className='w-2/4 flex flex-col mt-2'>
+                                                                            <h2 className='text-info'>Duration</h2>
+                                                                            <h3>{apply.Duration}</h3>
+                                                                        </div>
                                                                     </div>
                                                                     <div className='w-full flex justify-between gap-5 flex-row mt-2'>
                                                                         <div className='w-full flex flex-col'>
-                                                                            <div>Start date</div>
-                                                                            <div>{formatDate (apply.Start_date)}</div>
+                                                                            <h2 className='text-info'>Start date</h2>
+                                                                            <h3>{formatDate (apply.Start_date)}</h3>
                                                                         </div>
                                                                         <div className='w-full flex flex-col'>
-                                                                            <div>End date</div>
-                                                                            <div>{formatDate (apply.End_date)}</div>
+                                                                            <h2 className='text-info'>End date</h2>
+                                                                            <h3>{formatDate (apply.End_date)}</h3>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                                 <div className="w-full flex flex-col mt-4">
                                                                     <h1 className="text-info">Our Contact</h1>
-                                                                    <div className="w-full flex flex-col">
-                                                                        <div>Contact info</div>
-                                                                        <div><Snippet>{apply.APPLYING_TEL}</Snippet></div>
-                                                                        <div><Snippet>{apply.APPLYING_EMAIL}</Snippet></div>
+                                                                    <div className="w-full flex flex-col gap-2">
+                                                                        <h3><Snippet>{apply.APPLYING_TEL}</Snippet></h3>
+                                                                        <h3><Snippet>{apply.APPLYING_EMAIL}</Snippet></h3>
                                                                     </div>
                                                                 </div>
                                                                 <div className="w-full flex flex-row justify-between gap-5 mt-10">
@@ -1639,7 +1643,7 @@ const Lhome = () => {
                                                 </span>
                                             </span>
                                             <div>
-                                                {apply.description}
+                                                {truncateString(apply.description, 90)}
                                             </div>
                                         </CardBody>
                                     </Card>
@@ -1708,31 +1712,32 @@ const Lhome = () => {
                                                     this is specification
                                                     </div> */}
                                                     <div className='w-full flex flex-col'>
-                                                        <div className='w-2/4 flex flex-col mt-2'>
-                                                            <div>Amount</div>
-                                                            <div>{invite.Amount} FRW</div>
-                                                        </div>
-                                                        <div className='w-2/4 flex flex-col mt-2'>
-                                                            <div>Duration</div>
-                                                            <div>{invite.Duration}</div>
+                                                        <div className='text-info'>
+                                                            <div className='w-2/4 flex flex-col mt-2'>
+                                                                <h2 className='text-info'>Amount</h2>
+                                                                <h3>{invite.Amount} FRW</h3>
+                                                            </div>
+                                                            <div className='w-2/4 flex flex-col mt-2'>
+                                                                <h2 className='text-info'>Duration</h2>
+                                                                <h3>{invite.Duration}</h3>
+                                                            </div>
                                                         </div>
                                                         <div className='w-full flex justify-between gap-5 flex-row mt-2'>
                                                             <div className='w-full flex flex-col'>
-                                                                <div>Start date</div>
-                                                                <div>{formatDate (invite.Start_date)}</div>
+                                                                <h2 className='text-info'>Start date</h2>
+                                                                <h3>{formatDate (invite.Start_date)}</h3>
                                                             </div>
                                                             <div className='w-full flex flex-col'>
-                                                                <div>End date</div>
-                                                                <div>{formatDate (invite.End_date)}</div>
+                                                                <h2 className='text-info'>End date</h2>
+                                                                <h3>{formatDate (invite.End_date)}</h3>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div className="w-full flex flex-col mt-4">
                                                         <h1 className="text-info">Our Contact</h1>
-                                                        <div className="w-full flex flex-col">
-                                                            <div>Contact info</div>
-                                                            <div><Snippet>{invite.INVITER_TEL }</Snippet></div>
-                                                            <div><Snippet>{invite.INVITER_EMAIL}</Snippet></div>
+                                                        <div className="w-full flex flex-col gap-2">
+                                                            <h3><Snippet>{invite.INVITER_TEL }</Snippet></h3>
+                                                            <h3><Snippet>{invite.INVITER_EMAIL}</Snippet></h3>
                                                         </div>
                                                     </div>
                                                     <div className="w-full flex flex-row justify-between gap-5 mt-10">
@@ -1751,7 +1756,7 @@ const Lhome = () => {
                                 <div>
                                     <span className="flex flex-col">
                                         <span className="pt-2 text-default-700">{invite.inviter} has job for you</span>
-                                        <span>{invite.Description}</span>
+                                        <span>{truncateString(invite.Description, 90)}</span>
                                     </span>
                                 </div>
                                 <span className="pt-2 text-default-700">

@@ -12,6 +12,10 @@ import usegetTaskView from '../../hook/getTask/useTaskView.js';
 import usegetTaskTaker from '../../hook/getTask/getTaskTaker.js';
 import useGetInvite from '../../hook/Invitation/useGetInvite.js';
 import inviteData from '../../hook/Invitation/inviteData.js';
+
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
+
 const dashboard = () => {
     const [isHome, setIsHome] = useState(true)
   const [isTask, setIsTask] = useState(false);
@@ -93,23 +97,45 @@ const [isScrolled, setIsScrolled] = useState(false)
 const handleFocus2 = (label) => {
     setFocusedInput2(label);
 };
-  const handleChangeLogin = (e) => {
-    e.preventDefault()
-    const { name, value } = e.target;
-    setInputValues2({
-        ...inputValues2,
-        [name]: value
-    });
+//   const handleChangeLogin = (e) => {
+//     e.preventDefault()
+//     const { name, value } = e.target;
+//     setInputValues2({
+//         ...inputValues2,
+//         [name]: value
+//     });
 
+// };
+
+const handleChangeLogin = (eventOrValue) => {
+    let name, value;
+
+    if (eventOrValue && eventOrValue.target) {
+        // Standard input event
+        name = eventOrValue.target.name;
+        value = eventOrValue.target.value;
+    } else {
+        // PhoneInput or other components providing direct values
+        name = 'Phone_number'; // Adjust if needed
+        value = eventOrValue;
+    }
+
+    setInputValues2(prevState => ({
+        ...prevState,
+        [name]: value
+    }));
 };
-const { isDeposited, PostDeposite} = useDeposite();
+
+const { isDeposited, PostDeposite } = useDeposite();
 
 const handleDepositeSubmit = async (e) => {
     e.preventDefault();
-    const {Phone_number, Amount} = inputValues2
-    console.log('inputs :', inputValues2)
-    await PostDeposite(inputValues2)
-}
+    const { Phone_number, Amount} = inputValues2;
+    console.log('inputs :', inputValues2);
+    await PostDeposite(inputValues2);
+};
+
+
 const { isWithdrowal, PostWithdrowal} = useWithdrowal();
 
 const handleWithdrowaleSubmit = async (e) => {
@@ -130,7 +156,7 @@ const getRowStyle = (item) => {
     return {};
   };
   const {inviteTaskDash} = inviteData(activeButton)
-  console.log('invitee task :', inviteTaskDash)
+  //console.log('invitee task :', inviteTaskDash)
   return (
     <div className="w-full flex flex-col overflow-auto">
         <div className=" w-full">
@@ -188,27 +214,50 @@ const getRowStyle = (item) => {
             </div>
 
             <div className='w-full flex flex-row mt-4 justify-center gap-4 py-2'>
-                <Button className='w-2/5 border-none outline-none bg-base-100' onClick={()=>document.getElementById('my_modal_3').showModal()}>Cash IN</Button>
+                <Button className='w-2/5 border-accent text-tiny text-accent outline-none bg-base-100' onClick={()=>document.getElementById('my_modal_3').showModal()}>Cash IN</Button>
                 <dialog id="my_modal_3" className="modal">
                     <div className="modal-box">
                         <form method="dialog">
                         <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                         </form>
-                        <h3 className="font-bold text-lg">Cash IN!</h3>
+                        <h3 className="font-bold text-lg">Cash IN! In FRW</h3>
                         <form className='flex w-full flex-col align-middle justify-center' onSubmit={handleDepositeSubmit}>
                                     {['Amount', 'Phone_number'].map((field) => (
                                         <div key={field} className='flex w-full flex-col inputGroup'>
                                             <label htmlFor={field} className={`absolute ${inputValues2[field] ? 'trans2' : (focusedInput2 === field ? 'trans' : '')}`}>
                                                 {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1').trim()}
                                             </label>
-                                            <input
+                                            {/* <input
                                                 id={field}
                                                 name={field}
                                                 className="bg-transparent"
                                                 onChange={handleChangeLogin}
                                                 type={field.includes('Phone_number' && 'Amount') ? 'number' : 'text'}
                                                 onFocus={() => handleFocus2(field)}
-                                            />
+                                            /> */}
+                                            {field === 'Phone_number' ? (
+                                                <PhoneInput
+                                                    country={'rw'} // Default country code
+                                                    value={inputValues2[field]} // Your state value
+                                                    onChange={(phone) => handleChangeLogin({ target: { name: field, value: phone } })} // Handle change
+                                                    inputProps={{
+                                                        name: field,
+                                                        required: true,
+                                                        autoFocus: focusedInput2 === field
+                                                    }}
+                                                    inputClass="bg-transparent"
+                                                    className='bg-transparent'
+                                                />
+                                            ) : (
+                                                <input
+                                                    id={field}
+                                                    name={field}
+                                                    className="bg-transparent"
+                                                    onChange={handleChangeLogin}
+                                                    type={field === 'Amount' ? 'number' : 'text'}
+                                                    onFocus={() => handleFocus2(field)}
+                                                />
+                                            )}
                                         </div>
                                     ))}
                                     <div className='mt-10'>
@@ -220,27 +269,51 @@ const getRowStyle = (item) => {
                                 </form>
                     </div>
                 </dialog>
-                <Button className='w-2/5 border-none outline-none bg-base-100' onClick={()=>document.getElementById('my_modal_4').showModal()}>Cash Out</Button>
+                <Button className='w-2/5 border-accent outline-none bg-base-100 text-tiny text-accent' onClick={()=>document.getElementById('my_modal_4').showModal()}>Cash Out</Button>
                 <dialog id="my_modal_4" className="modal">
                     <div className="modal-box">
                         <form method="dialog">
                             <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                         </form>
-                        <h3 className="font-bold text-lg">Cash Out!</h3>
+                        <h3 className="font-bold text-lg">Cash Out! In FRW</h3>
                         <form className='flex w-full flex-col align-middle justify-center' onSubmit={handleWithdrowaleSubmit}>
                                     {['Amount', 'Phone_number'].map((field) => (
                                         <div key={field} className='flex w-full flex-col inputGroup'>
                                             <label htmlFor={field} className={`absolute ${inputValues2[field] ? 'trans2' : (focusedInput2 === field ? 'trans' : '')}`}>
                                                 {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1').trim()}
                                             </label>
-                                            <input
+                                            {/* <input
                                                 id={field}
                                                 name={field}
                                                 className="bg-transparent"
                                                 onChange={handleChangeLogin}
                                                 type={field.includes('Phone_number' || 'Amount') ? 'number' : 'text'}
                                                 onFocus={() => handleFocus2(field)}
+                                            /> */}
+                                            {field === 'Phone_number' ? (
+                                                <PhoneInput
+                                                    country={'rw'} // Default country code
+                                                    value={inputValues2[field]} // Your state value
+                                                    onChange={(phone) => handleChangeLogin({ target: { name: field, value: phone } })} // Handle change
+                                                    inputProps={{
+                                                        name: field,
+                                                        required: true,
+                                                        autoFocus: focusedInput2 === field
+                                                    }}
+                                                    inputClass="bg-transparent"
+                                                    className='bg-base-100'
+                                                />
+                                            ) : (
+                                                <input
+                                                id={field}
+                                                name={field}
+                                                className="bg-transparent"
+                                                onChange={handleChangeLogin}
+                                                type='number'
+                                                onFocus={() => handleFocus2(field)}
                                             />
+                                            )}
+
                                         </div>
                                     ))}
                                     <div className='mt-10'>

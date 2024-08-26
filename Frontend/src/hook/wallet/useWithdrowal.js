@@ -11,7 +11,7 @@ const [isWithdrowal, setIsWithdrowal] = useState(null)
     try{
         const token = localStorage.getItem('on-user')
 
-        const res = await axios.post('/api/A/C/withdrow', {
+        const res = await axios.post('/api/A/C/cash-out', {
             Amount,
             Phone_number
         }, {

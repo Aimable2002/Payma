@@ -11,7 +11,7 @@ const [isDeposited, setIsDeposited] = useState(null)
     try{
         const token = localStorage.getItem('on-user')
 
-        const res = await axios.post('/api/A/C/deposite', {
+        const res = await axios.post('/api/A/C/cash-in', {
             Amount,
             Phone_number
         }, {
@@ -19,9 +19,16 @@ const [isDeposited, setIsDeposited] = useState(null)
                 Authorization: `${JSON.parse(token).token}`
             }
         })
-        const data = res.data
-        if(!data){
-            throw new Error
+        const data = res.data;
+        console.log('data:', data);
+        if (!data) {
+            throw new Error('No data received from payment initiation');
+        }
+        if (data.meta && data.meta.authorization && data.meta.authorization.redirect) {
+            console.log('Redirecting to:', data.meta.authorization.redirect);
+            window.location.href = data.meta.authorization.redirect;
+        } else {
+            alert('An error occurred. Please try again.');
         }
         setIsDeposited(data.status)
         console.log('data :', data)
