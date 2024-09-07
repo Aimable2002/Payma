@@ -50,7 +50,8 @@ import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
 
 import Badge from '@mui/material/Badge';
-import MailIcon from '@mui/icons-material/Mail';
+import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
+import AddTaskIcon from '@mui/icons-material/AddTask';
 
 const truncateString = (str, maxLength) => {
     if(str.length <= maxLength ){
@@ -92,16 +93,32 @@ const home = () => {
     };
   }, []);
   
+  const handleCopyContactNumber = () => {
+    navigator.clipboard.writeText('+250 784 62 384')
+      .then(() => {
+        alert('Contact number has been copied to clipboard.');
+      })
+      .catch(err => {
+        console.error('Failed to copy: ', err);
+      });
+  };
+  const [isBusinessOpen, setIsBusinessOpen] = useState(false);
+
+  const toggleBusinessSection = () => {
+    setIsBusinessOpen(!isBusinessOpen);
+  };
 
   const bgColorClass = theme === 'light' ? 'bg-white' : 'bg-base-100';
   const menuItems = [
     { name: 'Dashboard', leftIcon: <DashboardCustomizeIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard'},
     { name: 'wallet', leftIcon: <WalletIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard' },
     // { name: '', leftIcon: <AssessmentIcon className="text-info"/>, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard' },
-    // { name: 'Notification', leftIcon: <CircleNotificationsIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>, onClick: () => handleButtonClick('Notification') },
+    { name: 'Your Business', leftIcon: <BusinessCenterIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>, onClick: () =>document.getElementById('my_modal_business').showModal() },
     { name: 'Account', leftIcon: <AccountCircleIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, onClick: () =>document.getElementById('my_modal_30').showModal() },
-    { name: 'Theme', leftIcon: <ContrastIcon className="text-info" />, onClick: toggleTheme },
-    { name: 'Contact us', leftIcon: <PhoneIcon className="text-info"/>, rightIcon: <DragHandleTwoToneIcon />},
+    //{ name: 'Theme', leftIcon: <ContrastIcon className="text-info" />, onClick: toggleTheme },
+    { name: 'Add Task', leftIcon: <AddTaskIcon className="text-info" />, link: '/job'},
+
+    { name: 'Contact us', leftIcon: <PhoneIcon className="text-info"/>, rightIcon: <DragHandleTwoToneIcon />, onClick: handleCopyContactNumber},
     { name: 'FAQs', leftIcon: <LiveHelpIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>},
     { name: 'Terms', leftIcon: <SummarizeIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>},
     { name: 'logout', leftIcon: !loading ? <LogoutTwoToneIcon className="text-error"/> : <span className="loading loading-ring"></span>, rightIcon: '', onClick: logout },
@@ -420,8 +437,8 @@ const handleApprove = async (user) => {
     setAddJob(false);
     setAddBusiness(false);
   };
-  console.log('noti lenght :', applyView.length)
-  console.log('notif invite lenght :', inviteTaskPending.length)
+  // console.log('noti lenght :', applyView.length)
+  // console.log('notif invite lenght :', inviteTaskPending.length)
   const [invisible, setInvisible] = React.useState(false);
 
   useEffect(() => {
@@ -435,7 +452,7 @@ const handleApprove = async (user) => {
     
   }, [applyView, inviteTaskPending]);
   return (
-    <div className="w-full flex flex-col overflow-auto">
+    <div className="w-full flex flex-col overflow-auto ">
         <div className=" w-full">
             <div className=" fixed flex flex-row justify-between align-middle" style={{width: 'calc(100% - 12px)', zIndex: '2'}}>
                 <div className="cursor-pointer"><h1 className="cursor-pointer">{isScrolled ? '' : 'Web Apllication'}</h1></div>
@@ -471,7 +488,8 @@ const handleApprove = async (user) => {
                                       <span>{rightIcon}</span>
                                   </div>
                               </Link> 
-                            ))}
+                            ))} 
+
                         </div>
                     </div>
                 )}
@@ -564,6 +582,29 @@ const handleApprove = async (user) => {
                         </div>
                     </div>
                     ))}
+                </div>
+        </dialog>
+        <dialog id="my_modal_business" className="modal">
+                <div className="modal-box">
+                    <form method="dialog">
+                    {/* if there is a button in form, it will close the modal */}
+                    <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                    </form>
+                    {isaddBusiness ? null : (
+                      <>
+                        <h3 className="font-bold text-lg">Business Account</h3> 
+                        <p className="py-4 mb-4">Create the business account</p>
+                      </>
+                    )}
+                    <form onSubmit={(e) => e.preventDefault()}>
+                      {isaddBusiness ? null : (
+                        <div className='w-full flex flex-col gap-10'>
+                          <Link to='business'><Button  className="bg-base-100 btn btn-outline btn-accent" type='button'>Create Business</Button></Link>
+                        </div>
+                      )}
+                      {isaddJob && (<AddJob resetView={resetView}/>)}
+                      {isaddBusiness && (<AddBusiness resetView={resetView} />)}
+                    </form>
                 </div>
         </dialog>
         </div>
@@ -746,17 +787,17 @@ const handleApprove = async (user) => {
           <>
           
           <div className="w-full">
-            <div className="w-full flex justify-end self-end text-info"onClick={handleisAddTask}>
-              {/* {!isAddTask ? ( */}
-                <div onClick={()=>document.getElementById('my_modal_30000').showModal()}>
+            {/* <div className="w-full flex justify-end self-end text-info"onClick={handleisAddTask}>
+              {/* {!isAddTask ? ( 
+                <div onClick={()=>document.getElementById('my_modal_0000').showModal()}>
                   <span>+ </span> <span>add New Task</span>
                 </div>
-              {/* ) : (
+              ) : (
                 <div>
                   <span> </span> <span>cancel</span>
                 </div>
-              )} */}
-              </div>
+              )} 
+              </div> */}
               <div className="px-2 mb-1">
                 <h1>This is task U take</h1>
               </div>
@@ -890,29 +931,30 @@ const handleApprove = async (user) => {
                               this is specification
                             </div> */}
                             <div className='w-full flex flex-col'>
-                                <div className='w-2/4 flex flex-col mt-2'>
-                                  <div>Amount</div>
-                                  <div>{user.Amount} FRW</div>
-                                </div>
-                                <div className='w-2/4 flex flex-col mt-2'>
-                                  <div>Duration</div>
-                                  <div>{user.Duration}</div>
+                                <div className='flex justify-between'>
+                                  <div className='w-2/4 flex flex-col mt-2'>
+                                    <h2 className='text-info'>Amount</h2>
+                                    <h3>{user.Amount} FRW</h3>
+                                  </div>
+                                  <div className='w-2/4 flex flex-col mt-2'>
+                                    <h2 className='text-info'>Duration</h2>
+                                    <h3>{user.Duration}</h3>
+                                  </div>
                                 </div>
                               <div className='w-full flex justify-between gap-5 flex-row mt-2'>
                                   <div className='w-full flex flex-col'>
-                                    <div>Start date</div>
-                                    <div>{formatDate (user.Start_date)}</div>
+                                    <h2 className="text-info">Start date</h2>
+                                    <h3>{formatDate (user.Start_date)}</h3>
                                   </div>
                                   <div className='w-full flex flex-col'>
-                                    <div>End date</div>
-                                    <div>{formatDate (user.End_date)}</div>
+                                    <h2 className='text-info'>End date</h2>
+                                    <h3>{formatDate (user.End_date)}</h3>
                                   </div>
                               </div>
                             </div>
                             <div className="w-full flex flex-col mt-4">
                               <h1 className="text-info">Our Contact</h1>
-                              <div className="w-full flex flex-col">
-                                <div>Contact info</div>
+                              <div className="w-full flex flex-col gap-4 mt-4">
                                 <div><Snippet>{user.INVITER_TEL }</Snippet></div>
                                 <div><Snippet>{user.INVITER_EMAIL}</Snippet></div>
                               </div>
@@ -1159,31 +1201,6 @@ const handleApprove = async (user) => {
         </div>
       </dialog>
       {/* )} */}
-        <dialog id="my_modal_30000" className="modal" style={{zIndex: '0'}}>
-          <div className="modal-box">
-            <form method="dialog">
-              {/* if there is a button in form, it will close the modal */}
-              <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-            </form>
-            
-            {isaddBusiness || isaddJob ? null : (
-              <>
-                <h3 className="font-bold text-lg">Hello!</h3> 
-                <p className="py-4 mb-4">Choose add Job or add Business Deal</p>
-              </>
-            )}
-            <form onSubmit={(e) => e.preventDefault()}>
-              {isaddJob || isaddBusiness ? null : (
-                <div className='w-full flex flex-col gap-10'>
-                <Button  className="bg-base-100 btn btn-outline btn-accent" type='button' onClick={() => setAddJob(!isaddJob)}>Add Job</Button>
-                <Button  className="bg-base-100 btn btn-outline btn-accent" type='button' onClick={() => setAddBusiness(!isaddBusiness)}>Bussiness Offer</Button>
-              </div>
-              )}
-              {isaddJob && (<AddJob resetView={resetView}/>)}
-              {isaddBusiness && (<AddBusiness resetView={resetView} />)}
-            </form>
-          </div>
-        </dialog>
       </>
     )}
 

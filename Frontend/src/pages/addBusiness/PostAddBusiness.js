@@ -48,24 +48,24 @@ import React, { useState } from 'react'
 const PostAddBusiness = () => {
     const [loading, setLoading] = useState(false);
 
-    const postBusiness = async (Business_Category, Description, Quantity, Amount, District, Product, Location) => {
+    const postBusiness = async (Business_Category, Description, Quantity, Amount, Product) => {
         
         const Business_Category1 = Business_Category.Business_Category
         const Description1 = Business_Category.Description
         const Quantity1 = Business_Category.Quantity
         const Amount1 = Business_Category.Amount
-        const District1 = Business_Category.District
+        // const District1 = Business_Category.District
         const Product1 = Business_Category.Product
-        const Location1 = Business_Category.Location
+        // const Location1 = Business_Category.Location
         console.log('Business_Category:', Business_Category1)
 
         console.log('Description:', Description1)
         console.log('Quantity:', Quantity1)
         console.log('Amount:', Amount1)
-        console.log('District:', District1)
+        // console.log('District:', District1)
         console.log('Product:', Product1)
-        console.log('Location :', Location1)
-        const Success = handleError(Business_Category1, Description1, Quantity1, Amount1, District1, Product1)
+        // console.log('Location :', Location1)
+        const Success = handleError(Business_Category1, Description1, Quantity1, Amount1,  Product1)
         if(!Success) return alert('fill the field')
         setLoading(true);
     
@@ -79,7 +79,6 @@ const PostAddBusiness = () => {
                 Description: Description1,
                 Quantity: Quantity1,
                 Amount: Amount1,
-                District: District1
             }, {
                 headers: {
                     Authorization: `${JSON.parse(token).token}`,
@@ -104,8 +103,8 @@ const PostAddBusiness = () => {
 
 export default PostAddBusiness;
 
-function handleError(Business_Category1, Description1, Quantity1, Amount1, District1, Product1){
-    if(!Business_Category1 || !Description1 || !Quantity1 || !Amount1 || !District1 || !Product1){
+function handleError(Business_Category1, Description1, Quantity1, Amount1,  Product1){
+    if(!Business_Category1 || !Description1 || !Quantity1 || !Amount1 || !Product1){
         return false
     }else{
         return true

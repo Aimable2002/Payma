@@ -6,11 +6,12 @@ const connection = connectDatabase();
 export const protectRoute = async(req, res, next) => {
     try{
         const token = req.headers.authorization
-        //console.log(token)
+        console.log(token)
         if(!token){
             return res.status(401).json('Token not found')
         }
         const decoded = jwt.verify(token, process.env.SECRET_KEY_AUTH)
+        console.log('decoded token :', decoded)
         if(!decoded){
             return res.status(403).json('invalid token')
         }
@@ -23,6 +24,7 @@ export const protectRoute = async(req, res, next) => {
                 return res.status(404).json('user not found')
             }
             req.user = result[0]
+            console.log('req user in middleware :', req.user)
             next()
         })
     }catch(error){
@@ -30,3 +32,6 @@ export const protectRoute = async(req, res, next) => {
         return res.status(500).json({error: 'internal server protect error'})
     }
 }
+
+
+

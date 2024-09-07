@@ -32,7 +32,20 @@ export const uploadPhoto = async (req, res) => {
 
 export const businessController = async (req, res) => {
     try{
-        const { Business_Category, Description, Product, Amount, Quantity, District} = req.body;
+        const { 
+            Business_Category, 
+            Description, 
+            Product, 
+            Amount, 
+            Quantity, 
+            
+            Business_Name, 
+            Business_Description, 
+            Business_email, 
+            Business_phone, 
+            Product_name, 
+            Product_Description
+        } = req.body;
 
         console.log('req.body :', req.body)
     }catch(error){

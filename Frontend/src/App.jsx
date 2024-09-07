@@ -15,6 +15,9 @@ import AfriPayForm from './context/afripay'
 
 import AddJob from './pages/AdDJob/addJob'
 import AddBusiness from './pages/addBusiness/addBusiness'
+import InDoor from './pages/InDoor/InDoor'
+import InDoorOrder from './pages/InDoor/InDoorOrder'
+import AddProduct from './pages/addBusiness/addProduct'
 // import BusinessPost from './pages/addBusiness/BusinessPost'
 
 function App() {
@@ -40,14 +43,19 @@ function App() {
         <Route path='/account' element={AuthUser ? <Profile /> : <Navigate to ='sign' />} />
         <Route path='/job' element={AuthUser ? <AddJob /> : <Navigate to ='sign' />} />
         <Route path='/business' element={AuthUser ? <AddBusiness /> : <Navigate to ='sign' />} />
-        {/* <Route path='/test' element={AuthUser ? <BusinessPost /> : <Navigate to ='sign' />} /> */}
-      </Routes>
+        <Route path='/indoor' element={AuthUser ? <InDoor /> : <Navigate to ='sign' />} />
+        <Route path='/product' element={AuthUser ? <AddProduct /> : <Navigate to ='sign' />} />
+        </Routes>
       ) : (
         <Routes>
           <Route path='/sign' element={AuthUser ? <Navigate to= '/' /> : <Lsign /> } />
           <Route path='/' element={AuthUser ? <Lhome /> : <Navigate to='sign' />} />
           <Route path='/dashboard' element={AuthUser ? <Ldashboard /> : <Navigate to='sign' />} />
           <Route path='/afripay' element={AuthUser ? <AfriPayForm /> : <Navigate to='sign' />} />
+          <Route path='/indoor' element={AuthUser ? <InDoorOrder /> : <Navigate to ='sign' />} />
+          
+        <Route path='/job' element={AuthUser ? <AddJob /> : <Navigate to ='sign' />} />
+        <Route path='/business' element={AuthUser ? <AddBusiness /> : <Navigate to ='sign' />} />
         </Routes>
       )}
     </div>

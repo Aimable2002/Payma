@@ -6,6 +6,14 @@
     width: calc(100% - 40%);
     padding: 0px 10px 0px 10px;
 }
+.drp-ctnt1{
+    position: absolute;
+    /* background-color: #070707; */
+    margin-left: 135px;
+    /* height: 100vh; */
+    width: calc(100% - 40%);
+    padding: 0px 10px 0px 10px;
+}
 
 .btn2{
     /* border-bottom: 2px solid yellowgreen; */

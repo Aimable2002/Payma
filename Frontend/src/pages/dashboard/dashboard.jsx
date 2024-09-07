@@ -16,6 +16,15 @@ import inviteData from '../../hook/Invitation/inviteData.js';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 
+import DragHandleTwoToneIcon from '@mui/icons-material/DragHandleTwoTone';
+
+import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
+import AddTaskIcon from '@mui/icons-material/AddTask';
+
+import { getCurrentTheme } from '../../utilities/themeToggle.js';
+
+import ClearTwoToneIcon from '@mui/icons-material/ClearTwoTone';
+
 const dashboard = () => {
     const [isHome, setIsHome] = useState(true)
   const [isTask, setIsTask] = useState(false);
@@ -157,13 +166,68 @@ const getRowStyle = (item) => {
   };
   const {inviteTaskDash} = inviteData(activeButton)
   //console.log('invitee task :', inviteTaskDash)
+
+  const [theme, setTheme] = useState(getCurrentTheme());
+
+  useEffect(() => {
+    const handleThemeChange = () => {
+      setTheme(getCurrentTheme());
+    };
+
+    //Listen for changes in the data-theme attribute
+    const observer = new MutationObserver(handleThemeChange);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  const bgColorClass = theme === 'light' ? 'bg-white' : 'bg-base-100';
+  const menuItems = [
+    { name: 'Your Business', leftIcon: <BusinessCenterIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>},
+    { name: 'Add Task', leftIcon: <AddTaskIcon className="text-info" />, link: '/job'},
+    { name: 'Add Product', leftIcon: <AddTaskIcon className="text-info" />, link: '/product'},
+    { name: 'Fees Ref', leftIcon: <AddTaskIcon className="text-info" />},
+  ];
+  const [isMenu, setIsMenu] = useState(false)
+  const handleMenu = (e) => {
+    e.preventDefault()
+    setIsMenu(!isMenu)
+  }
   return (
     <div className="w-full flex flex-col overflow-auto">
         <div className=" w-full">
             <div className=" fixed flex flex-row justify-between px-2 align-middle" style={{width: 'calc(100% - 32px)', zIndex: '2'}}>
                 <Link to='/'><div className='text-info'>{!isScrolled ? 'web Application' : ''}</div></Link>
+                <div className='text-info' onClick={handleMenu}>menu</div>
             </div>
         </div>
+
+        {isMenu && (
+                    <div style={{zIndex: '10'}} className={`drp-ctnt1 flex flex-col justify-between h-screen ${bgColorClass}`}>
+                        <div>
+                            <div className='flex flex-row justify-between'>
+                              <h1>Business Name</h1>
+                              <div className="flex justify-end" onClick={handleMenu}>
+                                  <ClearTwoToneIcon />
+                              </div>
+                            </div>
+                            {menuItems.map(({ name, leftIcon, rightIcon, onClick, link }) => (
+                              <Link to={link || '#'} key={name}> 
+                                <div key={name} className="flex flex-row justify-between items-center mt-5" onClick={onClick}>
+                                      <div className="flex flex-row items-center">
+                                      <span className="mr-2">{leftIcon}</span> 
+                                      {name.charAt(0).toUpperCase() + name.slice(1).replace(/([A-Z])/g, ' $1').trim()}
+                                      </div>
+                                      <span>{rightIcon}</span>
+                                  </div>
+                              </Link> 
+                            ))} 
+
+                        </div>
+                    </div>
+                )}
         {/* <div className="mt-8 py-2 gap-4 overflow-x-auto w-full flex flex-row hide-scrollbar">
             <div className={`${activeButton === 'Home' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Home')}>All</div>
             <div className={`${activeButton === 'Report' ? 'btn2' : 'btn1'}`} onClick={() => handleButtonClick('Report')}>Report</div>
@@ -183,7 +247,7 @@ const getRowStyle = (item) => {
                 </BarChart>
             </ResponsiveContainer>
         </div> */}
-        <div className='w-full flex flex-col  justify-center'>
+        <div className='w-full flex flex-col  justify-center mt-5'>
             {usersOn.map((user) => (
                 <>
             <div className='w-full px-2 py-2'>
@@ -234,7 +298,7 @@ const getRowStyle = (item) => {
                                                 onChange={handleChangeLogin}
                                                 type={field.includes('Phone_number' && 'Amount') ? 'number' : 'text'}
                                                 onFocus={() => handleFocus2(field)}
-                                            /> */}
+                                            />  */}
                                             {field === 'Phone_number' ? (
                                                 <PhoneInput
                                                     country={'rw'} // Default country code

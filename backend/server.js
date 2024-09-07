@@ -63,10 +63,10 @@ app.use('/api/email', emailRoute)
 app.use('/api/business', BusinessRouter)
 
 
-app.use(express.static(path.join(__dirname, "/Frontend/dist")));
+app.use(express.static(path.join(__dirname, "/Frontend/public")));
 
 app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "Frontend", "dist", "index.html"))
+    res.sendFile(path.join(__dirname, "Frontend", "public", "index.html"))
 })
 
 
@@ -76,3 +76,4 @@ app.listen(PORT, () => {
     connectCloudinary()
     console.log(`Server is running on port: ${PORT}`);
 });
+

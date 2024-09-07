@@ -44,7 +44,8 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
 import CircleNotificationsIcon from '@mui/icons-material/CircleNotifications';
-
+import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
+import AddTaskIcon from '@mui/icons-material/AddTask';
 
 const truncateString = (str, maxLength) => {
     if(str.length <= maxLength ){
@@ -84,6 +85,19 @@ const Lhome = () => {
         setInputValues((prevValues) => ({ ...prevValues, [name]: value }));
     };
 
+
+    const handleCopyContactNumber = () => {
+        navigator.clipboard.writeText('+250 784 62 384')
+          .then(() => {
+            alert('Contact number has been copied to clipboard.');
+          })
+          .catch(err => {
+            console.error('Failed to copy: ', err);
+          });
+      };
+
+
+
     const bgColorClass = theme === 'light' ? 'bg-white' : 'bg-dark';
     // const menuItems = [
     //     { name: 'transaction', leftIcon: <LinearScaleIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard'},
@@ -98,9 +112,11 @@ const Lhome = () => {
     const menuItems = [
         { name: 'Dashboard', leftIcon: <DashboardCustomizeIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard'},
         { name: 'Notifications', leftIcon: <CircleNotificationsIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, onClick: () => handleButtonClick('Notification')},
+        { name: 'Your Business', leftIcon: <BusinessCenterIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>, onClick: () =>document.getElementById('my_modal_business').showModal() },
         { name: 'Account', leftIcon: <AccountCircleIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, onClick: () =>document.getElementById('my_modal_30').showModal() },
-        { name: 'Theme', leftIcon: <ContrastIcon className="text-info" />, onClick: toggleTheme },
-        { name: 'Contact us', leftIcon: <PhoneIcon className="text-info"/>, rightIcon: <DragHandleTwoToneIcon />},
+        // { name: 'Theme', leftIcon: <ContrastIcon className="text-info" />, onClick: toggleTheme },
+        { name: 'Add Task', leftIcon: <AddTaskIcon className="text-info" />, link: '/job'},
+        { name: 'Contact us', leftIcon: <PhoneIcon className="text-info"/>, rightIcon: <DragHandleTwoToneIcon />, onClick: handleCopyContactNumber},
         { name: 'FAQs', leftIcon: <LiveHelpIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>},
         { name: 'Terms', leftIcon: <SummarizeIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>},
         { name: 'logout', leftIcon: !loading ? <LogoutTwoToneIcon className="text-error"/> : <span className="loading loading-ring"></span>, rightIcon: '', onClick: logout },
@@ -482,6 +498,31 @@ const Lhome = () => {
                     ))}
                 </div>
         </dialog>
+
+        <dialog id="my_modal_business" className="modal">
+                <div className="modal-box">
+                    <form method="dialog">
+                    {/* if there is a button in form, it will close the modal */}
+                    <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                    </form>
+                    {isaddBusiness ? null : (
+                      <>
+                        <h3 className="font-bold text-lg">Business Account</h3> 
+                        <p className="py-4 mb-4">Create the business account</p>
+                      </>
+                    )}
+                    <form onSubmit={(e) => e.preventDefault()}>
+                      {isaddBusiness ? null : (
+                        <div className='w-full flex flex-col gap-10'>
+                          <Link to='business'><Button  className="bg-base-100 btn btn-outline btn-accent" type='button'>Create Business</Button></Link>
+                        </div>
+                      )}
+                      {isaddJob && (<AddJob resetView={resetView}/>)}
+                      {isaddBusiness && (<AddBusiness resetView={resetView} />)}
+                    </form>
+                </div>
+        </dialog>
+
         </div>
         <div className='flex flex-col h-screen overflow-y-auto' style={{width: '95%'}}>
             <div className='w-full relative' style={{zIndex: '2'}}>
@@ -762,7 +803,7 @@ const Lhome = () => {
                         
                         {isTaskToApprove.map((user) => (
                             <>
-                                <dialog id={user.taskId} className="modal">
+                                <dialog id={user.task_taker_name} className="modal">
                       <div className="modal-box">
                         <form method="dialog">
                           {/* if there is a button in form, it will close the modal */}
@@ -845,10 +886,10 @@ const Lhome = () => {
                           </button>
                         )} */}
                       </div>
-                  </dialog>
+                                </dialog>
                                 <Card key={user.taskId} className="w-full mb-1" style={{zIndex: '1'}}>
                                     <CardHeader className="justify-between w-full">
-                                        <div className="flex w-4/5  gap-5" onClick={()=>document.getElementById(user.taskId).showModal()}>
+                                        <div className="flex w-4/5  gap-5" onClick={()=>document.getElementById(user.task_taker_name).showModal()}>
                                         {/* <Avatar isBordered radius="full" size="md" src="https://nextui.org/avatars/avatar-1.png" /> */}
                                         <div className=" cursor-pointer flex flex-col gap-1 items-start justify-center w-3/4">
                                             <h4 className="text-small font-semibold leading-none text-default-600">{user.Agreement}</h4>

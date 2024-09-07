@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 
 import {Card, CardHeader, CardBody, CardFooter, Avatar, Image, Button} from "@nextui-org/react";
+import { Link } from 'react-router-dom';
 
 const OtherButton = () => {
 
@@ -11,11 +12,11 @@ const OtherButton = () => {
   };
 
   return (
-    <div className="w-full flex flex-col overflow-auto">
+    <div className="w-full flex flex-col overflow-auto" >
         <Card isFooterBlurred className="w-full h-[300px] col-span-12 sm:col-span-5 mb-1">
-              <CardHeader className="absolute z-10 top-1 flex-col items-start">
-                <p className="text-tiny text-white/60 uppercase font-bold">New</p>
-                <h4 className="text-black font-medium text-2xl">Acme camera</h4>
+              <CardHeader className="absolute z-10 top-1 gap-1 flex-col items-start" style={{zIndex: '1'}}>
+                <p className="text-tiny text-[#13a993] uppercase font-bold bg-base-100 rounded-full px-1">New</p>
+                <h4 className="text-black font-medium text-2xl bg-base-100 rounded-full px-1">Speci Shop</h4>
               </CardHeader>
               <Image
                 removeWrapper
@@ -23,14 +24,28 @@ const OtherButton = () => {
                 className="z-0 w-full h-full scale-125 -translate-y-6 object-cover"
                 src="https://nextui.org/images/card-example-6.jpeg"
               />
-              <CardFooter style={{zIndex: '1'}} className="absolute w-full bg-white/30 bottom-0 border-t-1 border-zinc-100/50 z-10 justify-between">
+              <CardFooter style={{zIndex: '1'}} className="absolute w-full bg-white/50 bottom-0 border-t-1 border-zinc-100/50 z-10 justify-between">
                 <div className="w-3/4"> 
                   <p className="text-black text-tiny">Available for sale</p>
                   <p className="text-black text-tiny">1 piece for 100K</p>
                 </div>
-                <Button className="text-tiny bg-base-100 outline-none border-none text-accent" color="primary" radius="full" size="sm" onClick={()=>document.getElementById('my_modal_3').showModal()}>
+                {/* <Button className="text-tiny bg-base-100 outline-none border-none text-accent" color="primary" radius="full" size="sm" 
+                  onClick={()=>document.getElementById('my_modal_3').showModal()}
+                >
                   Order Now
-                </Button>
+                </Button> */}
+                <Link to='/indoor'>
+                  <Button className="text-tiny bg-base-100 outline-none border-none text-accent" color="primary" radius="full" size="sm">
+                    Visit page
+                  </Button>
+                </Link>
+                <div className='px-2'>
+                  <Button className="text-tiny bg-base-100 outline-none border-none text-accent" color="primary" radius="full" size="sm"
+                    onClick={()=>document.getElementById('my_modal_3').showModal()}
+                  >
+                    Order Now
+                  </Button>
+                </div>
               </CardFooter>
             </Card>
             <dialog id="my_modal_3" className="modal">

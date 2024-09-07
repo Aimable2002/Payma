@@ -3,3 +3,13 @@
 @tailwind utilities;
 
 
+/* Hide scrollbar for the specific divs */
+.flex.px-1.h-screen.overflow-y-auto {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .flex.px-1.h-screen.overflow-y-auto::-webkit-scrollbar {
+    display: none;  /* Safari and Chrome */
+  }
+  
