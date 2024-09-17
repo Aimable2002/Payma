@@ -65,5 +65,11 @@ export default defineConfig({
       }
     }
   },
+  build: {
+    rollupOptions: {
+      external: ['pg'], // Externalize 'pg' from the frontend build
+    },
+  },
 })
+
 
