@@ -38,10 +38,10 @@ const { Pool } = pkg;
 const connectDatabase = () => {
     try {
         const pool = new Pool({
-            host: 'localhost',
-            user: 'postgres', // PostgreSQL user
+            host: process.env.POSTGRESQL_HOST,
+            user: process.env.POSTGRESQL_USER, // PostgreSQL user
             password: '',      // Your PostgreSQL password
-            database: 'payma', // Your database name
+            database: process.env.POSTGRESQL_DB, // Your database name
             max: 20, // Maximum number of connections in the pool
             idleTimeoutMillis: 30000, // Time a connection can be idle before being closed
             connectionTimeoutMillis: 2000 // Time to wait for a connection to be established
