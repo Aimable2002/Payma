@@ -216,7 +216,7 @@
 
 
 
-import { connectDatabase } from "../database/connectDatabase.js";
+import connectDatabase  from "../database/connectDatabase.js";
 import nodemailer from 'nodemailer';
 
 const pool = connectDatabase();

@@ -66,7 +66,7 @@ import connectDatabase from "../database/connectDatabase.js";
 
 const pool = connectDatabase(); // Use Pool for PostgreSQL connection
 
-export const updatePassword = async (req, res) => {
+export const updatePassward = async (req, res) => {
     const { OldPassword, NewPassword } = req.body;
     console.log('data :', req.body);
     const USERID = req.user.userId;
