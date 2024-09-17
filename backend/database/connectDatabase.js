@@ -40,7 +40,7 @@ const connectDatabase = () => {
         const pool = new Pool({
             host: process.env.POSTGRESQL_HOST,
             user: process.env.POSTGRESQL_USER, // PostgreSQL user
-            password: '',      // Your PostgreSQL password
+            password: process.env.POSTGRESQL_PASSWORD,      // Your PostgreSQL password
             database: process.env.POSTGRESQL_DB, // Your database name
             max: 20, // Maximum number of connections in the pool
             idleTimeoutMillis: 30000, // Time a connection can be idle before being closed
