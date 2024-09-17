@@ -22,7 +22,7 @@
     "date-fns": "^3.6.0",
     "framer-motion": "^11.2.12",
     "nodemailer": "^6.9.14",
-    "payma": "file:..", 
+    "payma": "file:..",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-phone-input-2": "^2.15.1",
@@ -46,6 +46,3 @@
     "vite": "^5.3.1"
   }
 }
-
-
-

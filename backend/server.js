@@ -22,6 +22,8 @@ import emailRoute from './Routes/emailRoute.js'
 import BusinessRouter from './Routes/BusinessRoute.js'
 import connectCloudinary from './Cloudinary/connectCloudinary.js';
 
+
+
 import path from 'path'
 
 const app = express();
@@ -63,10 +65,10 @@ app.use('/api/email', emailRoute)
 app.use('/api/business', BusinessRouter)
 
 
-app.use(express.static(path.join(__dirname, "/Frontend/public")));
+app.use(express.static(path.join(__dirname, "/Frontend/dist")));
 
 app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "Frontend", "public", "index.html"))
+    res.sendFile(path.join(__dirname, "Frontend", "dist", "index.html"))
 })
 
 
