@@ -16,6 +16,7 @@ const useLogout = () => {
         console.log('logged out')
         window.location = '/sign'
     }catch(error){
+        alert('something went wrong')
         console.log('error in logout')
     }finally{
         setLoading(false)

@@ -21,6 +21,7 @@ const useLogin = () => {
         console.log('logged user :', data)
         window.location = '/'
     }catch(error){
+        alert('somthing went wrong')
         console.log('error in login :', error.message)
     }finally{
         setLoading(false)
