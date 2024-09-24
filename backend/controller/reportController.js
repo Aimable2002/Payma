@@ -18,7 +18,7 @@ export const Report = async (req, res) => {
             return res.status(404).json('missing data')
         }
 
-        const insertReport = 'INSERT INTO REPORT (Proof, End_date, taskId, task_taker_id) VALUES (?, ?, ?, ?)';
+        const insertReport = 'INSERT INTO report (Proof, End_date, taskId, task_taker_id) VALUES (?, ?, ?, ?)';
         connection.query(insertReport, [Agreement, End_date, taskId, task_taker_id], (err, result) => {
             if(err){
                 console.log('error inserting report :', err)

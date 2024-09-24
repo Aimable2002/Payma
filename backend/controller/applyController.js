@@ -19,7 +19,7 @@ export const applyTask = async (req, res) => {
             if(err){
                 throw err
             }
-            const selectTaskGiver = 'SELECT * FROM TASK WHERE taskId = ?';
+            const selectTaskGiver = 'SELECT * FROM task WHERE taskId = ?';
             connection.query(selectTaskGiver, [taskId], (err, result) => {
                 if(err){
                     return connection.rollback(() => {
@@ -46,7 +46,7 @@ export const applyTask = async (req, res) => {
                     console.log('taskGiverEmail :', taskGiverEmail)
                 
 
-                const selectApplyTask = 'SELECT * FROM APPLY_TASK WHERE taskId = ?';
+                const selectApplyTask = 'SELECT * FROM apply_task WHERE taskId = ?';
                 connection.query(selectApplyTask, [taskId], (err, results) => {
                     if(err){
                         return connection.rollback(() => {
@@ -82,7 +82,7 @@ export const applyTask = async (req, res) => {
                     console.log('Email User:', process.env.EMAIL_USER);
                 console.log('Email Pass:', process.env.EMAIL_PASS);
 
-                const insertApply = 'INSERT INTO APPLY_TASK (taskId, applying_user, task_giverId, Status) VALUES(?,?, ?, ?)';
+                const insertApply = 'INSERT INTO apply_task (taskId, applying_user, task_giverId, Status) VALUES(?,?, ?, ?)';
                 connection.query(insertApply, [taskId, applyingId, taskGiver, "Applied"], (err, result) => {
                     if(err){
                         console.log(err.message)
@@ -133,7 +133,7 @@ export const applyTask = async (req, res) => {
 }
 
 
-// const pool = connectDatabase();
+
 
 // export const applyTask = async (req, res) => {
 //     const client = await pool.connect();
@@ -229,7 +229,7 @@ export const applyTask = async (req, res) => {
 //     }
 // };
 
-
+// const pool = connectDatabase();
 
 // export const applyTask_view = async (req, res) => {
 //     try{
@@ -264,9 +264,14 @@ export const applyTask_view = async (req, res) => {
 
         // Query to get applying tasks
         const getApplyGranter = 'SELECT * FROM APPLYING_VIEW WHERE task_giverId = ? AND Apply_Status = ?';
-        const [rows] = await pool.execute(getApplyGranter, [user, "PENDING"]);
-
-        return res.status(200).json(rows);
+        connection.query(getApplyGranter, [user, "PENDING"], async (err, result) => {
+            if(err){
+                return connection.rollback(() => {
+                    return res.status(412).json({err: 'db error', data: err.message})
+                })
+            }
+            return res.status(200).json(result);
+        }); 
     } catch (error) {
         console.log('server error :', error.message);
         return res.status(500).json({ error: 'server error' });

@@ -3,11 +3,11 @@ import mysql from 'mysql';
 const connectDatabase = () => {
     try {
         const connection = mysql.createConnection({
-            host:  "localhost",
-            user: "Aimable",
+            host:  "162.55.131.89",
+            user: "konnectr_konnectr",
             password: "Back_wizard12@.",
-            database: "PAYMA",
-            port: 3306
+            database: "konnectr_konnect",
+            
         });
 
         connection.connect((err) => {
@@ -32,34 +32,42 @@ export default connectDatabase;
 
 
 
+// import mysql from 'mysql';
 
-// import pkg from 'pg';
-// const { Pool } = pkg;
+// let connection;
 
 // const connectDatabase = () => {
 //     try {
-//         const pool = new Pool({
-//             host: process.env.POSTGRESQL_HOST,
-//             user: process.env.POSTGRESQL_USER, // PostgreSQL user
-//             password: process.env.POSTGRESQL_PASSWORD,      // Your PostgreSQL password
-//             database: process.env.POSTGRESQL_DB, // Your database name
-//             max: 20, // Maximum number of connections in the pool
-//             idleTimeoutMillis: 30000, // Time a connection can be idle before being closed
-//             connectionTimeoutMillis: 2000 // Time to wait for a connection to be established
+//         connection = mysql.createConnection({
+//             host: "162.55.131.89",
+//             user: "konnectr_konnectr",
+//             password: "Back_wizard12@.",
+//             database: "konnectr_konnect",
 //         });
 
-//         // Test the connection
-//         pool.query('SELECT NOW()', (err, res) => {
+//         connection.connect((err) => {
 //             if (err) {
-//                 console.error('Failed to connect to the PostgreSQL database:', err);
+//                 console.error('Failed to connect to the database:', err.message);
+//                 setTimeout(connectDatabase, 2000); 
 //                 return;
 //             }
-//             console.log('Connected to the PostgreSQL database at:', res.rows[0].now);
+
+//             console.log('Connected to the database');
 //         });
 
-//         return pool;
+//         connection.on('error', (err) => {
+//             console.error('MySQL error:', err);
+//             if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+//                 console.error('MySQL connection was closed. Attempting to reconnect...', err.message);
+//                 connectDatabase(); 
+//             } else {
+//                 console.error('MySQL error occurred:', err.message);
+//             }
+//         });
+
+//         return connection;
 //     } catch (error) {
-//         console.error('Failed to connect to the PostgreSQL database:', error);
+//         console.error('Failed to connect to the database:', error.message);
 //     }
 // };
 

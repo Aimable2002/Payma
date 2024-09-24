@@ -54,7 +54,7 @@ export const approval = async (req, res) => {
                     return res.status(500).json({ error: 'Transaction error' });
                 }
 
-                const tracktaskId = 'SELECT * FROM TASK WHERE taskId = ? AND Status = ? AND task_giverId = ?';
+                const tracktaskId = 'SELECT * FROM task WHERE taskId = ? AND Status = ? AND task_giverId = ?';
                 
                 connection.query(tracktaskId, [taskId, 'Reported', USERID], async(err, result) => {
                     if(err){
@@ -104,7 +104,7 @@ export const approval = async (req, res) => {
                         const totalB = taskAmount + OLDBALANCE
                         console.log('total B :', totalB)
 
-                    const updateApproval = 'UPDATE TASK SET Approval = ? WHERE taskId = ? AND Status = ? AND task_giverId = ?';
+                    const updateApproval = 'UPDATE task SET Approval = ? WHERE taskId = ? AND Status = ? AND task_giverId = ?';
                     connection.query(updateApproval, ['Approved', taskId, 'Reported', USERID], (err, result) => {
                         if(err){
                             return connection.rollback(() => {

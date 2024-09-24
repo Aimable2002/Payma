@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer';
 import connectDatabase from "../database/connectDatabase.js";
 
 const connection = connectDatabase();
-const pool = connectDatabase()
+// const pool = connectDatabase()
 
 export const assignTask = async (req, res) => {
     try{
@@ -32,7 +32,7 @@ export const assignTask = async (req, res) => {
                     return res.status(303).json({message: 'low balance'})
                 }else{
                 // return res.status(200).json({message: 'task inserted', status: true})
-                const insertTask = 'INSERT INTO TASK (Agreement, Start_date, End_date, Amount, Duration, task_giverId, Description, Specification) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+                const insertTask = 'INSERT INTO task (Agreement, Start_date, End_date, Amount, Duration, task_giverId, Description, Specification) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
                 connection.query(insertTask, [Agreement, Start_date, End_date, Amount, formattedDuration, task_giverId, Description, Specification], async(err, result) => {
                     if (err) {
                         return connection.rollback(() => {
@@ -64,7 +64,7 @@ export const assignTask = async (req, res) => {
 export const assigneer = async (req, res) => {
     try{
         const USERID = req.user.userId;
-        const findAssigneer = 'SELECT * FROM TASK WHERE task_giverId = ?';
+        const findAssigneer = 'SELECT * FROM task WHERE task_giverId = ?';
         connection.query(findAssigneer, [USERID], (err, result) => {
             if(err){
                 throw err
@@ -148,7 +148,7 @@ export const taskTaker = async (req, res) => {
             if (err) {
                 throw err;
             }
-            const checkTask = 'SELECT task_giverId, task_takerId FROM TASK WHERE taskId = ?';
+            const checkTask = 'SELECT task_giverId, task_takerId FROM task WHERE taskId = ?';
             connection.query(checkTask, [taskId], async (err, result) => {
             if(err){
                 console.log(401).json({error: 'error'})
@@ -177,7 +177,7 @@ export const taskTaker = async (req, res) => {
                     return res.status(502).json('u cant take your own task')
                 }
             
-            const insertTaskTaker = 'INSERT INTO TASK_TAKER (taskId, takerId) VALUES (?, ?)';
+            const insertTaskTaker = 'INSERT INTO task_taker (taskId, takerId) VALUES (?, ?)';
             connection.query(insertTaskTaker, [taskId, taker_Id], (err, insertResult) => {
                 if (err) {
                     return connection.rollback(() => {
@@ -186,7 +186,7 @@ export const taskTaker = async (req, res) => {
                     });
                 }
 
-                const updateTask = 'UPDATE TASK SET task_takerId = ?, Task_status= ?, task_taker_name= ? WHERE taskId = ?';
+                const updateTask = 'UPDATE task SET task_takerId = ?, Task_status= ?, task_taker_name= ? WHERE taskId = ?';
                 connection.query(updateTask, [taker_Id, 'Taken', APPLYING_USERNAME, taskId], (err, updateResult) => {
                     if (err) {
                         return connection.rollback(() => {
@@ -207,7 +207,7 @@ export const taskTaker = async (req, res) => {
 
                     
                 
-                            const updateApplyTask = 'UPDATE APPLY_TASK SET Apply_Status = ? WHERE taskId = ? AND task_giverId = ? AND applying_user = ?';
+                            const updateApplyTask = 'UPDATE apply_task SET Apply_Status = ? WHERE taskId = ? AND task_giverId = ? AND applying_user = ?';
                             connection.query(updateApplyTask, ['Taken', taskId, ConfirmId, taker_Id], (err, result) => {
                                 if(err){
                                     return connection.rollback(() => {
@@ -824,7 +824,6 @@ export const taskTaker = async (req, res) => {
 
 
 export const DeclineRequest = async (req, res) => {
-    const connection = await pool.getConnection();
     try {
         const { taskId, APPLYING_USERNAME } = req.body;
         const DeclinedId = req.user.userId;
@@ -833,109 +832,150 @@ export const DeclineRequest = async (req, res) => {
             return res.status(400).json({ message: 'Missing data', status: false });
         }
 
-        await connection.beginTransaction();
-
-        // Check if the task exists and the requester is the task giver
-        const checkTask = `
-            SELECT task_giverId, task_takerId 
-            FROM TASK 
-            WHERE taskId = ?
-        `;
-        const [taskRows] = await connection.query(checkTask, [taskId]);
-
-        if (taskRows.length === 0) {
-            await connection.rollback();
-            return res.status(404).json({ message: 'No task found', status: false });
-        }
-
-        if (DeclinedId !== taskRows[0].task_giverId) {
-            await connection.rollback();
-            return res.status(403).json({ message: 'You cannot decline this task', status: false });
-        }
-
-        // Get the userId of the applying user
-        const getName = `
-            SELECT userId 
-            FROM USERS 
-            WHERE userName = ?
-        `;
-        const [userRows] = await connection.query(getName, [APPLYING_USERNAME]);
-
-        if (userRows.length === 0) {
-            await connection.rollback();
-            return res.status(404).json({ message: 'User not found', status: false });
-        }
-
-        const takerId = userRows[0].userId;
-
-        if (takerId === taskRows[0].task_giverId) {
-            await connection.rollback();
-            return res.status(400).json({ message: 'You cannot decline your own task', status: false });
-        }
-
-        // Update the apply task status
-        const updateApplyTask = `
-            UPDATE APPLY_TASK 
-            SET Apply_Status = ? 
-            WHERE taskId = ? AND task_giverId = ? AND applying_user = ?
-        `;
-        await connection.query(updateApplyTask, ['Declined', taskId, DeclinedId, takerId]);
-
-        // Get the email of the applying user
-        const getApplyedEmail = `
-            SELECT EMAIL 
-            FROM USERS 
-            WHERE userId = ?
-        `;
-        const [emailRows] = await connection.query(getApplyedEmail, [takerId]);
-
-        if (emailRows.length === 0) {
-            await connection.rollback();
-            return res.status(404).json({ message: 'Cannot get email', status: false });
-        }
-
-        const emailApply = emailRows[0].EMAIL;
-
-        await connection.commit();
-
-        // Send email notification
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
+        // Start the transaction
+        connection.beginTransaction((err) => {
+            if (err) {
+                return res.status(500).json({ message: 'Transaction start error', status: false });
             }
+
+            // Check if the task exists and the requester is the task giver
+            const checkTask = `
+                SELECT task_giverId, task_takerId 
+                FROM TASK 
+                WHERE taskId = ?
+            `;
+            connection.query(checkTask, [taskId], (err, taskRows) => {
+                if (err) {
+                    return connection.rollback(() => {
+                        return res.status(412).json({ err: 'Database error', data: err.message });
+                    });
+                }
+
+                if (taskRows.length === 0) {
+                    return connection.rollback(() => {
+                        return res.status(404).json({ message: 'No task found', status: false });
+                    });
+                }
+
+                if (DeclinedId !== taskRows[0].task_giverId) {
+                    return connection.rollback(() => {
+                        return res.status(403).json({ message: 'You cannot decline this task', status: false });
+                    });
+                }
+
+                // Get the userId of the applying user
+                const getName = `
+                    SELECT userId 
+                    FROM USERS 
+                    WHERE userName = ?
+                `;
+                connection.query(getName, [APPLYING_USERNAME], (err, userRows) => {
+                    if (err) {
+                        return connection.rollback(() => {
+                            return res.status(500).json({ err: 'Error fetching user', data: err.message });
+                        });
+                    }
+
+                    if (userRows.length === 0) {
+                        return connection.rollback(() => {
+                            return res.status(404).json({ message: 'User not found', status: false });
+                        });
+                    }
+
+                    const takerId = userRows[0].userId;
+
+                    if (takerId === taskRows[0].task_giverId) {
+                        return connection.rollback(() => {
+                            return res.status(400).json({ message: 'You cannot decline your own task', status: false });
+                        });
+                    }
+
+                    // Update the apply task status
+                    const updateApplyTask = `
+                        UPDATE APPLY_TASK 
+                        SET Apply_Status = ? 
+                        WHERE taskId = ? AND task_giverId = ? AND applying_user = ?
+                    `;
+                    connection.query(updateApplyTask, ['Declined', taskId, DeclinedId, takerId], (err) => {
+                        if (err) {
+                            return connection.rollback(() => {
+                                return res.status(500).json({ message: 'Failed to update apply task', status: false });
+                            });
+                        }
+
+                        // Get the email of the applying user
+                        const getApplyedEmail = `
+                            SELECT EMAIL 
+                            FROM USERS 
+                            WHERE userId = ?
+                        `;
+                        connection.query(getApplyedEmail, [takerId], (err, emailRows) => {
+                            if (err) {
+                                return connection.rollback(() => {
+                                    return res.status(500).json({ message: 'Failed to retrieve email', status: false });
+                                });
+                            }
+
+                            if (emailRows.length === 0) {
+                                return connection.rollback(() => {
+                                    return res.status(404).json({ message: 'Email not found', status: false });
+                                });
+                            }
+
+                            const emailApply = emailRows[0].EMAIL;
+
+                            // Commit the transaction
+                            connection.commit((err) => {
+                                if (err) {
+                                    return connection.rollback(() => {
+                                        return res.status(500).json({ message: 'Transaction commit failed', status: false });
+                                    });
+                                }
+
+                                // Send email notification
+                                const transporter = nodemailer.createTransport({
+                                    service: 'gmail',
+                                    auth: {
+                                        user: process.env.EMAIL_USER,
+                                        pass: process.env.EMAIL_PASS
+                                    }
+                                });
+
+                                const mailOptions = {
+                                    from: process.env.EMAIL_USER,
+                                    to: emailApply,
+                                    subject: 'Task Invitation',
+                                    text: 'Your request has been declined. Visit the app for more details.'
+                                };
+
+                                transporter.sendMail(mailOptions, (error, info) => {
+                                    if (error) {
+                                        console.log('Email error:', error);
+                                    } else {
+                                        console.log('Email sent:', info.response);
+                                    }
+                                });
+
+                                return res.status(200).json({ message: 'Successfully declined', status: true });
+                            });
+                        });
+                    });
+                });
+            });
         });
-
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: emailApply,
-            subject: 'Task Invitation',
-            text: 'Your request has been declined. Visit the app for more details.'
-        };
-
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.log('Email error:', error);
-            } else {
-                console.log('Email sent:', info.response);
-            }
-        });
-
-        return res.status(200).json({ message: 'Successfully declined', status: true });
-
     } catch (error) {
-        console.log('internal server error:', error.message);
+        console.log('Internal server error:', error.message);
         if (connection) {
-            await connection.rollback();
+            connection.rollback();
         }
-        return res.status(500).json({ error: 'internal server error', status: false });
+        return res.status(500).json({ error: 'Internal server error', status: false });
     } finally {
         if (connection) {
-            connection.release();
+            connection.release(); // Release the connection
         }
     }
 };
+
 
 
 // export const taskTakerView = async (req, res) => {
@@ -982,13 +1022,20 @@ export const taskTakerView = async (req, res) => {
             WHERE taskId = ? AND task_takerId = ?
         `;
 
-        const [tasks] = await pool.execute(selectTakerId, [taskId, takerId]);
+        connection.query(selectTakerId, [taskId, takerId], (err, result) => {
+            if(err){
+                return connection.rollback(() => {
+                    return res.status(412).json({err: 'error of db', data:err.message})
+                })
+            }
 
-        if (tasks.length === 0) {
-            return res.status(404).json({ message: 'No task taken yet', status: false });
-        }
+            if (result.length === 0) {
+                return res.status(404).json({ message: 'No task taken yet', status: false });
+            }
+    
+            return res.status(200).json(result);
+        });
 
-        return res.status(200).json(tasks);
     } catch (error) {
         console.error('internal server error:', error.message);
         return res.status(500).json({ error: 'internal server error', status: false });
@@ -1082,91 +1129,135 @@ export const taskTakerView = async (req, res) => {
 
 
 export const postInvitation = async (req, res) => {
-    const connection = await pool.getConnection();
     try {
         const GiverId = req.user.userId;
         const { TakerId, Taker_Name, Agreement, Description, Amount, Start_date, End_date } = req.body;
 
         if (!TakerId || !Taker_Name || !Agreement || !Description || !Amount || !Start_date || !End_date) {
             console.log('missing data');
-            return res.status(400).json({ message: 'missing data', status: false });
+            return res.status(400).json({ message: 'Missing data', status: false });
         }
 
-        await connection.beginTransaction();
-
-        const getInvitingUser = 'SELECT * FROM USERS WHERE userId = ?';
-        const [inviterRows] = await connection.query(getInvitingUser, [GiverId]);
-
-        if (inviterRows.length === 0) {
-            await connection.rollback();
-            console.log('user data missing');
-            return res.status(404).json({ message: 'user data missing', status: false });
-        }
-
-        const inviter = inviterRows[0].userName;
-        const balance = inviterRows[0].Balance;
-
-        if (balance < Amount) {
-            await connection.rollback();
-            return res.status(400).json({ message: 'insufficient Amount', status: false });
-        }
-
-        const insertInviteData = `
-            INSERT INTO invitee (invitee, inviter, Agreement, Description, Start_date, End_date, Amount, inviterId, TakerId) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `;
-        await connection.query(insertInviteData, [Taker_Name, inviter, Agreement, Description, Start_date, End_date, Amount, GiverId, TakerId]);
-
-        const subtractAmount = 'UPDATE USERS SET Balance = Balance - ? WHERE userId = ?';
-        await connection.query(subtractAmount, [Amount, GiverId]);
-
-        const getTakerEmail = 'SELECT EMAIL FROM USERS WHERE userId = ?';
-        const [takerRows] = await connection.query(getTakerEmail, [TakerId]);
-
-        if (takerRows.length === 0) {
-            await connection.rollback();
-            return res.status(408).json('cannot get Email');
-        }
-
-        const EmailTaker = takerRows[0].EMAIL;
-
-        await connection.commit();
-
-        // Send email notification
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
+        // Start the transaction
+        connection.beginTransaction(async (err) => {
+            if (err) {
+                return res.status(500).json({ message: 'Transaction start error', status: false });
             }
+
+            const getInvitingUser = 'SELECT * FROM USERS WHERE userId = ?';
+            connection.query(getInvitingUser, [GiverId], (err, inviterRows) => {
+                if (err) {
+                    return connection.rollback(() => {
+                        return res.status(500).json({ message: 'Error fetching inviter data', status: false });
+                    });
+                }
+
+                if (inviterRows.length === 0) {
+                    return connection.rollback(() => {
+                        console.log('User data missing');
+                        return res.status(404).json({ message: 'User data missing', status: false });
+                    });
+                }
+
+                const inviter = inviterRows[0].userName;
+                const balance = inviterRows[0].Balance;
+
+                if (balance < Amount) {
+                    return connection.rollback(() => {
+                        return res.status(400).json({ message: 'Insufficient balance', status: false });
+                    });
+                }
+
+                // Insert invite data
+                const insertInviteData = `
+                    INSERT INTO invitee (invitee, inviter, Agreement, Description, Start_date, End_date, Amount, inviterId, TakerId) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                `;
+                connection.query(insertInviteData, [Taker_Name, inviter, Agreement, Description, Start_date, End_date, Amount, GiverId, TakerId], (err) => {
+                    if (err) {
+                        return connection.rollback(() => {
+                            return res.status(500).json({ message: 'Error inserting invite data', status: false });
+                        });
+                    }
+
+                    // Subtract amount from inviter's balance
+                    const subtractAmount = 'UPDATE USERS SET Balance = Balance - ? WHERE userId = ?';
+                    connection.query(subtractAmount, [Amount, GiverId], (err) => {
+                        if (err) {
+                            return connection.rollback(() => {
+                                return res.status(500).json({ message: 'Error updating balance', status: false });
+                            });
+                        }
+
+                        // Get taker's email
+                        const getTakerEmail = 'SELECT EMAIL FROM USERS WHERE userId = ?';
+                        connection.query(getTakerEmail, [TakerId], (err, takerRows) => {
+                            if (err) {
+                                return connection.rollback(() => {
+                                    return res.status(500).json({ message: 'Error fetching taker email', status: false });
+                                });
+                            }
+
+                            if (takerRows.length === 0) {
+                                return connection.rollback(() => {
+                                    return res.status(404).json('Cannot get Email');
+                                });
+                            }
+
+                            const EmailTaker = takerRows[0].EMAIL;
+
+                            // Commit the transaction
+                            connection.commit((err) => {
+                                if (err) {
+                                    return connection.rollback(() => {
+                                        return res.status(500).json({ message: 'Transaction commit failed', status: false });
+                                    });
+                                }
+
+                                // Send email notification
+                                const transporter = nodemailer.createTransport({
+                                    service: 'gmail',
+                                    auth: {
+                                        user: process.env.EMAIL_USER,
+                                        pass: process.env.EMAIL_PASS
+                                    }
+                                });
+
+                                const mailOptions = {
+                                    from: process.env.EMAIL_USER,
+                                    to: EmailTaker,
+                                    subject: 'Task Invitation',
+                                    text: 'You have been invited to a task, check the app and confirm.'
+                                };
+
+                                transporter.sendMail(mailOptions, (error, info) => {
+                                    if (error) {
+                                        console.log('Email error:', error);
+                                    } else {
+                                        console.log('Email sent:', info.response);
+                                    }
+                                });
+
+                                return res.status(200).json({ message: 'Successfully invited', status: true });
+                            });
+                        });
+                    });
+                });
+            });
         });
-
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: EmailTaker,
-            subject: 'Task Invitation',
-            text: 'You have been invited to a task, check the app and confirm.'
-        };
-
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.log('Email error:', error);
-            } else {
-                console.log('Email sent:', info.response);
-            }
-        });
-
-        return res.status(200).json({ message: 'successfully invited', status: true });
     } catch (error) {
-        console.log('internal server error:', error.message);
-        await connection.rollback();
-        return res.status(500).json({ error: 'internal server error' });
+        console.log('Internal server error:', error.message);
+        if (connection) {
+            connection.rollback();
+        }
+        return res.status(500).json({ error: 'Internal server error' });
     } finally {
         if (connection) {
-            connection.release();
+            connection.release(); // Release the connection
         }
     }
 };
+
 
 
 
@@ -1512,58 +1603,50 @@ export const acceptInvitation = (req, res) => {
         return res.status(404).json('Missing data');
     }
 
-    pool.getConnection((err, connection) => {
-        if (err) {
-            console.error('Connection error:', err);
-            return res.status(500).json({ error: 'Internal server error' });
-        }
-
+    // Directly use the global connection object
+    try{
         connection.beginTransaction((err) => {
             if (err) {
-                connection.release();
                 return res.status(500).json({ error: 'Internal server error' });
             }
-
+    
             const checkAccepter = 'SELECT * FROM INVITEE WHERE inviteeId = ? AND TakerId = ? AND Approval = ?';
             connection.query(checkAccepter, [inviteeId, TakerId, Approval], (error, results) => {
                 if (error) {
                     return connection.rollback(() => {
-                        connection.release();
                         return res.status(500).json({ error: 'Internal server error' });
                     });
                 }
-
+    
                 if (results.length === 0 || results[0].Approval !== 'Pending..') {
                     return connection.rollback(() => {
-                        connection.release();
                         return res.status(409).json({ message: 'Not expected status', status: false });
                     });
                 }
-
+    
                 const updateApprovalStatus = 'UPDATE INVITEE SET Approval = ? WHERE inviteeId = ? AND TakerId = ?';
                 connection.query(updateApprovalStatus, ['Approved', inviteeId, TakerId], (error) => {
                     if (error) {
                         return connection.rollback(() => {
-                            connection.release();
                             return res.status(500).json({ error: 'Internal server error' });
                         });
                     }
-
+    
                     connection.commit((err) => {
                         if (err) {
                             return connection.rollback(() => {
-                                connection.release();
                                 return res.status(500).json({ error: 'Internal server error' });
                             });
                         }
-
+    
+                        // Send email notification
                         const mailOptions = {
                             from: process.env.EMAIL_USER,
                             to: 'taskGiverEmail@example.com', // Replace with the actual task giver's email
                             subject: 'Task Request Confirmation',
                             text: 'You have a task request you need to confirm.'
                         };
-
+    
                         const transporter = nodemailer.createTransport({
                             service: 'gmail',
                             auth: {
@@ -1571,22 +1654,31 @@ export const acceptInvitation = (req, res) => {
                                 pass: process.env.EMAIL_PASS
                             }
                         });
-
+    
                         transporter.sendMail(mailOptions, (error, info) => {
                             if (error) {
-                                console.error(error);
+                                console.error('Email error:', error);
                             } else {
                                 console.log('Email sent:', info.response);
                             }
                         });
-
-                        connection.release();
+    
                         return res.status(200).json({ message: 'Successfully accepted invitation', status: true });
                     });
                 });
             });
         });
-    });
+    } catch (error) {
+        console.log('Internal server error:', error.message);
+        if (connection) {
+            connection.rollback();
+        }
+        return res.status(500).json({ error: 'Internal server error' });
+    } finally {
+        if (connection) {
+            connection.release(); // Release the connection
+        }
+    }
 };
 
 
@@ -1673,6 +1765,7 @@ export const acceptInvitation = (req, res) => {
 
 
 export const DeclineInvitation = (req, res) => {
+    const connection = getConnection(); // Replace with your actual connection method
     const { inviteeId, TakerId, Approval, inviterId } = req.body;
     const userId = req.user.userId;
 
@@ -1680,76 +1773,64 @@ export const DeclineInvitation = (req, res) => {
         return res.status(404).json('Missing data');
     }
 
-    pool.getConnection((err, connection) => {
-        if (err) {
-            console.error('Connection error:', err);
-            return res.status(500).json({ error: 'Internal server error' });
-        }
-
+    try{
         connection.beginTransaction((err) => {
             if (err) {
-                connection.release();
                 return res.status(500).json({ error: 'Internal server error' });
             }
-
+    
             const checkAccepter = 'SELECT * FROM INVITEE WHERE inviteeId = ? AND TakerId = ? AND Approval = ?';
             connection.query(checkAccepter, [inviteeId, TakerId, Approval], (error, results) => {
                 if (error) {
                     return connection.rollback(() => {
-                        connection.release();
                         return res.status(500).json({ error: 'Internal server error' });
                     });
                 }
-
+    
                 if (results.length === 0 || results[0].Approval !== 'Pending..') {
                     return connection.rollback(() => {
-                        connection.release();
                         return res.status(409).json({ message: 'Not expected status', status: false });
                     });
                 }
-
+    
                 const getTakerEmail = 'SELECT EMAIL FROM USERS WHERE userId = ?';
                 connection.query(getTakerEmail, [inviterId], (error, emailResults) => {
                     if (error) {
                         return connection.rollback(() => {
-                            connection.release();
                             return res.status(500).json({ error: 'Internal server error' });
                         });
                     }
-
+    
                     if (emailResults.length === 0) {
                         return connection.rollback(() => {
-                            connection.release();
                             return res.status(406).json('Missing Email');
                         });
                     }
-
+    
                     const inviterEmail = emailResults[0].EMAIL;
-
+    
                     const updateApprovalStatus = 'UPDATE INVITEE SET Approval = ? WHERE inviteeId = ? AND TakerId = ?';
                     connection.query(updateApprovalStatus, ['Declined', inviteeId, TakerId], (error) => {
                         if (error) {
                             return connection.rollback(() => {
-                                connection.release();
                                 return res.status(500).json({ error: 'Internal server error' });
                             });
                         }
-
+    
                         connection.commit((err) => {
                             if (err) {
                                 return connection.rollback(() => {
-                                    connection.release();
                                     return res.status(500).json({ error: 'Internal server error' });
                                 });
                             }
-
+    
                             const mailOptions = {
                                 from: process.env.EMAIL_USER,
                                 to: inviterEmail,
                                 subject: 'Task Invitation Declined',
                                 text: 'Your task invitation has been declined.'
                             };
-
+    
                             const transporter = nodemailer.createTransport({
                                 service: 'gmail',
                                 auth: {
@@ -1757,7 +1838,7 @@ export const DeclineInvitation = (req, res) => {
                                     pass: process.env.EMAIL_PASS
                                 }
                             });
-
+    
                             transporter.sendMail(mailOptions, (error, info) => {
                                 if (error) {
                                     console.error(error);
@@ -1765,14 +1846,23 @@ export const DeclineInvitation = (req, res) => {
                                     console.log('Email sent:', info.response);
                                 }
                             });
-
-                            connection.release();
+    
                             return res.status(200).json({ message: 'Successfully declined invitation', status: true });
                         });
                     });
                 });
             });
         });
-    });
+    } catch (error) {
+        console.log('Internal server error:', error.message);
+        if (connection) {
+            connection.rollback();
+        }
+        return res.status(500).json({ error: 'Internal server error' });
+    } finally {
+        if (connection) {
+            connection.release(); 
+        }
+    }
 };
 

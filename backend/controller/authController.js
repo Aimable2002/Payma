@@ -21,18 +21,18 @@ export const signup = async (req, res) => {
         connection.query(existUser, [userName], async (err, result) => {
             if(err) {
                 console.log('error on exist user')
-                return res.status(409).json('userName taken')
+                return res.status(411).json({error: 'error of db', data: err.message})
             }
             if(result.length > 0){
-                console.log('userName exist');
+                console.log('userName exist :', result[0].userName);
                 return res.status(404).json('userName taken')
             }
-            
-            const insertUser = 'INSERT INTO users (First_name, Last_name, userName, Title, Email, Phone_number, Balance, Password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+            console.log('retrieved data :', result)
+            const insertUser = 'INSERT INTO USERS (First_name, Last_name, userName, Title, Email, Phone_number, Balance, Password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
             connection.query(insertUser, [First_name, Last_name, userName, Title, Email, Phone_number, Balance || 0, Password], (err, result) => {
                 if(err){
                     console.log('error on insert user data :', err)
-                    return res.status(409).json('error inserting user data')
+                    return res.status(412).json('error inserting user data')
                 }
                 const user = result
                 const token = jwt.sign({userId: user.insertId}, process.env.SECRET_KEY_AUTH, {expiresIn: '30d'})
@@ -57,11 +57,11 @@ export const login = async (req, res) => {
             return res.status(409).json('fill all the field')
         }
         
-        const trackUser = 'SELECT * FROM users WHERE userName = ?';
+        const trackUser = 'SELECT * FROM USERS WHERE userName = ?';
         connection.query(trackUser, [userName], async (err, result) => {
             if(err){
-                console.log('error tracking user');
-                return res.status(400).json({err: 'internal error tracking user', data: err.message})
+                console.log('error tracking user', err.message);
+                return res.status(410).json({err: 'internal error tracking user', data: err.message})
             }
             if(result.length === 0){
                 console.log("user not found ")
