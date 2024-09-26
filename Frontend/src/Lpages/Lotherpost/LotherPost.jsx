@@ -18,10 +18,10 @@ const handleVisitBtn = (pro) => {
   navigate(`/indoor/${pro.ownerId}there&wego`)
 }
   return (
-    <div className="w-full flex flex-col overflow-auto" >
+    <>
       {products.length !== 0 ? (
         products.map((pro, idx) => (
-          <>
+          <div className='grid grid-cols-3 gap-4 px-2 w-full'>
         <Card isFooterBlurred className="mb-5 w-full h-[300px] col-span-12 sm:col-span-5">
               <CardHeader className="absolute z-10 top-1 gap-1 flex-col items-start" style={{zIndex: '1'}}>
                 <p className="text-tiny text-[#13a993] uppercase font-bold bg-base-100 rounded-full px-1">New</p>
@@ -133,11 +133,11 @@ const handleVisitBtn = (pro) => {
                 </div>
               </div>
             </dialog>
-            </>
+            </div>
           ))
           ): null}
           
-    </div>
+    </>
   )
 }
 

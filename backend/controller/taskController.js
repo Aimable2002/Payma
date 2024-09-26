@@ -841,7 +841,7 @@ export const DeclineRequest = async (req, res) => {
             // Check if the task exists and the requester is the task giver
             const checkTask = `
                 SELECT task_giverId, task_takerId 
-                FROM TASK 
+                FROM task 
                 WHERE taskId = ?
             `;
             connection.query(checkTask, [taskId], (err, taskRows) => {
@@ -1610,7 +1610,7 @@ export const acceptInvitation = (req, res) => {
                 return res.status(500).json({ error: 'Internal server error' });
             }
     
-            const checkAccepter = 'SELECT * FROM INVITEE WHERE inviteeId = ? AND TakerId = ? AND Approval = ?';
+            const checkAccepter = 'SELECT * FROM invitee WHERE inviteeId = ? AND TakerId = ? AND Approval = ?';
             connection.query(checkAccepter, [inviteeId, TakerId, Approval], (error, results) => {
                 if (error) {
                     return connection.rollback(() => {
@@ -1624,7 +1624,7 @@ export const acceptInvitation = (req, res) => {
                     });
                 }
     
-                const updateApprovalStatus = 'UPDATE INVITEE SET Approval = ? WHERE inviteeId = ? AND TakerId = ?';
+                const updateApprovalStatus = 'UPDATE invitee SET Approval = ? WHERE inviteeId = ? AND TakerId = ?';
                 connection.query(updateApprovalStatus, ['Approved', inviteeId, TakerId], (error) => {
                     if (error) {
                         return connection.rollback(() => {
@@ -1779,7 +1779,7 @@ export const DeclineInvitation = (req, res) => {
                 return res.status(500).json({ error: 'Internal server error' });
             }
     
-            const checkAccepter = 'SELECT * FROM INVITEE WHERE inviteeId = ? AND TakerId = ? AND Approval = ?';
+            const checkAccepter = 'SELECT * FROM invitee WHERE inviteeId = ? AND TakerId = ? AND Approval = ?';
             connection.query(checkAccepter, [inviteeId, TakerId, Approval], (error, results) => {
                 if (error) {
                     return connection.rollback(() => {
@@ -1809,7 +1809,7 @@ export const DeclineInvitation = (req, res) => {
     
                     const inviterEmail = emailResults[0].EMAIL;
     
-                    const updateApprovalStatus = 'UPDATE INVITEE SET Approval = ? WHERE inviteeId = ? AND TakerId = ?';
+                    const updateApprovalStatus = 'UPDATE invitee SET Approval = ? WHERE inviteeId = ? AND TakerId = ?';
                     connection.query(updateApprovalStatus, ['Declined', inviteeId, TakerId], (error) => {
                         if (error) {
                             return connection.rollback(() => {

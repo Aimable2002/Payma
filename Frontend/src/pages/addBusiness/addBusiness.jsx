@@ -38,38 +38,40 @@ const addBusiness = () => {
     };
     const { loading, postBusiness } = postBusinessProduct()
 
-    const handleSubmit = async (e) => {
-      e.preventDefault()
-      const { 
-        Business_Category, 
-        Business_Name, 
-        Business_Description, 
-        Business_email, 
-        Business_phone, 
-        Product_name, 
-        Amount, 
-        Quantity, 
-        Product_Description 
-      } = inputValue;
   
-      console.log('inputValue :', inputValue);
-      console.log('Business_Category :', Business_Category);
-      await postBusiness(inputValue);
-    };
 
-    const [imgChange, setImgChange] = useState();
+   const handleSubmit = async (e) => {
+     e.preventDefault()
+     const { 
+       Business_Category, 
+       Business_Name, 
+       Business_Description, 
+       Business_email, 
+       Business_phone, 
+       Product_name, 
+       Amount, 
+       Quantity, 
+       Product_Description 
+     } = inputValue;
+  
+     console.log('inputValue :', inputValue);
+     console.log('Business_Category :', Business_Category);
+     await postBusiness(inputValue);
+   };
+
+   const [imgChange, setImgChange] = useState();
 
   const addImg = useRef();
 
   const handleRefProfile = () => {
-    addImg.current.click();
+   addImg.current.click();
   };
 
-    const { upload } = postUploadPhoto();
+   const { upload } = postUploadPhoto();
   const handleProfileChange = async (e) => {
-    const file = e.target.files[0];
-    await upload(file);
-    setImgChange(new Date().getTime());
+   const file = e.target.files[0];
+   await upload(file);
+   setImgChange(new Date().getTime());
   };
   return (
     <div className='w-full flex flex-col'>
@@ -127,10 +129,10 @@ const addBusiness = () => {
           <div>
             <Button 
               className='w-2/5 border-accent text-tiny text-accent outline-none bg-base-100 mt-10'
-                onClick={handleNext}
-                type='button'
+                
+                type='submit'
               >
-              Next
+              Submit
             </Button>
           </div>
           <div className='w-full mt-10'>
@@ -138,6 +140,10 @@ const addBusiness = () => {
           </div>
         </form>
       ) : (
+
+
+
+        // not being used
         <form className='flex flex-col justify-center items-center w-4/5 mt-10' onSubmit={handleSubmit}>
           <div className='w-full'>
             {['Product_name', 'Product_Description', 'Amount', 'Quantity', 'Add_photo'].map((field) => (
@@ -164,9 +170,9 @@ const addBusiness = () => {
                     style={{ display: 'none' }}
                     ref={addImg}
                   />
-                  <div className='w-full mb-4 gap-4 flex flex-row' onClick={handleRefProfile}>
-                    <div><SummarizeIcon /></div>
-                    <div><h1>Add Photo</h1></div>
+                  <div className='w-full mb-4 gap-4 flex flex-row' onClick={handleRefProfile}> 
+                    <div><SummarizeIcon className={`${imgChange ? 'text-info' : ''}`}/></div>
+                    <div><h1 className={`${imgChange ? 'text-info' : ''}`}>{!imgChange ? 'Add Photo' : 'sent'}</h1></div>
                   </div>
                 </>
               ) : (

@@ -1,34 +1,23 @@
-// import { useTable } from '@nextui-org/react'
+
+
+
 // import axios from 'axios'
 // import React, { useState } from 'react'
 
-// const PostAddBusiness = () => {
-//     const [loading, setLoading] = useState(false);
+// const postBusinessProduct = () => {
 
-//     const postBusiness = async (formData) => {
+//     const [loading, setLoading] = useState(false);
+   
+//     const postBusiness = async (photo, inputData) => {
+//         console.log('photo :', photo.photo)
+//         console.log('photo 2 :', photo)
 //         setLoading(true);
 //         try {
 //             const token = localStorage.getItem('on-user');
-//             console.log('form data :', formData.get('Add_photo')); // This checks if the file is included
-//             formData.forEach((value, key) => {
-//                 console.log(`${key}:`, value);
-//             });
             
-//             const res = await axios.post('/api/business/uploadProduct', formData, {
-//                 headers: {
-//                     Authorization: `${JSON.parse(token).token}`,
-//                     'Content-Type': 'multipart/form-data', // Required for handling file uploads
-//                 },
-//             });
-
-//             const responseData = res.data;
-//             if (!responseData) {
-//                 throw new Error('No data sent');
-//             }
-
-//             return responseData;
 //         } catch (error) {
 //             console.log('Error:', error.message);
+//             alert('something went wrong')
 //         } finally {
 //             setLoading(false);
 //         }
@@ -37,34 +26,30 @@
 //     return { loading, postBusiness };
 // };
 
-// export default PostAddBusiness;
+// export default postBusinessProduct
+
 
 
 
 
 import axios from 'axios'
 import React, { useState } from 'react'
+import { useProductContext } from '../../context/productContext/productContext.jsx';
 
 const PostAddBusiness = () => {
     const [loading, setLoading] = useState(false);
 
-    const postBusiness = async (Business_Category, Description, Quantity, Amount, Product) => {
-        
-        const Business_Category1 = Business_Category.Business_Category
-        const Description1 = Business_Category.Description
-        const Quantity1 = Business_Category.Quantity
-        const Amount1 = Business_Category.Amount
-        // const District1 = Business_Category.District
-        const Product1 = Business_Category.Product
-        // const Location1 = Business_Category.Location
-        console.log('Business_Category:', Business_Category1)
+    const { setIsProductPublished } = useProductContext()
 
-        console.log('Description:', Description1)
-        console.log('Quantity:', Quantity1)
-        console.log('Amount:', Amount1)
-        // console.log('District:', District1)
-        console.log('Product:', Product1)
-        // console.log('Location :', Location1)
+    const postBusiness = async (photo, Description, Quantity, Amount, Product) => {
+        
+        const Business_Category1 = photo.Business_Category
+        const Description1 = photo.Description
+        const Quantity1 = photo.Quantity
+        const Amount1 = photo.Amount
+        const Product1 = photo.Product
+        const photo1 = photo.photo
+
         const Success = handleError(Business_Category1, Description1, Quantity1, Amount1,  Product1)
         if(!Success) return alert('fill the field')
         setLoading(true);
@@ -79,18 +64,24 @@ const PostAddBusiness = () => {
                 Description: Description1,
                 Quantity: Quantity1,
                 Amount: Amount1,
+                imgUrl: photo1
             }, {
                 headers: {
                     Authorization: `${JSON.parse(token).token}`,
                 },
             });
 
-            const responseData = res.data;
-            if (!responseData) {
+            const data = res.data;
+            if (!data) {
                 throw new Error('No data sent');
             }
 
-            return responseData;
+            if(data.status === true){
+                alert('product published')
+                setIsProductPublished(true);
+            }else{
+                alert('product publish fail, try again')
+            }
         } catch (error) {
             console.log('Error:', error.message);
         } finally {

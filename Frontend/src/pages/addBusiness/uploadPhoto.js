@@ -5,6 +5,8 @@ import React, { useState } from 'react'
 const postUploadPhoto = () => {
     const [loading, setLoading] = useState(false);
 
+    const [imgUrl, setImgUrl] = useState(null)
+
     const upload = async (file) => {
         setLoading(true);
         try {
@@ -16,16 +18,17 @@ const postUploadPhoto = () => {
             const res = await axios.post('/api/business/upload', formData, {
                 headers: {
                     Authorization: `${JSON.parse(token).token}`,
-                    'Content-Type': 'multipart/form-data', //Required for handling file uploads
+                    'Content-Type': 'multipart/form-data',
                 },
             });
 
-            const responseData = res.data;
-            if (!responseData) {
+            const data = res.data;
+            if (!data) {
                 throw new Error('No data sent');
             }
-
-            return responseData;
+            console.log('data :', data)
+            console.log('img url :', data.secure_url)
+            setImgUrl(data.secure_url)
         } catch (error) {
             console.log('Error:', error.message);
         } finally {
@@ -33,7 +36,7 @@ const postUploadPhoto = () => {
         }
     };
 
-    return { loading, upload };
+    return { loading, upload, imgUrl };
 };
 
 export default postUploadPhoto;

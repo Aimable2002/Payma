@@ -24,7 +24,7 @@ import postApproval from "../../hook/approveTask/postApproval";
 
 import ContrastIcon from '@mui/icons-material/Contrast';
 import { toggleTheme, getCurrentTheme } from "../../utilities/themeToggle";
-import { updatePassward } from "../../../../backend/controller/updateControlla";
+import { useNavigate } from "react-router-dom";
 import { PUpdate } from "../../hook/updateHook/PUpdate";
 import useInvite from "../../hook/Invitation/useInvite";
 import useGetInvite from "../../hook/Invitation/useGetInvite";
@@ -52,6 +52,8 @@ import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
 import Badge from '@mui/material/Badge';
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import AddTaskIcon from '@mui/icons-material/AddTask';
+import getProduct from "../addBusiness/getProduct";
+// import getBusiness from "../addBusiness/getBusiness";
 
 const truncateString = (str, maxLength) => {
     if(str.length <= maxLength ){
@@ -113,7 +115,7 @@ const home = () => {
     { name: 'Dashboard', leftIcon: <DashboardCustomizeIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard'},
     { name: 'wallet', leftIcon: <WalletIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard' },
     // { name: '', leftIcon: <AssessmentIcon className="text-info"/>, rightIcon: <DragHandleTwoToneIcon />, link: '/dashboard' },
-    { name: 'Your Business', leftIcon: <BusinessCenterIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>, onClick: () =>document.getElementById('my_modal_business').showModal() },
+    { name: 'Add Selling', leftIcon: <BusinessCenterIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon/>, link: '/product'},
     { name: 'Account', leftIcon: <AccountCircleIcon className="text-info" />, rightIcon: <DragHandleTwoToneIcon />, onClick: () =>document.getElementById('my_modal_30').showModal() },
     //{ name: 'Theme', leftIcon: <ContrastIcon className="text-info" />, onClick: toggleTheme },
     { name: 'Add Task', leftIcon: <AddTaskIcon className="text-info" />, link: '/job'},
@@ -451,6 +453,16 @@ const handleApprove = async (user) => {
     }
     
   }, [applyView, inviteTaskPending]);
+
+  // const {business} = getBusiness()
+  const navigate = useNavigate();
+  const [selectedBusiness, setSelectedBusiness] = useState(null)
+  const handleBusinessBtn = (businessName) => {
+    setSelectedBusiness(businessName);
+    navigate(`/product/${businessName}`);
+  };
+  const {products} = getProduct()
+
   return (
     <div className="w-full flex flex-col overflow-auto ">
         <div className=" w-full">
@@ -465,9 +477,6 @@ const handleApprove = async (user) => {
                     )}
                   </div>
                   <div onClick={handleMenu} className="text-info"><MenuIcon /></div>
-                  <div>
-                    
-                  </div>
                 </div>
                 {isMenu && (
                     <div style={{zIndex: '10'}} className={`drp-ctnt flex flex-col justify-between h-screen ${bgColorClass}`}>
@@ -584,29 +593,36 @@ const handleApprove = async (user) => {
                     ))}
                 </div>
         </dialog>
-        <dialog id="my_modal_business" className="modal">
+        {/* <dialog id="my_modal_business" className="modal">
                 <div className="modal-box">
                     <form method="dialog">
-                    {/* if there is a button in form, it will close the modal */}
                     <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                     </form>
                     {isaddBusiness ? null : (
                       <>
-                        <h3 className="font-bold text-lg">Business Account</h3> 
-                        <p className="py-4 mb-4">Create the business account</p>
+                        <h3 className="font-bold text-center text-lg">Business Account</h3> 
+                        <p className=" text-center text-sm">Choose your Business you want to a add product to</p> 
+                        {!loading && business.length !== 0 ? (
+                          business.map((busi, idx) => (
+                            <Button 
+                              className=" py-4 mt-4 bg-base-100 btn btn-outline btn-accent" 
+                              type='button'
+                              onClick={() => handleBusinessBtn(busi.business_name)}>{busi.business_name}</Button>
+                          ))
+                        ) : null}
                       </>
                     )}
                     <form onSubmit={(e) => e.preventDefault()}>
                       {isaddBusiness ? null : (
                         <div className='w-full flex flex-col gap-10'>
-                          <Link to='business'><Button  className="bg-base-100 btn btn-outline btn-accent" type='button'>Create Business</Button></Link>
+                          <Link to='business'><Button  className="mt-4 bg-base-100 btn btn-outline btn-accent" type='button'>Create New Business</Button></Link>
                         </div>
                       )}
                       {isaddJob && (<AddJob resetView={resetView}/>)}
                       {isaddBusiness && (<AddBusiness resetView={resetView} />)}
                     </form>
                 </div>
-        </dialog>
+        </dialog> */}
         </div>
         <div className="mt-8 py-2 gap-2 overflow-x-auto w-full flex flex-row hide-scrollbar">
           <div className={`${activeButton === 'Home' ? 'btn2 cursor-pointer' : 'btn1 cursor-pointer'}`} onClick={() => handleButtonClick('Home')}>Home</div>
@@ -622,7 +638,9 @@ const handleApprove = async (user) => {
         {isHome && (
           <>
 
-            <Otherpost />
+            {!loading && products.length !== 0 ? (
+              <Otherpost products={products} />
+            ) : null}
           {usersTask.map((task) => (
             <Card key={task.taskId} style={{zIndex: '1'}} className="mb-1">
                 <CardHeader className="justify-between ">

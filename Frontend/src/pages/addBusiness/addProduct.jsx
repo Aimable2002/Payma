@@ -12,7 +12,8 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import parse from 'autosuggest-highlight/parse';
 import { debounce } from '@mui/material/utils';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+// import getBusiness from './getBusiness';
 
 // This key was created specifically for the demo in mui.com.
 // You need to create a new one for your application.
@@ -39,7 +40,7 @@ function loadScript(src, position, id, callback) {
 
 const autocompleteService = { current: null };
 
-const GoogleMaps = ({ onChange }) => {
+const GoogleMaps = ({ onChange, business_name }) => {
   const [value, setValue] = React.useState(null);
   const [inputValue, setInputValue] = React.useState('');
   const [options, setOptions] = React.useState([]);
@@ -119,7 +120,7 @@ const GoogleMaps = ({ onChange }) => {
       onChange={(event, newValue) => {
         setOptions(newValue ? [newValue, ...options] : options);
         setValue(newValue);
-        onChange(newValue ? newValue.description : ''); // Pass the selected value to parent
+        onChange(newValue ? newValue.description : '');
       }}
       onInputChange={(event, newInputValue) => {
         setInputValue(newInputValue);
@@ -164,14 +165,15 @@ const GoogleMaps = ({ onChange }) => {
   );
 };
 
-const AddProduct = ({ resetView }) => {
+const AddProduct = ({ resetView}) => {
   const [inputValue, setInputValue] = useState({
     Business_Category: '',
     Description: '',
     Product: '',
     Amount: '',
     Quantity: '',
-    Location: '' // Adding Location to track the selected place
+    Location: '',
+    photo: ''
   });
 
   const handleChange = (e) => {
@@ -181,16 +183,30 @@ const AddProduct = ({ resetView }) => {
       [name]: value
     }));
   };
+  const { loading, postBusiness } = PostAddBusiness();
+  const { upload, imgUrl } = postUploadPhoto();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { Business_Category, Product_Description: Description, Product_name: Product, Amount, Quantity, Location } = inputValue;
+    // Destructure values from inputValue and include imgUrl
+    const { Business_Category, Description, Product, Amount, Quantity, Location } = inputValue;
 
-    console.log('inputValue :', inputValue);
-    console.log('Business_Category :', Business_Category);
-    await postBusiness(inputValue);
-  };
+    const inputData = {
+        Business_Category,
+        Description,
+        Product,
+        Amount,
+        Quantity,
+        Location,
+        photo: imgUrl, 
+    };
+
+    console.log('inputData:', inputData);
+
+    await postBusiness(inputData); // Submit the data
+};
+
 
   const [imgChange, setImgChange] = useState();
 
@@ -200,25 +216,45 @@ const AddProduct = ({ resetView }) => {
     addImg.current.click();
   };
 
-  const { loading, postBusiness } = PostAddBusiness();
-  const { upload } = postUploadPhoto();
   const handleProfileChange = async (e) => {
     const file = e.target.files[0];
     await upload(file);
     setImgChange(new Date().getTime());
   };
-
+  const navigate = useNavigate()
+  const [selectedBusiness, setSelectedBusiness] = useState(null)
+  const handleButtonClick = (businessName) => {
+    setSelectedBusiness(businessName);
+  };
+  // const {business} = getBusiness()
+  
   return (
     <div className="w-full flex flex-col overflow-auto">
       <div className='w-full fixed'>
         <Link to='/'><h1 style={{ cursor: 'pointer' }}>Back</h1></Link>
       </div>
-      <div className='w-full mt-8'>
-        <h1 className='w-full flex justify-center mt-5'>Form to add Business Product</h1>
-        <div className='w-full mt-4'>
+      <div className='w-full justify-center flex '>
+      <div className='w-full flex-col mt-8 justify-center' style={{maxWidth: '600px', boxShadow: '0 4px 4px rgba(0, 0, 0, 0.4)'}}>
+        <h1 className='w-full flex justify-center mt-5'>Business Center</h1>
+        {/* {!loading && business.length !== 0 ? 
+        (
+          business.map((busi, idx) => (
+            
+              <div key={idx} className='flex mt-4 w-full px-4'>
+                <Button className="bg-base-100 btn btn-outline btn-accent"
+                  onClick={() => handleButtonClick(busi.business_name)}
+                >
+                  {busi.business_name}
+                </Button>
+              </div>
+            
+          )) 
+        ) : null }
+          {selectedBusiness && ( */}
+          <div  className='flex align-middle justify-center mt-4 px-2 py-2' >
           <form onSubmit={handleSubmit}>
             <div className='w-full'>
-              {['Business_Category', 'Description', 'Product', 'Amount', 'Quantity', 'Add_photo'].map((field) => (
+              {['Business_Category', 'Product', 'Description',  'Amount', 'Quantity', 'Add_photo'].map((field) => (
                 field === 'Business_Category' ? (
                   <select
                     key={field}
@@ -228,7 +264,7 @@ const AddProduct = ({ resetView }) => {
                     onChange={handleChange}
                     className="select select-accent outline-none w-full mb-2 p-2 border rounded"
                   >
-                    <option value="" disabled>Select Business Category</option>
+                    <option value="" disabled>Select Product Category</option>
                     <option value="Art">Art</option>
                     <option value="IT Field">IT Field</option>
                     <option value="Delivery">Delivery</option>
@@ -260,9 +296,15 @@ const AddProduct = ({ resetView }) => {
                       style={{ display: 'none' }}
                       ref={addImg}
                     />
-                    <div className='w-full mb-4 gap-4 flex flex-row' onClick={handleRefProfile}>
-                      <div><SummarizeIcon /></div>
-                      <div><h1>Add Photo</h1></div>
+                    <div className='w-full flex flex-col' onClick={handleRefProfile}>
+                      <div className=' w-full mb-4 gap-4 flex flex-row'>
+                        <div><SummarizeIcon className={`${imgChange ? 'text-info' : ''}`}/></div>
+                        <div><h1 className={`${imgChange ? 'text-info' : ''}`}>{!imgChange ? 'Add Photo' : 'sent'}</h1></div>
+                      </div>
+                        <div>
+                          <img style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+                          src={imgUrl}/>
+                        </div>
                     </div>
                   </>
                 ) : (
@@ -286,6 +328,9 @@ const AddProduct = ({ resetView }) => {
             </div>
           </form>
         </div>
+          {/* )} */}
+      </div>
+
       </div>
     </div>
   );

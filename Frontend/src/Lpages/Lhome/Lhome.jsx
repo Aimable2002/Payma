@@ -35,6 +35,7 @@ import useDecline from '../../hook/applying/DeclineRequest';
 import useDeclineInvite from '../../hook/Invitation/useDeclineInvite';
 import getLogUser from '../../hook/getUsers/getLogUser';
 
+import LOtherPost from '../../Lpages/Lotherpost/LotherPost.jsx'
 import OtherPost from '../../pages/home/Otherpost'
 import AddJob from '../../pages/AdDJob/addJob'
 import AddBusiness from '../../pages/addBusiness/addBusiness';
@@ -46,6 +47,7 @@ import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
 import CircleNotificationsIcon from '@mui/icons-material/CircleNotifications';
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import AddTaskIcon from '@mui/icons-material/AddTask';
+import getProduct from '../../pages/addBusiness/getProduct';
 
 const truncateString = (str, maxLength) => {
     if(str.length <= maxLength ){
@@ -399,7 +401,7 @@ const Lhome = () => {
         setAddJob(false);
         setAddBusiness(false);
     };
-
+    const {products} = getProduct()
   return (
     <div className='w-full flex flex-row fixed'>
         <div className={`w-2/12 overflow-y-auto ${bgColorClass}`} style={{zIndex: '2'}}>
@@ -613,11 +615,13 @@ const Lhome = () => {
                 )}
             <div className='grid grid-cols-3 gap-4 px-2 w-full'>
                 {isBusiness && (
-                    <OtherPost />
+                    <LOtherPost products={products}/>
                 )}
                 {isHome && (
                     <>
-                    <OtherPost />
+                    {!loading && products.length !== 0 ? (
+                        <LOtherPost products={products}/>
+                    ) : null}
                 {usersTask.map((task) => {
                     return (
                     <Card  style={{zIndex: '1'}}>

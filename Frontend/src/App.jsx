@@ -43,7 +43,7 @@ function App() {
         <Route path='/account' element={AuthUser ? <Profile /> : <Navigate to ='sign' />} />
         <Route path='/job' element={AuthUser ? <AddJob /> : <Navigate to ='sign' />} />
         <Route path='/business' element={AuthUser ? <AddBusiness /> : <Navigate to ='sign' />} />
-        <Route path='/indoor' element={AuthUser ? <InDoor /> : <Navigate to ='sign' />} />
+        <Route path='/indoor/:id' element={AuthUser ? <InDoor /> : <Navigate to ='sign' />} />
         <Route path='/product' element={AuthUser ? <AddProduct /> : <Navigate to ='sign' />} />
         </Routes>
       ) : (
@@ -52,8 +52,8 @@ function App() {
           <Route path='/' element={AuthUser ? <Lhome /> : <Navigate to='sign' />} />
           <Route path='/dashboard' element={AuthUser ? <Ldashboard /> : <Navigate to='sign' />} />
           <Route path='/afripay' element={AuthUser ? <AfriPayForm /> : <Navigate to='sign' />} />
-          <Route path='/indoor' element={AuthUser ? <InDoorOrder /> : <Navigate to ='sign' />} />
-          
+          <Route path='/indoor/:id' element={AuthUser ? <InDoorOrder /> : <Navigate to ='sign' />} />
+          <Route path='/product' element={AuthUser ? <AddProduct /> : <Navigate to ='sign' />} />
         <Route path='/job' element={AuthUser ? <AddJob /> : <Navigate to ='sign' />} />
         <Route path='/business' element={AuthUser ? <AddBusiness /> : <Navigate to ='sign' />} />
         </Routes>

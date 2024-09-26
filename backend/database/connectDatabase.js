@@ -7,7 +7,7 @@ const connectDatabase = () => {
             user: "konnectr_konnectr",
             password: "Back_wizard12@.",
             database: "konnectr_konnect",
-            
+
         });
 
         connection.connect((err) => {
@@ -31,6 +31,16 @@ const connectDatabase = () => {
 export default connectDatabase;
 
 
+
+
+
+// const connection = mysql.createConnection({
+//     host:  "162.55.131.89",
+//     user: "konnectr_konnectr",
+//     password: "Back_wizard12@.",
+//     database: "konnectr_konnect",
+    
+// });
 
 // import mysql from 'mysql';
 

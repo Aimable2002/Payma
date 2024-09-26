@@ -5,6 +5,7 @@ import './index.css'
 import { BrowserRouter } from 'react-router-dom'
 import { NextUIProvider } from '@nextui-org/react'
 import { AuthContextProvider } from './context/authContext/authContext.jsx'
+import { ProductProvider } from './context/productContext/productContext.jsx'
 //import { ThemeContext } from './context/ThemeContext.js'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -13,7 +14,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <NextUIProvider>
         {/* <ThemeContext> */}
         <AuthContextProvider>
-          <App />
+          <ProductProvider>
+            <App />
+          </ProductProvider>
         </AuthContextProvider>
         {/* </ThemeContext> */}
       </NextUIProvider>

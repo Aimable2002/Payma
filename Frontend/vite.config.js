@@ -60,7 +60,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://http://www.konnect.rw',
+        target: 'http://konnect.rw/',
         changeOrigin: true
       }
     }

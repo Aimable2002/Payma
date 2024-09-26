@@ -4,6 +4,7 @@ import React, {useState, useEffect} from 'react'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { Link } from 'react-router-dom';
+import getProduct from '../addBusiness/getProduct';
 
 const InDoorOrder= () => {
 
@@ -15,6 +16,9 @@ const InDoorOrder= () => {
             setIsScrolled(false)
         }
     }
+
+    const {loading, products} = getProduct()
+
     useEffect(() => {
         window.addEventListener('scroll', handleScrol)
         return () => {
@@ -29,12 +33,12 @@ const InDoorOrder= () => {
     ];
 
     const nextSlide = () => {
-        setCurrentSlide((prevSlide) => (prevSlide + 1) % images.length);
+        setCurrentSlide((prevSlide) => (prevSlide + 1) % products.length);
     };
 
     const prevSlide = () => {
         setCurrentSlide((prevSlide) =>
-            prevSlide === 0 ? images.length - 1 : prevSlide - 1
+            prevSlide === 0 ? products.length - 1 : prevSlide - 1
         );
     };
 
@@ -58,11 +62,13 @@ const InDoorOrder= () => {
                     <div className='w-full flex flex-col justify-center '>
                         <div 
                             className='w-full h-[300px] bg-slate-50 flex items-center justify-center overflow-hidden'
-                            style={{ backgroundImage: `url(${images[currentSlide]})`, 
+                            style={{ backgroundImage: products.length > 0 
+                            ? `url(${products[currentSlide]?.product_img_url})` 
+                            : 'none',  
                             borderRadius: '10px'}}
                         >
                             <img 
-                                src={images[currentSlide]}
+                                src={products[currentSlide]?.product_img_url}
                                 className='max-w-full max-h-full'
                                 alt='Example'
                             />
@@ -78,9 +84,7 @@ const InDoorOrder= () => {
                         <div className='flex flex-col'>
                             <h1 className='font-bold'>Description</h1>
                             <p>
-                                Your development work will be backend-centric, 
-                                involving APIs, databases, and logic handling, 
-                                rather than traditional frontend technologies like HTML, CSS, or JavaScript.
+                                {products[currentSlide]?.description}
                             </p>
                         </div>
                         <div className='flex flex-col py-4'>
@@ -93,7 +97,7 @@ const InDoorOrder= () => {
                             <div className='flex flex-col py-4'>
                                 <h1 className='font-bold'>Cost</h1>
                                 <p>
-                                    460,000 RWF
+                                    {products[currentSlide]?.price} RWF
                                 </p>
                             </div>
                             <div className='flex align-middle'>
@@ -108,33 +112,37 @@ const InDoorOrder= () => {
                         <h1 className='font-bold mb-2 px-4'>Recommended</h1>
                         <div className='px-4'>
                             <div className='w-full grid grid-cols-4 gap-4'>
-                                {images.map((img, index) => (
-                                    <div key={index} className='flex w-full flex-col  border-gray-300 shadow-lg' 
-                                        style={{
-                                            borderRadius: '10px'
-                                        }}
-                                    >
-                                        <div 
-                                            className='w-full h-[200px] bg-slate-50 flex flex-col items-center justify-center overflow-hidden'
-                                            style={{ backgroundImage: `url(${img})`, 
-                                            borderTopLeftRadius: '10px', borderTopRightRadius: '10px'}}
+                                {!loading && products.length !== 0 ? (
+                                    products.map((img, index) => (
+                                        <div key={index} className='flex w-full flex-col  border-gray-300 shadow-lg' 
+                                            style={{
+                                                borderRadius: '10px'
+                                            }}
                                         >
-                                            <img 
-                                                src={img}
-                                                className='max-w-full max-h-full cursor-pointer'
-                                                alt='Example'
-                                                onClick={() => handleImageClick(index)}
-                                            />
-                                        </div>
-                                        <div className='w-full flex px-1 flex-col'>
-                                            <h2 className='text-sm font-bold'>AC Camera</h2>
-                                            <div className='flex flex-row justify-between'>
-                                                <h4 className='text-sm '>Amount</h4>
-                                                <h4 className='text-sm'>46,000 RWF</h4>
+                                            <div 
+                                                className='w-full h-[200px] bg-slate-50 flex flex-col items-center justify-center overflow-hidden'
+                                                style={{ backgroundImage: products.length > 0 
+                                                    ? `url(${products.product_img_url})` 
+                                                    : 'none',
+                                                borderTopLeftRadius: '10px', borderTopRightRadius: '10px'}}
+                                            >
+                                                <img 
+                                                    src={img.product_img_url}
+                                                    className='max-w-full max-h-full cursor-pointer'
+                                                    alt='Example'
+                                                    onClick={() => handleImageClick(index)}
+                                                />
+                                            </div>
+                                            <div className='w-full flex px-1 flex-col'>
+                                                <h2 className='text-sm font-bold'>{img.product_name}</h2>
+                                                <div className='flex flex-row justify-between'>
+                                                    <h4 className='text-sm '>Amount</h4>
+                                                    <h4 className='text-sm'>{img.price} RWF</h4>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    )
+                                )) : ''}
                     
                             </div>
                         </div>
