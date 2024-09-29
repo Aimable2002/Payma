@@ -1,6 +1,7 @@
 import { Button } from '@mui/material';
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import {Card, CardHeader, CardBody, CardFooter, Avatar, Image} from "@nextui-org/react";
 
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
@@ -54,16 +55,34 @@ const InDoor = () => {
     }
     return (
         <div className='w-full flex flex-col'>
-            <div className='w-full flex top-0 bg-base-300 left-0 fixed'>
-                <div className='w-11/12 flex align-middle justify-between'
+            <div className='w-full flex top-0 left-0 fixed'>
+                <div className='w-[100%] flex align-middle justify-between'
                     // style={{
                     //     backgroundImage: isScrolled ? 'none' : `url(${images[currentSlide]})`,
                     // }}
                 >
-                    {!isScrolled ? (<h1 onClick={() => handleBack()} className='px-2'>G0 Back</h1>) : (<div className='px-2'><ArrowBackIosIcon /></div>)}
+                    {!isScrolled ? (
+                        <div onClick={() => handleBack()} className='flex flex-row'>
+                                <img 
+                                    width="40px" 
+                                    height="40px" 
+                                    className="flex items-center"
+                                    src='https://res.cloudinary.com/djwl0uwtj/image/upload/v1727640905/KONNECT_LOGO_1_ln7aew.png' />
+                                <h1 className="flex align-middle self-center mb-2">Konnect</h1>
+                            </div>
+                        ) : (
+                            <div onClick={() => handleBack()} className='flex flex-row bg-white w-full'>
+                                <img 
+                                    width="40px" 
+                                    height="40px" 
+                                    className="flex items-center"
+                                    src='https://res.cloudinary.com/djwl0uwtj/image/upload/v1727640905/KONNECT_LOGO_1_ln7aew.png' />
+                                    <h1 className="flex align-middle self-center mb-2">Konnect</h1>
+                            </div>
+                        )}
                 </div>
             </div>
-            <div className='w-full mt-3 flex justify-center '>
+            <div className='w-full mt-6 flex justify-center '>
                 <div 
                     className='w-full h-[300px] bg-slate-50 flex items-center justify-center overflow-hidden'
                     style={{ backgroundImage: products.length > 0 
@@ -81,7 +100,8 @@ const InDoor = () => {
                     
                 </div>   
             </div>
-            
+            <Card className='mt-4'>
+            <CardHeader>
             <div className='w-full flex flex-col'>
                 <div className='flex flex-col'>
                     <h1 className='font-bold'>Description</h1>
@@ -107,7 +127,8 @@ const InDoor = () => {
                     </div>
                 </div>
             </div> 
-
+            </CardHeader>
+            </Card>
             <div className='w-full flex flex-col'>
                 <h1 className='font-bold mb-2'>Recommended</h1>
                 <div className='w-full grid grid-cols-2 gap-4'>
@@ -115,11 +136,11 @@ const InDoor = () => {
                         products.map((img, index) => (
                         <div key={index} className='flex w-full flex-col'>
                             <div 
-                                className='w-full h-[200px] bg-slate-70 border-bg-slate-100 flex flex-col items-center justify-center overflow-hidden'
+                                className='w-full h-[200px] bg-slate-70 border-black border-bg-slate-100 flex flex-col items-center justify-center overflow-hidden'
                                 style={{ backgroundImage: products.length > 0 
                                     ? `url(${products?.product_img_url})` 
                                     : 'none',
-                                    borderRadius: '10px'}}
+                                    borderRadius: '10px', border: '2px solid #00aaff'}}
                             >
                                 <img 
                                     src={img.product_img_url}
@@ -132,7 +153,7 @@ const InDoor = () => {
                                 <h2>{img.product_name}</h2>
                                 <div className='flex flex-row justify-between'>
                                     <h4>Amount</h4>
-                                    <h4>{img.price} RWF</h4>
+                                    <h4 className='text-info'>{img.price} RWF</h4>
                                 </div>
                             </div>
                         </div>

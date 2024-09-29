@@ -54,6 +54,8 @@ import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import getProduct from "../addBusiness/getProduct";
 // import getBusiness from "../addBusiness/getBusiness";
+import CardSkeleton from "../../skeleton/cardSkeleton";
+import SmallSkeleton from "../../skeleton/smallSkeleton";
 
 const truncateString = (str, maxLength) => {
     if(str.length <= maxLength ){
@@ -467,16 +469,25 @@ const handleApprove = async (user) => {
     <div className="w-full flex flex-col overflow-auto ">
         <div className=" w-full">
             <div className=" fixed flex flex-row justify-between align-middle" style={{width: 'calc(100% - 12px)', zIndex: '2'}}>
-                <div className="cursor-pointer"><h1 className="cursor-pointer">{isScrolled ? '' : 'Web Apllication'}</h1></div>
+                <div className="cursor-pointer"><h1 className="cursor-pointer">{isScrolled ? '' : (
+                  <div className='flex flex-row'>
+                    <img 
+                    width="50px" 
+                    height="50px" 
+                    className="flex items-center"
+                    src='https://res.cloudinary.com/djwl0uwtj/image/upload/v1727640905/KONNECT_LOGO_1_ln7aew.png' />
+                    <h1 className="flex align-middle self-center mb-3">Konnect</h1>
+                  </div>
+                )}</h1></div>
                 <div className="w-2/6 flex flex-row justify-around">
-                  <div className="text-info" onClick={() => handleButtonClick('Notification')}>
+                  <div className="text-info flex self-center mb-4" onClick={() => handleButtonClick('Notification')}>
                     {isScrolled ? '': (
                       <Badge color="secondary" variant="dot" invisible={invisible}>
                         <NotificationsActiveIcon />
                       </Badge>
                     )}
                   </div>
-                  <div onClick={handleMenu} className="text-info"><MenuIcon /></div>
+                  <div onClick={handleMenu} className="text-info flex self-center mb-4"><MenuIcon /></div>
                 </div>
                 {isMenu && (
                     <div style={{zIndex: '10'}} className={`drp-ctnt flex flex-col justify-between h-screen ${bgColorClass}`}>
@@ -633,15 +644,16 @@ const handleApprove = async (user) => {
         </div>
 
         {isBusiness && (
-            <Otherpost />
+            <Otherpost products={products} />
           )}
         {isHome && (
           <>
 
             {!loading && products.length !== 0 ? (
               <Otherpost products={products} />
-            ) : null}
-          {usersTask.map((task) => (
+            ) : loading ? <CardSkeleton /> : null}
+          {!loading && usersTask.length !== 0 ? ( 
+            usersTask.map((task) => (
             <Card key={task.taskId} style={{zIndex: '1'}} className="mb-1">
                 <CardHeader className="justify-between ">
                     <div className="flex  gap-5">
@@ -713,15 +725,21 @@ const handleApprove = async (user) => {
                           </Card> 
 
                           <div className='w-full px-2 flex flex-col'>
+                          <Card className="mt-4">
+                          <CardHeader className="flex flex-col">
                             <h1 className="text-default-500 tracking-tight">Job description</h1>
                             <h2 className="text-small tracking-tight text-default-500">Job titile : {task.Agreement}</h2>
                             <div className='w-full flex flex-col mt-3'>
                                 <h1 className="text-info">Description</h1>
                                 <p>{task.Description}</p>
                             </div>
+                            </CardHeader>
+                            </Card>
                             {/* <div className='w-full inline-block mt-3'>
                               this is specification
                             </div> */}
+                            <Card className="mt-4">
+                            <CardHeader>
                             <div className='w-full flex flex-col'>
                                 <div className='w-full flex flex-row justify-around mt-4'>
                                   <div className='w-2/4 flex flex-col mt-2'>
@@ -744,6 +762,8 @@ const handleApprove = async (user) => {
                                   </div>
                               </div>
                             </div>
+                            </CardHeader>
+                            </Card>
                         </div>
                     {/* </div> */}
 
@@ -761,7 +781,8 @@ const handleApprove = async (user) => {
                   </dialog>
                 </CardFooter>
             </Card>
-            ))}
+            )
+            )) : loading ? <SmallSkeleton /> : null}
           </>
         )}
         {/* {isTask && (
@@ -822,7 +843,8 @@ const handleApprove = async (user) => {
             </div>
             {/* {!isAddTask ? ( */}
             
-            {isData.map((user) => (
+            {loading ? 
+            <SmallSkeleton /> : isData.length !== 0 ? isData.map((user) => (
               <>
                 <dialog id={user.taskId} className="modal">
                       <div className="modal-box">
@@ -845,7 +867,8 @@ const handleApprove = async (user) => {
                               </div> */}
                             </CardHeader>
                           </Card> 
-
+                          <Card className="mt-4">
+                          <CardHeader>
                           <div className='w-full px-2 flex flex-col'>
                             <h1 className="text-default-500 tracking-tight">Job description</h1>
                             <h2 className="text-small tracking-tight text-default-500">Job titile : {user.Agreement}</h2>
@@ -876,6 +899,8 @@ const handleApprove = async (user) => {
                               </div>
                             </div>
                         </div>
+                        </CardHeader>
+                        </Card>
                     {/* </div> */}
 
                         </div>
@@ -912,7 +937,7 @@ const handleApprove = async (user) => {
                       </CardHeader>
                 </Card>
               </>
-            ))}
+            )) : null}
             {!loading && inviteTask.length !== 0 ? (
               inviteTask.map((user) => (
               <>
@@ -938,7 +963,8 @@ const handleApprove = async (user) => {
                               </div> */}
                             </CardHeader>
                           </Card> 
-
+                          <Card className="mt-4">
+                          <CardHeader>
                           <div className='w-full px-2 flex flex-col'>
                             <h1 className="text-default-500 tracking-tight">Job description</h1>
                             <h2 className="text-small tracking-tight text-default-500">Job titile : {user.Agreement}</h2>
@@ -978,6 +1004,8 @@ const handleApprove = async (user) => {
                               </div>
                             </div>
                         </div>
+                        </CardHeader>
+                        </Card>
                     {/* </div> */}
 
                         </div>
@@ -1005,7 +1033,7 @@ const handleApprove = async (user) => {
                       </CardHeader>
                 </Card>
               </>
-            ))) : ('')}
+            ))) : loading ? <SmallSkeleton /> : null}
         {/* ) : ( */}
         <dialog id="my_modal_3" className="modal">
           <div className="modal-box">
@@ -1275,7 +1303,8 @@ const handleApprove = async (user) => {
                               </div> */}
                             </CardHeader>
                           </Card> 
-
+                          <Card className="mt-4">
+                          <CardHeader>
                           <div className='w-full px-2 flex flex-col'>
                             <h1 className="text-default-500 tracking-tight">Job description</h1>
                             <h2 className="text-small tracking-tight text-default-500">Job titile : {apply.Agreement}</h2>
@@ -1319,6 +1348,8 @@ const handleApprove = async (user) => {
                               <Button onClick={() => handleDEclineRequest(apply)}>{!loading && trackDecline ? 'oops You decline' : loading ? 'loading..' : 'Decline offer'}</Button>
                             </div>
                         </div>
+                        </CardHeader>
+                        </Card>
                     {/* </div> */}
 
                         </div>
@@ -1387,7 +1418,8 @@ const handleApprove = async (user) => {
                               </div> */}
                             </CardHeader>
                           </Card> 
-
+                          <Card className="mt-4">
+                          <CardHeader>
                           <div className='w-full px-2 flex flex-col'>
                             <h1 className="text-default-500 tracking-tight">Job description</h1>
                             <h2 className="text-small tracking-tight text-default-500">Job titile : {invite.Agreement}</h2>
@@ -1431,6 +1463,8 @@ const handleApprove = async (user) => {
                               <Button onClick={() => handleDeclineInvite(invite)}>{tractDeclineInvite ? 'oops you decline' : 'Decline offer'}</Button>
                             </div>
                         </div>
+                        </CardHeader>
+                        </Card>
                     {/* </div> */}
 
                         </div>
@@ -1506,7 +1540,8 @@ const handleApprove = async (user) => {
                                 </div> */}
                               </CardHeader>
                             </Card> 
-  
+                            <Card className="mt-4">
+                            <CardHeader>
                             <div className='w-full px-2 flex flex-col'>
                               <h1 className="text-default-500 tracking-tight">Job description</h1>
                               <h2 className="text-small tracking-tight text-default-500">Job titile : {apply.Agreement}</h2>
@@ -1550,6 +1585,8 @@ const handleApprove = async (user) => {
                                 <Button onClick={() => handleDEclineRequest(apply)}>{!loading && trackDecline ? 'oops You decline' : loading ? 'loading..' : 'Decline offer'}</Button>
                               </div>
                           </div>
+                          </CardHeader>
+                          </Card>
                       {/* </div> */}
   
                           </div>
@@ -1623,7 +1660,8 @@ const handleApprove = async (user) => {
                               </div> */}
                             </CardHeader>
                           </Card> 
-
+                          <Card className="mt-4">
+                          <CardHeader>
                           <div className='w-full px-2 flex flex-col'>
                             <h1 className="text-default-500 tracking-tight">Job description</h1>
                             <h2 className="text-small tracking-tight text-default-500">Job titile : {invite.Agreement}</h2>
@@ -1667,6 +1705,8 @@ const handleApprove = async (user) => {
                               <Button onClick={() => handleDeclineInvite(invite)}>{tractDeclineInvite ? 'oops you decline' : 'Decline offer'}</Button>
                             </div>
                         </div>
+                        </CardHeader>
+                        </Card>
                     {/* </div> */}
 
                         </div>
@@ -1714,7 +1754,8 @@ const handleApprove = async (user) => {
           <div className="px-2 mb-1">
             <h1>This is task U need to Approve</h1>
           </div>
-          {isTaskToApprove.map((user) => (
+          {loading ?
+          <SmallSkeleton /> : isTaskToApprove.length !== 0 ? isTaskToApprove.map((user) => (
           <>
           <dialog id={user.task_taker_name} className="modal">
                       <div className="modal-box">
@@ -1737,7 +1778,8 @@ const handleApprove = async (user) => {
                               </div> */}
                             </CardHeader>
                           </Card> 
-
+                          <Card className="mt-4">
+                          <CardHeader>
                           <div className='w-full px-2 flex flex-col'>
                             <h1 className="text-default-500 tracking-tight">Job description</h1>
                             <h2 className="text-small tracking-tight text-default-500">Job titile : {user.Agreement}</h2>
@@ -1768,6 +1810,8 @@ const handleApprove = async (user) => {
                               </div>
                             </div>
                         </div>
+                        </CardHeader>
+                        </Card>
                     {/* </div> */}
                               <h1 className="mt-5">User done task</h1>
                           <Card className="mt-5">
@@ -1847,7 +1891,7 @@ const handleApprove = async (user) => {
               </CardHeader>
           </Card>
           </>
-          ))}
+          )) : null}
           </>
           )}
         {isRank && (
@@ -1864,7 +1908,7 @@ const handleApprove = async (user) => {
               </form>
             </div>
           </div>
-          {users
+          {loading ? <SmallSkeleton /> : users.length !== 0 ? (users
           .filter((user) => user.userName.toLowerCase().includes(search.toLowerCase()))
           .map((user) => (
               <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
@@ -1922,7 +1966,8 @@ const handleApprove = async (user) => {
                 </dialog>
               </CardFooter>
           </Card>
-          ))}
+          )
+          )) : null}
           </>
         )}
     </div>

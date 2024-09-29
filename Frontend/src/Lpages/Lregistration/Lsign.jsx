@@ -71,7 +71,15 @@ const Lsign = () => {
   return (
     <div className='w-full flex flex-col'>
       <div className='w-full flex justify-between'>
-        <div className='w-3/6 flex'>Web App</div>
+        <div className='w-3/6 flex'>
+          <div className='flex flex-row items-center'>
+            <img 
+              width='50px'
+              height='50px'
+              src='https://res.cloudinary.com/djwl0uwtj/image/upload/v1727640905/KONNECT_LOGO_1_ln7aew.png' alt="React Logo" />
+            <h1 className='mb-3'>Konnect</h1>
+          </div>
+        </div>
         <div className='w-3/6 flex flex-row gap-4 justify-end'>
           <p className='flex align-middle self-center'>{!isLogin ? 'Already have account' : 'Create account'}</p>
           <div><button className="btn btn-outline btn-info" onClick={handleLoginState}>{isLogin ? 'Sign UP' : 'Sign IN'}</button></div>
@@ -83,8 +91,8 @@ const Lsign = () => {
             <>
           <div className='w-full flex gap-2 flex-row justify-around'>
             <div className='w-full'>
-              <h1 className='text-center text-info mb-5'>Web Focus</h1>
-              <p className='text-center'>Welcome to [Your Website Name], <br /> where efficiency meets opportunity! We are <br /> a streamlined platform designed <br /> for seamless transactions and task management:</p>
+              <h1 className='text-center text-info mb-5'>Konnect Focus</h1>
+              <p className='text-center'>Welcome to Konnect, <br /> where efficiency meets opportunity! We are <br /> a streamlined platform designed <br /> for seamless transactions and task management:</p>
               <ul className='mt-5 text-center'>
                 <li>Publish Tasks: Easily list tasks needing completion and specify requirements.</li>
                 <li>Deposit Funds: Securely transfer funds to ensure task completion and payment.</li>
@@ -103,7 +111,7 @@ const Lsign = () => {
             <h1 className='text-center text-info'>Contact Us</h1>
             <div className='flex justify-center  gap-2 flex-row'>
               <div><CallIcon /></div>
-              <div>(255) 755 5555</div>
+              <div>(250) 787 4623 84</div>
             </div>
           </div>
             </>
@@ -116,7 +124,7 @@ const Lsign = () => {
                   <h1 className='text-center text-info'>Contact Us</h1>
                   <div className='flex justify-center  gap-2 flex-row'>
                     <div><CallIcon /></div>
-                    <div>(255) 755 5555</div>
+                    <div>(250) 787 4623 84</div>
                   </div>
                 </div>
               </>

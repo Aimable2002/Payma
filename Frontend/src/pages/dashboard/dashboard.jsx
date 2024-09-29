@@ -197,10 +197,32 @@ const getRowStyle = (item) => {
   }
   return (
     <div className="w-full flex flex-col overflow-auto">
-        <div className=" w-full">
-            <div className=" fixed flex flex-row justify-between px-2 align-middle" style={{width: 'calc(100% - 32px)', zIndex: '2'}}>
-                <Link to='/'><div className='text-info'>{!isScrolled ? 'web Application' : ''}</div></Link>
-                <div className='text-info' onClick={handleMenu}>menu</div>
+        <div className={`w-full mb-5 ${isScrolled ? 'w-[95%] bg-info' : 'w-full'}`}>
+            <div className={`fixed top-0 flex flex-row py-4  px-2 ${isScrolled ? 'bg-white': ''} `} style={{width: 'calc(100% - 32px)', zIndex: '1'}}>
+                <Link to='/'>
+                    <div className='text-info w-full'>
+                        {isScrolled ? (
+                            <div className='flex flex-row w-full'>
+                                <img 
+                                    width="40px" 
+                                    height="40px" 
+                                    className="flex items-center"
+                                    src='https://res.cloudinary.com/djwl0uwtj/image/upload/v1727640905/KONNECT_LOGO_1_ln7aew.png' />
+                                <h1 className="flex align-middle self-center mb-3">Konnect</h1>
+                            </div>
+                        ) : (
+                            <div className='flex flex-row'>
+                                <img 
+                                    width="50px" 
+                                    height="50px" 
+                                    className="flex items-center"
+                                    src='https://res.cloudinary.com/djwl0uwtj/image/upload/v1727640905/KONNECT_LOGO_1_ln7aew.png' />
+                                <h1 className="flex align-middle self-center mb-3">Konnect</h1>
+                            </div>
+                        )}
+                    </div>
+                </Link>
+                
             </div>
         </div>
 
@@ -250,6 +272,8 @@ const getRowStyle = (item) => {
         <div className='w-full flex flex-col  justify-center mt-5'>
             {usersOn.map((user) => (
                 <>
+        <Card className='mt-4' style={{zIndex: '-1'}}>
+        <CardHeader>
             <div className='w-full px-2 py-2'>
                 <div className='w-full flex justify-center align-middle text-center mb-2'>Wallet</div>
                 <div className='w-full justify-between gap-1  flex flex-row'>
@@ -267,7 +291,11 @@ const getRowStyle = (item) => {
                     </div>
                 </div>
             </div>
-
+            
+            </CardHeader>
+            </Card>
+            <Card className='mt-4' style={{zIndex: '-1'}}>
+            <CardHeader>
             <div className='w-full px-2 py-2'>
                 <div className='w-full justify-center gap-1  flex flex-row'>
                     <div className='flex flex-col bg-base-100 p-2 px-5' style={{borderRadius: '15px'}}>
@@ -276,7 +304,10 @@ const getRowStyle = (item) => {
                     </div>
                 </div>
             </div>
-
+            </CardHeader>
+            </Card>
+            <Card className='mt-4' style={{zIndex: '-1'}}>
+            <CardHeader>
             <div className='w-full flex flex-row mt-4 justify-center gap-4 py-2'>
                 <Button className='w-2/5 border-accent text-tiny text-accent outline-none bg-base-100' onClick={()=>document.getElementById('my_modal_3').showModal()}>Cash IN</Button>
                 <dialog id="my_modal_3" className="modal">
@@ -390,6 +421,8 @@ const getRowStyle = (item) => {
                     </div>
                 </dialog>
             </div>
+            </CardHeader>
+            </Card>
             {/* <div className='w-full px-2 mt-4'>
                 <div className='w-full justify-between flex flex-row'>
                     <div className='flex flex-row bg-indigo-700 p-2' style={{borderRadius: '15px'}}>
@@ -401,6 +434,8 @@ const getRowStyle = (item) => {
             </>
             ))}
         </div>
+        <Card className='mt-4' style={{zIndex: '-1'}}>
+        <CardHeader>
         <div className='w-full mt-3'>
             <h1>Task I publish</h1>
                 <table className="table">
@@ -425,6 +460,10 @@ const getRowStyle = (item) => {
                     
                 </table>
         </div>
+        </CardHeader>
+        </Card>
+        <Card className='mt-4'>
+        <CardHeader>
         <div className='w-full mt-3'>
             <h1>Task I doing</h1>
                 <table className="table">
@@ -461,6 +500,8 @@ const getRowStyle = (item) => {
                         )}
                 </table>
         </div>
+        </CardHeader>
+        </Card>
     </div>
         
     );

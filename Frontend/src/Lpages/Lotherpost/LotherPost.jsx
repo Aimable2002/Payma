@@ -77,6 +77,8 @@ const handleVisitBtn = (pro) => {
                     <h5 className="text-small tracking-tight text-default-400">@username</h5>
                   </div>
                 </div>
+                <Card className='mt-4'>
+                <CardHeader>
                 <div className='mt-4 w-full flex justify-center'>
                   <div 
                     className='w-3/6 h-[100px] bg-slate-50 flex items-center justify-center overflow-hidden'
@@ -103,29 +105,52 @@ const handleVisitBtn = (pro) => {
                     </dialog>
                   </div>
                 </div>
+                </CardHeader>
+                </Card>
+
+                <Card className='mt-4'>
+                <CardHeader>
                 <div className='w-full flex flex-col mt-4'>
                   <h1 className='text-info'>Description</h1>
                   <p>{pro.description}</p>
                 </div>
+                </CardHeader>
+                </Card>
+
+                <Card className='mt-4'>
+                <CardHeader>
                 <div className='w-full flex flex-row justify-around mt-4'>
                   <div className='flex align-middle flex-col'>
                     <h2 className='text-info'>Quantity</h2>
                     <h3>{pro.stock}</h3>
                   </div>
+                  
                   <div className='flex align-middle flex-col'>
                     <h2 className='text-info'>Amount</h2>
                     <h3>{pro.price}</h3>
                   </div>
                 </div>
+                </CardHeader>
+                </Card>
+
+                <Card className='mt-4'>
+                <CardHeader>
                 <div className='w-full flex flex-col justify-center mt-4'>
                   <h2 className='text-info'>Product Address</h2>
                   <h3>Kicukiro</h3>
                 </div>
+                </CardHeader>
+                </Card>
+
+                <Card className='mt-4'>
+                <CardHeader>
                 <div className='w-full flex flex-col mt-4'>
                   <h1 className='text-info'>Contact me</h1>
                   <h3>078745673</h3>
                   <h3>example@gmail.com</h3>
                 </div>
+                </CardHeader>
+                </Card>
                 <div className='w-full mt-4 flex justify-center'>
                   <Button className="text-tiny bg-base-100 outline-none border-none text-accent" color="primary" radius="full" size="sm" onClick={()=>document.getElementById('my_modal_3').showModal()}>
                     Order Now

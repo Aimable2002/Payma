@@ -1,5 +1,6 @@
-import { Button } from '@mui/material'
+import { Button} from '@mui/material'
 import React, {useState, useEffect} from 'react'
+import {Card, CardHeader, CardBody, CardFooter, Avatar, Image} from "@nextui-org/react";
 
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
@@ -46,18 +47,30 @@ const InDoorOrder= () => {
         setCurrentSlide(index);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
+
     return (
         <div className='w-full flex flex-col fixed'>
-                <div className='w-full left-0 top-0 h-12 flex fixed bg-base-200'>
+                <div className='w-full left-0 top-0 h-14 flex fixed' style={{borderBottom: ' 2px solid #00aaff'}}>
                     <div className='w-11/12 flex items-center justify-between'>
-                        <div className='cursor-pointer px-4 text-3xl font-bold'><Link to='/'><h1>Konect</h1></Link></div>
+                        <div className='cursor-pointer px-4 text-3xl font-bold'>
+                                <Link to='/'>
+                                <div className='flex flex-row w-full cursor-pointer'>
+                                    <img 
+                                        width="40px" 
+                                        height="40px" 
+                                        className="flex items-center"
+                                        src='https://res.cloudinary.com/djwl0uwtj/image/upload/v1727640905/KONNECT_LOGO_1_ln7aew.png' />
+                                    <h4 className="flex align-middle self-center mb-3">Konnect</h4>
+                                </div>
+                            </Link>
+                        </div>
                         <div className='flex flex-row gap-5'>
                             <Link to='/'><h1 className='cursor-pointer'>Home</h1></Link>
                             <Link to='dasboard'><h1 className='cursor-pointer'>Dashboard</h1></Link>
                         </div>
                     </div>
                 </div>
-            <div className='w-full flex flex-row mt-8 '>
+            <div className='w-full flex flex-row mt-12 '>
                 <div className='flex px-1 h-screen overflow-y-auto w-3/12 flex-col'>
                     <div className='w-full flex flex-col justify-center '>
                         <div 
@@ -79,7 +92,8 @@ const InDoorOrder= () => {
                                 <div className='left-50 cursor-pointer' onClick={nextSlide}><ArrowForwardIosIcon /></div>  
                             </div>
                     </div>
-
+                    <Card className='mt-4'>
+                    <CardHeader>
                     <div className='w-full flex flex-col'>
                         <div className='flex flex-col'>
                             <h1 className='font-bold'>Description</h1>
@@ -105,6 +119,8 @@ const InDoorOrder= () => {
                             </div>
                         </div>
                     </div> 
+                    </CardHeader>
+                    </Card>
                     <div className='mb-40'></div>
                 </div>
                 <div className='flex w-3/4 h-screen overflow-y-auto flex-col'>
@@ -116,7 +132,7 @@ const InDoorOrder= () => {
                                     products.map((img, index) => (
                                         <div key={index} className='flex w-full flex-col  border-gray-300 shadow-lg' 
                                             style={{
-                                                borderRadius: '10px'
+                                                borderRadius: '10px', border: '2px solid #00aaff'
                                             }}
                                         >
                                             <div 
@@ -137,7 +153,7 @@ const InDoorOrder= () => {
                                                 <h2 className='text-sm font-bold'>{img.product_name}</h2>
                                                 <div className='flex flex-row justify-between'>
                                                     <h4 className='text-sm '>Amount</h4>
-                                                    <h4 className='text-sm'>{img.price} RWF</h4>
+                                                    <h4 className='text-sm text-info'>{img.price} RWF</h4>
                                                 </div>
                                             </div>
                                         </div>

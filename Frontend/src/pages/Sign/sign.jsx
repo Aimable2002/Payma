@@ -181,7 +181,26 @@ const Sign = () => {
     
     return (
         <div className=''>
-            <h1 className='mb-10'>{!isLogin ? 'Welcome to webApplication' : 'Welcome Back'}</h1>
+            <div className='mb-10'>
+                {!isLogin ? (
+                    <div className='flex flex-row items-center'>
+                        <img 
+                        width='50px'
+                        height='50px'
+                        src='https://res.cloudinary.com/djwl0uwtj/image/upload/v1727640905/KONNECT_LOGO_1_ln7aew.png' alt="React Logo" />
+                        <h1 className='mb-3'>Konnect</h1>
+                    </div>
+                ) : (
+                    <div className='flex flex-row items-center'>
+                        <img 
+                        width='50px'
+                        height='50px'
+                        src='https://res.cloudinary.com/djwl0uwtj/image/upload/v1727640905/KONNECT_LOGO_1_ln7aew.png' alt="React Logo" />
+                        <h1 className='mb-3'>Konnect</h1>
+                    </div>
+                )}
+            </div>
+
             {!isLogin ? (
                 <div className='frm'>
                     {!isNext ? (

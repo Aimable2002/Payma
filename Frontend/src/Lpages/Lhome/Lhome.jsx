@@ -13,7 +13,7 @@ import { toggleTheme, getCurrentTheme } from "../../utilities/themeToggle";
 import useLogout from '../../hook/registration/logout';
 
 import PersonIcon from '@mui/icons-material/Person';
-import {Card, CardHeader, CardBody, CardFooter, Avatar, Button, input} from "@nextui-org/react";
+import {Card, CardHeader, CardBody, CardFooter, Avatar, Button, Image, input} from "@nextui-org/react";
 import useGetUserTask from '../../hook/getUsers/usegetusersTaskl';
 import useTakeTask from '../../hook/getTask/useTakeTask';
 import approveTask from '../../hook/approveTask/approveTask';
@@ -48,6 +48,9 @@ import CircleNotificationsIcon from '@mui/icons-material/CircleNotifications';
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import getProduct from '../../pages/addBusiness/getProduct';
+
+import CardSkeleton from '../../skeleton/cardSkeleton.jsx'
+import SmallSkeleton from '../../skeleton/smallSkeleton.jsx';
 
 const truncateString = (str, maxLength) => {
     if(str.length <= maxLength ){
@@ -406,7 +409,14 @@ const Lhome = () => {
     <div className='w-full flex flex-row fixed'>
         <div className={`w-2/12 overflow-y-auto ${bgColorClass}`} style={{zIndex: '2'}}>
             <div className='w-full flex flex-row justify-between'>
-                <h1 className="cursor-pointer">Web App</h1>
+                <div className='flex flex-row w-full cursor-pointer'>
+                    <img 
+                      width="40px" 
+                      height="40px" 
+                      className="flex items-center"
+                      src='https://res.cloudinary.com/djwl0uwtj/image/upload/v1727640905/KONNECT_LOGO_1_ln7aew.png' />
+                    <h1 className="flex align-middle self-center mb-3">Konnect</h1>
+                </div>
                 <div onClick={handleMenu} className="text-info"><PersonIcon /></div>
             </div>
             <div className={`w-full flex flex-col ${bgColorClass}`}>
@@ -621,8 +631,9 @@ const Lhome = () => {
                     <>
                     {!loading && products.length !== 0 ? (
                         <LOtherPost products={products}/>
-                    ) : null}
-                {usersTask.map((task) => {
+                    ) : loading ? <CardSkeleton /> : null}
+                {loading ? <SmallSkeleton /> : usersTask.length !== 0 ? (
+                    usersTask.map((task) => {
                     return (
                     <Card  style={{zIndex: '1'}}>
                         <CardHeader className="justify-between">
@@ -683,6 +694,8 @@ const Lhome = () => {
                                                 </div> */}
                                             </CardHeader>
                                         </Card>
+                                        <Card className='mt-4'>
+                                        <CardHeader>
                                         <div className='w-full px-2 flex flex-col'>
                                             <h1 className="text-default-500 tracking-tight">Job description</h1>
                                             <h2 className="text-small tracking-tight text-default-500">Job titile : {task.Agreement}</h2>
@@ -719,6 +732,8 @@ const Lhome = () => {
                                                 </div>
                                             </div>
                                         </div>
+                                        </CardHeader>
+                                        </Card>
                                     </div>
                                     {task.Task_Status === 'Taken' ? (
                                         <Button className="text-tiny bg-base-100 outline-none border-none text-accent">
@@ -734,12 +749,14 @@ const Lhome = () => {
                         </CardFooter>
                     </Card>
                     )
-                })}
+                    
+                })) : null}
                 </>
                 )}
                 {isRank && (
                     <>
-                        {users
+                        {loading ? <SmallSkeleton /> : users.length !== 0 ? (
+                            users
                         .filter((user) => user.userName.toLowerCase().includes(search.toLowerCase()))
                         .map((user) => (
                             <Card style={{zIndex: '1', gap: '4px'}} className="mb-1">
@@ -799,13 +816,13 @@ const Lhome = () => {
                                     </dialog>
                                 </CardFooter>
                                 </Card>
-                        ))}
+                        ))) : null}
                     </>
                 )}
                 {isAlert && (
                     <>
                         
-                        {isTaskToApprove.map((user) => (
+                        {loading ? <SmallSkeleton /> : isTaskToApprove.length !== 0 ? ( isTaskToApprove.map((user) => (
                             <>
                                 <dialog id={user.task_taker_name} className="modal">
                       <div className="modal-box">
@@ -829,7 +846,8 @@ const Lhome = () => {
                               </div> */}
                             </CardHeader>
                           </Card> 
-
+                        <Card className='mt-4'>
+                        <CardHeader>
                           <div className='w-full px-2 flex flex-col'>
                             <h1 className="text-default-500 tracking-tight">Job description</h1>
                             <h2 className="text-small tracking-tight text-default-500">Job titile : {user.Agreement}</h2>
@@ -860,6 +878,8 @@ const Lhome = () => {
                               </div>
                             </div>
                         </div>
+                        </CardHeader>
+                        </Card>
                     {/* </div> */}
 
                     <h1 className="mt-5">User done task</h1>
@@ -941,12 +961,12 @@ const Lhome = () => {
                                     </CardHeader>
                                 </Card>
                             </>
-                        ))}
+                        ))) : null}
                     </>
                 )}
                 {isTask && (
                     <>
-                        {isData.map((user) => (
+                        {loading ? <SmallSkeleton /> : isData.length !== 0 ? ( isData.map((user) => (
                             <>
                                 <dialog id={user.taskId} className="modal">
                       <div className="modal-box">
@@ -970,7 +990,8 @@ const Lhome = () => {
                               </div> */}
                             </CardHeader>
                           </Card> 
-
+                        <Card className='mt-4'>
+                        <CardHeader>
                           <div className='w-full px-2 flex flex-col'>
                             <h1 className="text-default-500 tracking-tight">Job description</h1>
                             <h2 className="text-small tracking-tight text-default-500">Job titile : {user.Agreement}</h2>
@@ -1001,6 +1022,8 @@ const Lhome = () => {
                               </div>
                             </div>
                         </div>
+                        </CardHeader>
+                        </Card>
                     {/* </div> */}
 
                         </div>
@@ -1037,7 +1060,7 @@ const Lhome = () => {
                                     </CardHeader>
                                 </Card>
                             </>
-                        ))}
+                        ))) : null}
                         {!loading && inviteTask.length !== 0 ? (
                             inviteTask.map((user) => (
                             <>
@@ -1064,7 +1087,8 @@ const Lhome = () => {
                               </div> */}
                             </CardHeader>
                           </Card> 
-
+                        <Card className='mt-4'>
+                        <CardHeader>
                           <div className='w-full px-2 flex flex-col'>
                             <h1 className="text-default-500 tracking-tight">Job description</h1>
                             <h2 className="text-small tracking-tight text-default-500">Job titile : {user.Agreement}</h2>
@@ -1103,6 +1127,8 @@ const Lhome = () => {
                               </div>
                             </div>
                         </div>
+                        </CardHeader>
+                        </Card>
                     {/* </div> */}
 
                         </div>
@@ -1130,7 +1156,7 @@ const Lhome = () => {
                                     </CardHeader>
                                 </Card>
                             </>
-                        ))) : ('')}
+                        ))) : loading ? <SmallSkeleton /> : null}
                         {/* ) : ( */}
                         <dialog id="my_modal_3" className="modal">
                         <div className="modal-box">
@@ -1397,7 +1423,8 @@ const Lhome = () => {
                                                                         </div> */}
                                                                     </CardHeader>
                                                                 </Card> 
-    
+                                                                <Card className='mt-4'>
+                                                                <CardHeader>
                                                                 <div className='w-full px-2 flex flex-col'>
                                                                     <h1 className="text-default-500 tracking-tight">Job description</h1>
                                                                     <h2 className="text-small tracking-tight text-default-500">Job titile : {apply.Agreement}</h2>
@@ -1441,6 +1468,8 @@ const Lhome = () => {
                                                                         <Button onClick={() => handleDEclineRequest(apply)}>{!loading && trackDecline ? 'oops You decline' : loading ? 'loading..' : 'Decline offer'}</Button>
                                                                     </div>
                                                                 </div>
+                                                                </CardHeader>
+                                                                </Card>
                                                                 {/* </div> */}
     
                                                             </div>
@@ -1462,7 +1491,7 @@ const Lhome = () => {
                                         </Card>
                                     ))
                                 ) : (
-                                    loading && applyView.length !== 0 ? 'lodding....' : ''
+                                    loading ? <SmallSkeleton /> : null
                                 )}
 
 
@@ -1511,7 +1540,8 @@ const Lhome = () => {
                                                                     </div> */}
                                                                 </CardHeader>
                                                             </Card> 
-
+                                                            <Card className='mt-4'>
+                                                            <CardHeader>
                                                             <div className='w-full px-2 flex flex-col'>
                                                                 <h1 className="text-default-500 tracking-tight">Job description</h1>
                                                                 <h2 className="text-small tracking-tight text-default-500">Job titile : {invite.Agreement}</h2>
@@ -1555,6 +1585,8 @@ const Lhome = () => {
                                                                     <Button onClick={() => handleDeclineInvite(invite)}>{tractDeclineInvite ? 'oops you decline' : 'Decline offer'}</Button>
                                                                 </div>
                                                             </div>
+                                                            </CardHeader>
+                                                            </Card>
                                                             {/* </div> */}
 
                                                         </div>
@@ -1579,7 +1611,7 @@ const Lhome = () => {
                                     </Card>
                                 ))
                                     ) : (
-                                        loading && inviteTaskPending.length !== 0 ? 'loading..' : ''
+                                        loading ? <SmallSkeleton /> : null
                                 )}
                             </>
                         )}
@@ -1629,7 +1661,8 @@ const Lhome = () => {
                                                                     </div> */}
                                                                 </CardHeader>
                                                             </Card> 
-    
+                                                            <Card className='mt-4'>
+                                                            <CardHeader>
                                                             <div className='w-full px-2 flex flex-col'>
                                                                 <h1 className="text-default-500 tracking-tight">Job description</h1>
                                                                 <h2 className="text-small tracking-tight text-default-500">Job titile : {apply.Agreement}</h2>
@@ -1673,6 +1706,8 @@ const Lhome = () => {
                                                                         <Button onClick={() => handleDEclineRequest(apply)}>{!loading && trackDecline ? 'oops You decline' : loading ? 'loading..' : 'Decline offer'}</Button>
                                                                 </div>
                                                             </div>
+                                                            </CardHeader>
+                                                            </Card>
                                                             {/* </div> */}
     
                                                         </div>
@@ -1694,7 +1729,7 @@ const Lhome = () => {
                                     </Card>
                                 ))
                             ) : (
-                                loading && applyView.length !== 0 ? 'lodding....' : ''
+                                loading ? <SmallSkeleton /> : null
                             )}
                             </>
                         )}
@@ -1746,7 +1781,8 @@ const Lhome = () => {
                                                         </div> */}
                                                     </CardHeader>
                                                 </Card> 
-
+                                                <Card className='mt-4'>
+                                                <CardHeader>
                                                 <div className='w-full px-2 flex flex-col'>
                                                     <h1 className="text-default-500 tracking-tight">Job description</h1>
                                                     <h2 className="text-small tracking-tight text-default-500">Job titile : {invite.Agreement}</h2>
@@ -1790,6 +1826,8 @@ const Lhome = () => {
                                                         <Button onClick={() => handleDeclineInvite(invite)}>{tractDeclineInvite ? 'oops you decline' : 'Decline offer'}</Button>
                                                     </div>
                                                 </div>
+                                                </CardHeader>
+                                                </Card>
                                                 {/* </div> */}
 
                                             </div>
@@ -1814,7 +1852,7 @@ const Lhome = () => {
                         </Card>
                         ))
                                 ) : (
-                                    loading && inviteTaskPending.length !== 0 ? 'loading..' : ''
+                                    loading ? <SmallSkeleton /> : null
                                 )}
                             </>
                         )}
@@ -1839,4 +1877,3 @@ const Lhome = () => {
 };
 
 export default Lhome;
-

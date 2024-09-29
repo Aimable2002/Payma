@@ -60,14 +60,14 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://konnect.rw/',
+        target: 'http://localhost:5000/',
         changeOrigin: true
       }
     }
   },
   build: {
     rollupOptions: {
-      external: ['pg'], // Externalize 'pg' from the frontend build
+      external: ['pg'], 
     },
   },
 })

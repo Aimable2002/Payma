@@ -269,7 +269,16 @@ const Ldashboard = () => {
     <div className='w-full flex flex-row fixed'>
         <div className={`w-2/12 overflow-y-auto ${bgColorClass}`} style={{zIndex: '2'}}>
             <div className='w-full flex flex-row justify-between'>
-                <Link to='/'><h1 className='cursor-pointer text-info'>Web App</h1></Link>
+                <Link to='/'>
+                <div className='flex flex-row w-full cursor-pointer'>
+                    <img 
+                      width="40px" 
+                      height="40px" 
+                      className="flex items-center"
+                      src='https://res.cloudinary.com/djwl0uwtj/image/upload/v1727640905/KONNECT_LOGO_1_ln7aew.png' />
+                    <h1 className="flex align-middle self-center mb-3">Konnect</h1>
+                  </div>
+                </Link>
                 <div onClick={handleMenu} className="text-info"><PersonIcon /></div>
             </div>
             <div className={`w-full flex flex-col ${bgColorClass}`}>
