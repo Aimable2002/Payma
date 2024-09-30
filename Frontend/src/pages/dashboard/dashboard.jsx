@@ -198,7 +198,7 @@ const getRowStyle = (item) => {
   return (
     <div className="w-full flex flex-col overflow-auto">
         <div className={`w-full mb-5 ${isScrolled ? 'w-[95%] bg-info' : 'w-full'}`}>
-            <div className={`fixed top-0 flex flex-row py-4  px-2 ${isScrolled ? 'bg-white': ''} `} style={{width: 'calc(100% - 32px)', zIndex: '1'}}>
+            <div className={`fixed top-0 flex flex-row py-4  px-2 ${isScrolled ? 'bg-white': ''} `} style={{width: 'calc(100% - 32px)'}}>
                 <Link to='/'>
                     <div className='text-info w-full'>
                         {isScrolled ? (
@@ -270,45 +270,44 @@ const getRowStyle = (item) => {
             </ResponsiveContainer>
         </div> */}
         <div className='w-full flex flex-col  justify-center mt-5'>
-            {usersOn.map((user) => (
-                <>
-        <Card className='mt-4' style={{zIndex: '-1'}}>
+        <Card className='mt-4' style={{zIndex: '1'}}>
         <CardHeader>
             <div className='w-full px-2 py-2'>
                 <div className='w-full flex justify-center align-middle text-center mb-2'>Wallet</div>
                 <div className='w-full justify-between gap-1  flex flex-row'>
                     <div className='flex w-2/6 flex-col bg-base-100 p-2 px-3' style={{borderRadius: '15px'}}>
                         <div className='flex justify-center text-small tracking-tight'>Bal</div>
-                        <div className='flex justify-center'><span className='text-small tracking-tight text-default-400'>FRW </span> {user.Balance}</div>
+                        <div className='flex justify-center'><span className='text-small tracking-tight text-default-400'>FRW </span> {usersOn.Balance || 0 }</div>
                     </div>
                     <div className='flex w-2/6 flex-col bg-base-100 p-2 px-5' style={{borderRadius: '15px'}}>
                         <div className='flex justify-center text-small tracking-tight '>Deposite</div>
-                        <div className='flex justify-center'><span className='text-small tracking-tight text-default-400'>FRW </span> {user.Deposite}</div>
+                        <div className='flex justify-center'><span className='text-small tracking-tight text-default-400'>FRW </span> {usersOn.Deposite || 0 }</div>
                     </div>
                     <div className='flex w-2/6 flex-col bg-base-100 p-2 px-5' style={{borderRadius: '15px'}}>
                         <div className='flex justify-center text-small tracking-tight'>Withdrow</div>
-                        <div className='flex justify-center'><span className='text-small tracking-tight text-default-400'>FRW </span> {user.WITHDROWAL}</div>
+                        <div className='flex justify-center'><span className='text-small tracking-tight text-default-400'>FRW </span> {usersOn.WITHDROWAL || 0 }</div>
                     </div>
                 </div>
             </div>
             
             </CardHeader>
             </Card>
-            <Card className='mt-4' style={{zIndex: '-1'}}>
+            <Card className='mt-4' style={{zIndex: '1'}}>
             <CardHeader>
             <div className='w-full px-2 py-2'>
                 <div className='w-full justify-center gap-1  flex flex-row'>
                     <div className='flex flex-col bg-base-100 p-2 px-5' style={{borderRadius: '15px'}}>
                         <div className='flex justify-center text-small tracking-tight '>Earned Amount</div>
-                        <div className='flex justify-center'><span className='text-small tracking-tight text-default-400'>FRW </span> {user.Earnings}</div>
+                        <div className='flex justify-center'><span className='text-small tracking-tight text-default-400'>FRW </span> {usersOn.Earnings || 0 }</div>
                     </div>
                 </div>
             </div>
             </CardHeader>
             </Card>
-            <Card className='mt-4' style={{zIndex: '-1'}}>
-            <CardHeader>
-            <div className='w-full flex flex-row mt-4 justify-center gap-4 py-2'>
+
+            {/* <Card className='mt-4'>
+            <CardHeader> */}
+            <div style={{zIndex: '1'}} className='w-full flex flex-row mt-4 justify-center gap-4 py-2'>
                 <Button className='w-2/5 border-accent text-tiny text-accent outline-none bg-base-100' onClick={()=>document.getElementById('my_modal_3').showModal()}>Cash IN</Button>
                 <dialog id="my_modal_3" className="modal">
                     <div className="modal-box">
@@ -421,8 +420,8 @@ const getRowStyle = (item) => {
                     </div>
                 </dialog>
             </div>
-            </CardHeader>
-            </Card>
+            {/* </CardHeader>
+            </Card> */}
             {/* <div className='w-full px-2 mt-4'>
                 <div className='w-full justify-between flex flex-row'>
                     <div className='flex flex-row bg-indigo-700 p-2' style={{borderRadius: '15px'}}>
@@ -431,10 +430,9 @@ const getRowStyle = (item) => {
                     </div>
                 </div>
             </div> */}
-            </>
-            ))}
+            
         </div>
-        <Card className='mt-4' style={{zIndex: '-1'}}>
+        <Card className='mt-4'>
         <CardHeader>
         <div className='w-full mt-3'>
             <h1>Task I publish</h1>

@@ -28,7 +28,7 @@ export const getOnPeople = async(req, res) => {
     const selectOnPeople = 'SELECT * FROM USERS WHERE userId = ?'
     connection.query(selectOnPeople, [USERID], (err, result) => {
         if(err){
-            throw err
+            return res.status(412).json({err: 'err of db', data: err.message})
         }
         if(result.length === 0){
             return res.status(404).json('user not fund')
