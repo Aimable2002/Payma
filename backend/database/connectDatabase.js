@@ -3,7 +3,7 @@ import mysql from 'mysql';
 const connectDatabase = () => {
     try {
         const connection = mysql.createConnection({
-            host:  "localhost",
+            host:  "payma-production.up.railway.app",
             user: "root",
             password: "",
             database: "payma",
