@@ -306,8 +306,8 @@ const getRowStyle = (item) => {
             </div>
             </CardHeader>
             </Card>
-            {/* <Card className='mt-4' style={{zIndex: '-1'}}>
-            <CardHeader> */}
+            <Card className='mt-4' style={{zIndex: '-1'}}>
+            <CardHeader>
             <div className='w-full flex flex-row mt-4 justify-center gap-4 py-2'>
                 <Button className='w-2/5 border-accent text-tiny text-accent outline-none bg-base-100' onClick={()=>document.getElementById('my_modal_3').showModal()}>Cash IN</Button>
                 <dialog id="my_modal_3" className="modal">
@@ -421,8 +421,8 @@ const getRowStyle = (item) => {
                     </div>
                 </dialog>
             </div>
-            {/* </CardHeader>
-            </Card> */}
+            </CardHeader>
+            </Card>
             {/* <div className='w-full px-2 mt-4'>
                 <div className='w-full justify-between flex flex-row'>
                     <div className='flex flex-row bg-indigo-700 p-2' style={{borderRadius: '15px'}}>

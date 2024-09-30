@@ -60,7 +60,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'https://payma-production.up.railway.app/',
+        target: 'http://localhost:5000/',
         changeOrigin: true
       }
     }
