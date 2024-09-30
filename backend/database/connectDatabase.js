@@ -4,7 +4,7 @@ const connectDatabase = () => {
     try {
         const connection = mysql.createConnection({
             host:  "theta.epicdns.co.uk",
-            user: "konnectr_konnectr",
+            user: "konnectr_Admin",
             password: "Back_wizard12@.",
             database: "konnectr_konnect",
 
