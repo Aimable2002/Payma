@@ -3,10 +3,10 @@ import mysql from 'mysql';
 const connectDatabase = () => {
     try {
         const connection = mysql.createConnection({
-            host:  "payma-production.up.railway.app",
-            user: "root",
-            password: "",
-            database: "payma",
+            host:  "theta.epicdns.co.uk",
+            user: "konnectr_konnectr",
+            password: "Back_wizard12@.",
+            database: "konnectr_konnect",
 
         });
 
