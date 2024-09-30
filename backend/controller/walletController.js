@@ -8,7 +8,7 @@ export const deposite = async (req, res) => {
     try{
         // const cashToDeposite = req.cashInTrack
         // const {Amount, Phone_number} = req.body;
-        console.log('body req :', payload)
+        console.log('body req payload :', payload)
         // connection.beginTransaction(err => {
         //     if(err){
         //         throw err

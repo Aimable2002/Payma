@@ -21,7 +21,7 @@ export const depo = async (req, res) => {
             currency: 'RWF',
             Phone_number: Phone_number,
             payment_type: "mobilemoneyrwanda",
-            redirect_url: 'http://https://payma-production.up.railway.app/dashboard',
+            redirect_url: 'https://payma-production.up.railway.app/dashboard',
             phone_number: Phone_number,
             email: 'aganzerizen@gmail.com',
             customer: {
