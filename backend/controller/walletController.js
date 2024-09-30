@@ -7,62 +7,56 @@ const connection = connectDatabase();
 export const deposite = async (req, res) => {
     try{
         // const cashToDeposite = req.cashInTrack
-        const {Amount, Phone_number} = req.body;
-        console.log('body req :', req.body)
-        const USERID = req.user.userId
-        const Currency = 'FRW'
-        if(!Amount || !Phone_number || !USERID){
-            console.log('missing data ')
-            return res.status(400).json('missing data')
-        }
-        connection.beginTransaction(err => {
-            if(err){
-                throw err
-            }
-            const getUserName = 'SELECT userName, EMAIL FROM USERS WHERE userId = ?';
-            connection.query(getUserName, [USERID], (err, result) => {
-                if(err){
-                    return connection.rollback(() => {
-                        return res.status(404).json('userName issue')
-                    })
-                }
-                const userName = result[0].userName
-                const userEmail = result[0].EMAIL 
-                console.log('user Email :', userEmail)
-                console.log('userName :', userName)
-                const insertDeposite = 'INSERT INTO DEPOSITE (Amount, Currency, Phone_number, userName, USERID) VALUES (?, ?, ?, ?, ?)';
-                connection.query(insertDeposite, [Amount, Currency, Phone_number, userName, USERID], async(err, result) => {
-                    if(err){
-                        console.log('error on deposite :', err)
-                        return res.status(400).json({err: 'error on deposite', status: false})
-                    }
-                    let transporter = nodemailer.createTransport({
-                        service: 'gmail',
-                        auth: {
-                            user: process.env.EMAIL_USER,
-                            pass: process.env.EMAIL_PASS
-                        }
-                    });
+        // const {Amount, Phone_number} = req.body;
+        console.log('body req :', payload)
+        // connection.beginTransaction(err => {
+        //     if(err){
+        //         throw err
+        //     }
+        //     const getUserName = 'SELECT userName, EMAIL FROM USERS WHERE userId = ?';
+        //     connection.query(getUserName, [USERID], (err, result) => {
+        //         if(err){
+        //             return connection.rollback(() => {
+        //                 return res.status(404).json('userName issue')
+        //             })
+        //         }
+        //         const userName = result[0].userName
+        //         const userEmail = result[0].EMAIL 
+        //         console.log('user Email :', userEmail)
+        //         console.log('userName :', userName)
+        //         const insertDeposite = 'INSERT INTO DEPOSITE (Amount, Currency, Phone_number, userName, USERID) VALUES (?, ?, ?, ?, ?)';
+        //         connection.query(insertDeposite, [Amount, Currency, Phone_number, userName, USERID], async(err, result) => {
+        //             if(err){
+        //                 console.log('error on deposite :', err)
+        //                 return res.status(400).json({err: 'error on deposite', status: false})
+        //             }
+        //             let transporter = nodemailer.createTransport({
+        //                 service: 'gmail',
+        //                 auth: {
+        //                     user: process.env.EMAIL_USER,
+        //                     pass: process.env.EMAIL_PASS
+        //                 }
+        //             });
     
-                    let mailOptions = {
-                        from: process.env.EMAIL_USER,
-                        to: userEmail,
-                        subject: 'Cash In Complete',
-                        text: 'deposite done. Thank you for using our website'
-                    };
+        //             let mailOptions = {
+        //                 from: process.env.EMAIL_USER,
+        //                 to: userEmail,
+        //                 subject: 'Cash In Complete',
+        //                 text: 'deposite done. Thank you for using our website'
+        //             };
     
-                    transporter.sendMail(mailOptions, (error, info) => {
-                        if (error) {
-                            console.log(error);
-                        } else {
-                            console.log('Email sent: ' + info.response);
-                        }
-                    });
+        //             transporter.sendMail(mailOptions, (error, info) => {
+        //                 if (error) {
+        //                     console.log(error);
+        //                 } else {
+        //                     console.log('Email sent: ' + info.response);
+        //                 }
+        //             });
 
-                    res.status(200).json({message: 'deposited successfully', status: true})
-                })
-            })
-        })
+        //             res.status(200).json({message: 'deposited successfully', status: true})
+        //         })
+        //     })
+        // })
     }catch(error){
         console.log('internal deposite server error :', error);
         res.status(500).json({error : 'internal deposite server error'})

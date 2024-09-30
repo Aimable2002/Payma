@@ -13,9 +13,10 @@ export const depo = async (req, res) => {
         if(!Amount || !Phone_number){
             return res.status(400).json('missing data')
         }
+        const tx_ref = `hooli-tx-${userId}-${Date.now()}`;
         const response = await axios.post('https://api.flutterwave.com/v3/charges?type=mobile_money_rwanda', {
 
-            tx_ref: `hooli-tx-${Date.now()}`,
+            tx_ref: tx_ref,
             amount: Amount,
             currency: 'RWF',
             Phone_number: Phone_number,
