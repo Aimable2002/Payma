@@ -27,10 +27,11 @@ export const depo = async (req, res) => {
             customer: {
                 email: 'aganzerizen@gmail.com',
                 Phone_number: Phone_number,
+                userId: userId
             },
             customizations: {
-                title: 'Payment for items in cart',
-                description: 'Payment for items in cart',
+                title: `Payment for items in cart for user = ${userId}`,
+                description: `Payment for items in cart for user = ${userId}`,
                 userId: userId
             },
         }, {
@@ -39,6 +40,10 @@ export const depo = async (req, res) => {
                 'Content-Type': 'application/json',
                 // userId: userId
             },
+        }, {
+            meta: {
+                userId: userId
+            }
         });
         console.log('response :', response.data)
         res.status(201).json(response.data)
@@ -49,6 +54,15 @@ export const depo = async (req, res) => {
 }
 
 
+export const webhook = async(req, res) => {
+    try{
+        const payload = req.body;
+        console.log('payload :', payload)
+    }catch(error){
+        console.log('internal server error :', error)
+        res.status(500).json({error: 'internal server error'})
+    }
+}
 
 
 export const withdro = async (req, res) => {

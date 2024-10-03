@@ -53,6 +53,10 @@ const InDoor = () => {
         localStorage.removeItem('selected')
         navigate('/')
     }
+    const [isOrder, setIsOrder] = useState(false)
+    const onButtonClick = (products) => {
+        setIsOrder(!isOrder)
+    }
     return (
         <div className='w-full flex flex-col'>
             <div className='w-full flex top-0 left-0 fixed'>
@@ -123,12 +127,23 @@ const InDoor = () => {
                         </p>
                     </div>
                     <div className='flex align-middle'>
-                        <Button>Order Now</Button>
+                        <Button onClick={() => onButtonClick(products[currentSlide])}>Order Now</Button>
                     </div>
                 </div>
             </div> 
             </CardHeader>
             </Card>
+            {isOrder ? (
+            <Card>
+                <CardHeader>
+                    <div className='w-full flex flex-row'>
+                        <div className='w-full flex flex-col'>
+                            <h1></h1>
+                        </div>
+                    </div>
+                </CardHeader>
+            </Card>
+        ) : null}
             <div className='w-full flex flex-col'>
                 <h1 className='font-bold mb-2'>Recommended</h1>
                 <div className='w-full grid grid-cols-2 gap-4'>
